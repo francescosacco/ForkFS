@@ -1,7 +1,11 @@
 BSD 2-Clause License
 
-Copyright (c) 2016, Francesco Sacco
+Copyright (c) 20xx, ChaN
 All rights reserved.
+
+FatFs module is an open source software. Redistribution and use of FatFs in
+source and binary forms, with or without modification, are permitted provided
+that the following condition is met:
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
