@@ -1,15 +1,13 @@
-FatFs Module Source Files R0.12a
+ForkFs Module Source Files V0.0 - Based on FatFS, from ELM-Chan.
 
 
 FILES
 
   00readme.txt This file.
-  history.txt  Revision history.
   ffconf.h     Configuration file for FatFs module.
   ff.h         Common include file for FatFs and application module.
   ff.c         FatFs module.
   diskio.h     Common include file for FatFs and disk I/O module.
-  diskio.c     An example of glue function to attach existing disk I/O module to FatFs.
   integer.h    Integer type definitions for FatFs.
   option       Optional external functions.
 
