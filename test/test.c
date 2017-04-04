@@ -3,7 +3,9 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 0 )
+#define VERSION_NUMBER                           ( 1 )
+
+#define FRESULT_POSITION                         ( 57 )
 
 void print_FRESULT( const char * str , FRESULT in ) ;
 
@@ -19,21 +21,21 @@ int main( int argc , char * argv[] )
     printf( "ForkFS - Test Software - Version: %03d\n" , VERSION_NUMBER ) ;
   
     ffRet = f_mkfs( "" , FM_ANY , 0 , workBuffer , sizeof( workBuffer ) ) ;
-    print_FRESULT( "f_mkfs()" , ffRet ) ;
+    print_FRESULT( "f_mkfs(\"\",FM_ANY,0,workBuffer,sizeof(workBuffer))" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
 
     ffRet = f_mount( &fatFs , "0:" , 0 ) ;
-    print_FRESULT( "f_mount()" , ffRet ) ;
+    print_FRESULT( "f_mount( &fatFs , \"0:\" , 0 )" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
   
     ffRet = f_open( &file, "file.bin" , FA_WRITE | FA_CREATE_ALWAYS ) ;
-    print_FRESULT( "f_open()" , ffRet ) ;
+    print_FRESULT( "f_open(&file,\"file.bin\",FA_WRITE|FA_CREATE_ALWAYS)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
@@ -41,19 +43,71 @@ int main( int argc , char * argv[] )
     
     ( void ) memset( buffer , 0x5A , sizeof( buffer ) ) ;
     ffRet = f_write( &file , ( const void * ) buffer , sizeof( buffer ) , &bw );
-    print_FRESULT( "f_write()" , ffRet ) ;
+    print_FRESULT( "f_write(&file,(const void *)buffer,sizeof(buffer),&bw)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
+	if( bw != sizeof( buffer ) )
+    {
+        printf( "\t\tbw -> %d != %d\n" , bw , sizeof( buffer ) ) ;
+        return( -1 ) ;
+    }
  
     ffRet = f_close( &file );
-    print_FRESULT( "f_close()" , ffRet ) ;
+    print_FRESULT( "f_close(&file)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
   
+    ffRet = f_open( &file , "file.bin" , FA_READ ) ;
+    print_FRESULT( "f_open(&file,\"file.bin\",FA_READ)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    ( void ) memset( buffer , 0x00 , sizeof( buffer ) ) ;
+    ffRet = f_read( &file , ( void * ) buffer , sizeof( buffer ) , &bw ) ;
+    print_FRESULT( "f_read(&file,(void *)buffer,sizeof(buffer),&bw)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+	if( bw != sizeof( buffer ) )
+    {
+        printf( "\t\tbw -> %d != %d\n" , bw , sizeof( buffer ) ) ;
+        return( -1 ) ;
+    }
+
+	if( f_size( &file ) != sizeof( buffer ) )
+	{
+        printf( "\t\tf_size() -> %d != %d\n" , ( int ) f_size( &file ) , sizeof( buffer ) ) ;
+		return( -1 ) ;
+	}
+	
+    ffRet = f_close( &file );
+    print_FRESULT( "f_close(&file)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+	
+	ffRet = f_mkdir( "/testdir" ) ;
+    print_FRESULT( "f_mkdir(\"/testdir\")" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+	
+	ffRet = f_rename( "file.bin" , "/testdir/data.mem" ) ;
+    print_FRESULT( "f_rename(\"file.bin\",\"/testdir/data.mem\")" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+	
     return( 0 ) ;
 }
 
@@ -63,7 +117,7 @@ void print_FRESULT( const char * str , FRESULT in )
     
     numPrinted = printf( "\t%s" , str ) ;
     
-    numPrinted = ( numPrinted < 50 ) ? ( 50 - numPrinted ) : ( 0 ) ;
+    numPrinted = ( numPrinted < FRESULT_POSITION ) ? ( FRESULT_POSITION - numPrinted ) : ( 0 ) ;
     while( numPrinted-- )
     {
         ( void ) putchar( ' ' ) ;
