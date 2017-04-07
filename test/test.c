@@ -3,11 +3,43 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 1 )
+#define VERSION_NUMBER                           ( 2 )
 
 #define FRESULT_POSITION                         ( 57 )
 
 void print_FRESULT( const char * str , FRESULT in ) ;
+
+/* Tests:
+f_open() .............. OK
+f_close() ............. OK
+f_read() .............. OK
+f_write() ............. OK
+f_lseek()
+f_truncate()
+f_sync()
+f_opendir()
+f_closedir()
+f_readdir()
+f_findfirst()
+f_findnext()
+f_mkdir() ............. OK
+f_unlink()
+f_rename() ............ OK
+f_stat()
+f_chmod()
+f_utime()
+f_chdir()
+f_chdrive()
+f_getcwd()
+f_getfree()
+f_getlabel()
+f_setlabel()
+f_forward()
+f_expand()
+f_mount() ............. OK
+f_mkfs() .............. OK
+f_fdisk()
+*/
 
 int main( int argc , char * argv[] )
 {
@@ -103,6 +135,39 @@ int main( int argc , char * argv[] )
 	
 	ffRet = f_rename( "file.bin" , "/testdir/data.mem" ) ;
     print_FRESULT( "f_rename(\"file.bin\",\"/testdir/data.mem\")" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    ffRet = f_open( &file, "/testdir/data.mem" , FA_WRITE ) ;
+    print_FRESULT( "f_open(&file,\"/testdir/data.mem\",FA_WRITE)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+	if( f_size( &file ) != sizeof( buffer ) )
+	{
+        printf( "\t\tf_size() -> %d != %d\n" , ( int ) f_size( &file ) , sizeof( buffer ) ) ;
+		return( -1 ) ;
+	}
+	
+    ffRet = f_truncate( &file );
+    print_FRESULT( "f_truncate(&file)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+	if( f_size( &file ) != 0 )
+	{
+        printf( "\t\tf_size() -> %d != %d\n" , ( int ) f_size( &file ) , 0 ) ;
+		return( -1 ) ;
+	}
+
+    ffRet = f_close( &file );
+    print_FRESULT( "f_close(&file)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
