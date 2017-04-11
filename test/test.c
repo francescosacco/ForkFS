@@ -3,7 +3,7 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 2 )
+#define VERSION_NUMBER                           ( 3 )
 
 #define FRESULT_POSITION                         ( 57 )
 
@@ -15,7 +15,7 @@ f_close() ............. OK
 f_read() .............. OK
 f_write() ............. OK
 f_lseek()
-f_truncate()
+f_truncate() .......... OK
 f_sync()
 f_opendir()
 f_closedir()
@@ -38,9 +38,16 @@ f_forward()
 f_expand()
 f_mount() ............. OK
 f_mkfs() .............. OK
-f_fdisk()
+f_fdisk() ............. OK
 */
 
+/* Volume management table defined by user (required when _MULTI_PARTITION == 1) */
+PARTITION VolToPart[] =
+{
+    { 0 , 1 } ,   /* "0:" ==> Physical drive 0, 1st partition */
+    { 0 , 2 } ,   /* "1:" ==> Physical drive 0, 2nd partition */
+    { 1 , 0 }     /* "2:" ==> Physical drive 1, Autodetect */
+};
 int main( int argc , char * argv[] )
 {
     unsigned char workBuffer[ _MAX_SS ] ;
@@ -52,8 +59,24 @@ int main( int argc , char * argv[] )
     
     printf( "ForkFS - Test Software - Version: %03d\n" , VERSION_NUMBER ) ;
   
-    ffRet = f_mkfs( "" , FM_ANY , 0 , workBuffer , sizeof( workBuffer ) ) ;
-    print_FRESULT( "f_mkfs(\"\",FM_ANY,0,workBuffer,sizeof(workBuffer))" , ffRet ) ;
+    DWORD plist[] = { 50 , 50 , 0 , 0 } ;  // Divide the drive into two partitions.
+	
+	ffRet = f_fdisk( 0 , plist , workBuffer ) ;
+    print_FRESULT( "f_fdisk(0,plist,workBuffer)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+  
+    ffRet = f_mkfs( "0:" , FM_ANY , 0 , workBuffer , sizeof( workBuffer ) ) ;
+    print_FRESULT( "f_mkfs(\"0:\",FM_ANY,0,workBuffer,sizeof(workBuffer))" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    ffRet = f_mkfs( "1:" , FM_ANY , 0 , workBuffer , sizeof( workBuffer ) ) ;
+    print_FRESULT( "f_mkfs(\"1:\",FM_ANY,0,workBuffer,sizeof(workBuffer))" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
@@ -168,6 +191,13 @@ int main( int argc , char * argv[] )
 
     ffRet = f_close( &file );
     print_FRESULT( "f_close(&file)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+	
+	ffRet = f_unlink( "/testdir/data.mem" ) ;
+    print_FRESULT( "f_unlink(\"/testdir/data.mem\")" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 

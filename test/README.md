@@ -1,6 +1,10 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-04-11 - Version 003 - Added more tests to check the File System.
+  * Added f_unlink() test.
+  * Added f_disk() test.
+
 * 2017-04-07 - Version 002 - Added more tests to check the File System.
   * Added f_truncate() test.
 

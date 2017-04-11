@@ -43,4 +43,4 @@ test: test.o diskio.o ff.o ccsbcs.o
 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
     
 clean:
-	rm test.o diskio.o ff.o ccsbcs.o test.exe
+	rm -f test.o diskio.o ff.o ccsbcs.o test.exe filedisk.dsk
