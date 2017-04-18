@@ -3,7 +3,7 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 3 )
+#define VERSION_NUMBER                           ( 4 )
 
 #define FRESULT_POSITION                         ( 57 )
 
@@ -17,9 +17,9 @@ f_write() ............. OK
 f_lseek()
 f_truncate() .......... OK
 f_sync()
-f_opendir()
-f_closedir()
-f_readdir()
+f_opendir() ........... OK
+f_closedir() .......... OK
+f_readdir() ........... OK
 f_findfirst()
 f_findnext()
 f_mkdir() ............. OK
@@ -28,7 +28,7 @@ f_rename() ............ OK
 f_stat()
 f_chmod()
 f_utime()
-f_chdir()
+f_chdir() ............. OK
 f_chdrive()
 f_getcwd()
 f_getfree()
@@ -55,9 +55,12 @@ int main( int argc , char * argv[] )
     FRESULT ffRet ;
     FATFS fatFs ;
     FIL file ;
+	DIR dir ;
+	FILINFO fileInfo ;
     UINT bw ;
+	int i ;
     
-    printf( "ForkFS - Test Software - Version: %03d\n" , VERSION_NUMBER ) ;
+    printf( "ForkFS - Sanity Test Software - Version: %03d\n" , VERSION_NUMBER ) ;
   
     DWORD plist[] = { 50 , 50 , 0 , 0 } ;  // Divide the drive into two partitions.
 	
@@ -198,6 +201,119 @@ int main( int argc , char * argv[] )
 	
 	ffRet = f_unlink( "/testdir/data.mem" ) ;
     print_FRESULT( "f_unlink(\"/testdir/data.mem\")" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+	
+	ffRet = f_chdir( "/testdir" ) ;
+    print_FRESULT( "f_chdir(\"/testdir\")" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    ffRet = f_open( &file, "file.dat" , FA_WRITE | FA_CREATE_ALWAYS ) ;
+    print_FRESULT( "f_open(&file,\"file.dat\",FA_WRITE|FA_CREATE_ALWAYS)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+    
+    ( void ) memset( buffer , 0x5A , sizeof( buffer ) ) ;
+    ffRet = f_write( &file , ( const void * ) buffer , sizeof( buffer ) , &bw );
+    print_FRESULT( "f_write(&file,(const void *)buffer,sizeof(buffer),&bw)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+	if( bw != sizeof( buffer ) )
+    {
+        printf( "\t\tbw -> %d != %d\n" , bw , sizeof( buffer ) ) ;
+        return( -1 ) ;
+    }
+ 
+    ffRet = f_close( &file );
+    print_FRESULT( "f_close(&file)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+	ffRet = f_chdir( ".." ) ;
+    print_FRESULT( "f_chdir(\"..\")" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    ffRet = f_open( &file , "/testdir/file.dat" , FA_READ ) ;
+    print_FRESULT( "f_open(&file,\"/testdir/file.dat\",FA_READ)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    ( void ) memset( buffer , 0x00 , sizeof( buffer ) ) ;
+    ffRet = f_read( &file , ( void * ) buffer , sizeof( buffer ) , &bw ) ;
+    print_FRESULT( "f_read(&file,(void *)buffer,sizeof(buffer),&bw)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+	if( bw != sizeof( buffer ) )
+    {
+        printf( "\t\tbw -> %d != %d\n" , bw , sizeof( buffer ) ) ;
+        return( -1 ) ;
+    }
+
+	if( f_size( &file ) != sizeof( buffer ) )
+	{
+        printf( "\t\tf_size() -> %d != %d\n" , ( int ) f_size( &file ) , sizeof( buffer ) ) ;
+		return( -1 ) ;
+	}
+	
+    ffRet = f_close( &file );
+    print_FRESULT( "f_close(&file)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+	
+    ffRet = f_opendir( &dir , "/testdir" ) ;
+    print_FRESULT( "f_opendir(&dir,\"/testdir\")" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+	
+	for( i = 0 ; ; i++ )
+	{
+		ffRet = f_readdir( &dir , &fileInfo ) ;
+        print_FRESULT( "f_readdir(&dir,&fileInfo)" , ffRet ) ;
+        if( ffRet != FR_OK )
+        {
+            return( -1 ) ; 
+        }
+		
+		if(  fileInfo.fname[ 0 ] == 0 )
+			break ;
+		
+		if( strcmp( "file.dat" , fileInfo.fname ) )
+		{
+            printf( "\t\tf_readdir() -> \"%s\" != \"%s\"\n" , fileInfo.fname , "file.dat" ) ;
+		    return( -1 ) ;
+		}
+		
+        if( fileInfo.fsize != sizeof( buffer ) )
+	    {
+            printf( "\t\tf_readdir() -> %d != %d\n" , ( int ) fileInfo.fsize , sizeof( buffer ) ) ;
+		    return( -1 ) ;
+	    }
+	}
+	
+    ffRet = f_closedir( &dir );
+    print_FRESULT( "f_closedir(&dir)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 

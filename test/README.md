@@ -1,6 +1,13 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-04-18 - Version 004 - Added more tests to check the File System.
+  * Added f_chdir() test.
+  * Added f_opendir() test.
+  * Added f_readdir() test.
+  * Added f_closedir() test.
+  * Changed the software name to "Sanity Test Software".
+
 * 2017-04-11 - Version 003 - Added more tests to check the File System.
   * Added f_unlink() test.
   * Added f_disk() test.
