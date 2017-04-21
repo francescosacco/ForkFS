@@ -3,7 +3,7 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 4 )
+#define VERSION_NUMBER                           ( 5 )
 
 #define FRESULT_POSITION                         ( 57 )
 
@@ -23,9 +23,9 @@ f_readdir() ........... OK
 f_findfirst()
 f_findnext()
 f_mkdir() ............. OK
-f_unlink()
+f_unlink() ............ OK
 f_rename() ............ OK
-f_stat()
+f_stat() .............. OK
 f_chmod()
 f_utime()
 f_chdir() ............. OK
@@ -267,6 +267,13 @@ int main( int argc , char * argv[] )
         return( -1 ) ;
     }
 
+	ffRet = f_sync( &file ) ;
+    print_FRESULT( "f_sync(&file)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
 	if( f_size( &file ) != sizeof( buffer ) )
 	{
         printf( "\t\tf_size() -> %d != %d\n" , ( int ) f_size( &file ) , sizeof( buffer ) ) ;
@@ -319,6 +326,13 @@ int main( int argc , char * argv[] )
         return( -1 ) ; 
     }
 	
+	ffRet = f_stat( "/testdir/file.dat" , &fileInfo ) ;
+    print_FRESULT( "f_stat(\"/testdir/file.dat\",&fileInfo)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+		
     return( 0 ) ;
 }
 

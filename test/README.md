@@ -1,6 +1,10 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-04-21 - Version 005 - Added more tests to check the File System.
+  * Added f_stat() test.
+  * Added f_sync() test.
+
 * 2017-04-18 - Version 004 - Added more tests to check the File System.
   * Added f_chdir() test.
   * Added f_opendir() test.
