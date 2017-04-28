@@ -1,6 +1,12 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-04-28 - Version 006 - Added more tests to check the File System.
+  * Added f_getcwd() test.
+  * Added f_setlabel() test.
+  * Added f_getlabel() test.
+  * Added f_getfree() test.
+
 * 2017-04-21 - Version 005 - Added more tests to check the File System.
   * Added f_stat() test.
   * Added f_sync() test.
