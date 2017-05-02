@@ -1,6 +1,9 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-05-02 - Version 007 - Added more tests to check the File System.
+  * Added f_chmod() test.
+
 * 2017-04-28 - Version 006 - Added more tests to check the File System.
   * Added f_getcwd() test.
   * Added f_setlabel() test.

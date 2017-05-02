@@ -3,7 +3,7 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 6 )
+#define VERSION_NUMBER                           ( 7 )
 
 #define FRESULT_POSITION                         ( 57 )
 
@@ -26,7 +26,7 @@ f_mkdir() ............. OK
 f_unlink() ............ OK
 f_rename() ............ OK
 f_stat() .............. OK
-f_chmod()
+f_chmod() ............. OK
 f_utime()
 f_chdir() ............. OK
 f_chdrive()
@@ -364,6 +364,13 @@ int main( int argc , char * argv[] )
     
     ffRet = f_stat( "/testdir/file.dat" , &fileInfo ) ;
     print_FRESULT( "f_stat(\"/testdir/file.dat\",&fileInfo)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+	
+	ffRet = f_chmod( "/testdir/file.dat" , AM_RDO , AM_RDO | AM_ARC ) ;
+    print_FRESULT( "f_chmod(\"/testdir/file.dat\",AM_RDO,AM_RDO|AM_ARC)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
