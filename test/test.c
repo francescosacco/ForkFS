@@ -3,7 +3,7 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 7 )
+#define VERSION_NUMBER                           ( 8 )
 
 #define FRESULT_POSITION                         ( 57 )
 
@@ -27,7 +27,7 @@ f_unlink() ............ OK
 f_rename() ............ OK
 f_stat() .............. OK
 f_chmod() ............. OK
-f_utime()
+f_utime() ............. OK
 f_chdir() ............. OK
 f_chdrive()
 f_getcwd() ............ OK
@@ -368,12 +368,59 @@ int main( int argc , char * argv[] )
     {
         return( -1 ) ; 
     }
+    if( fileInfo.ftime != 0x0000 )
+    {
+        printf( "\t\tf_stat() ftime -> %04Xh != %04Xh\n" , ( unsigned short int ) fileInfo.ftime , 0x0000 ) ;
+        return( -1 ) ;
+    }
+    if( fileInfo.fdate != 0x4821 )
+    {
+        printf( "\t\tf_stat() fdate -> %04Xh != %04Xh\n" , ( unsigned short int ) fileInfo.fdate , 0x4821 ) ;
+        return( -1 ) ;
+    }
+    if( fileInfo.fattrib != 0x20 )
+    {
+        printf( "\t\tf_stat() fattrib -> %02Xh != %02Xh\n" , ( unsigned char ) fileInfo.fattrib , 0x20 ) ;
+        return( -1 ) ;
+    }
 	
-	ffRet = f_chmod( "/testdir/file.dat" , AM_RDO , AM_RDO | AM_ARC ) ;
+	ffRet = f_chmod( "/testdir/file.dat" , AM_RDO | AM_ARC , AM_RDO | AM_ARC ) ;
     print_FRESULT( "f_chmod(\"/testdir/file.dat\",AM_RDO,AM_RDO|AM_ARC)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
+    }
+
+    // Set date and time to 2017-05-03 20:02:44
+    fileInfo.fdate = ( WORD )( ( ( 2017 - 1980 ) * 512U ) | 5 * 32U | 3 ) ;
+    fileInfo.ftime = ( WORD )( 20 * 2048U | 2 * 32U | 44 / 2U ) ;
+    ffRet = f_utime( "/testdir/file.dat" , &fileInfo ) ;
+    print_FRESULT( "f_utime(\"/testdir/file.dat\",&fileInfo)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    ffRet = f_stat( "/testdir/file.dat" , &fileInfo ) ;
+    print_FRESULT( "f_stat(\"/testdir/file.dat\",&fileInfo)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+    if( fileInfo.ftime != 0xA056 )
+    {
+        printf( "\t\tf_stat() ftime -> %04Xh != %04Xh\n" , ( unsigned short int ) fileInfo.ftime , 0xA056 ) ;
+        return( -1 ) ;
+    }
+    if( fileInfo.fdate != 0x4AA3 )
+    {
+        printf( "\t\tf_stat() fdate -> %04Xh != %04Xh\n" , ( unsigned short int ) fileInfo.fdate , 0x4AA3 ) ;
+        return( -1 ) ;
+    }
+    if( fileInfo.fattrib != 0x21 )
+    {
+        printf( "\t\tf_stat() fattrib -> %02Xh != %02Xh\n" , ( unsigned char ) fileInfo.fattrib , 0x21 ) ;
+        return( -1 ) ;
     }
     
     ffRet = f_getfree( "0:" , &freeClust , &fatFsPointer ) ;
