@@ -1,6 +1,9 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-05-09 - Version 009 - Changed to support Linux GCC.
+  * Changed diskio.c to use fseek() instead of fsetpos().
+
 * 2017-05-05 - Version 008 - Added more tests to check the File System.
   * Added FILINFO test, from f_stat().
   * Added f_utime() test.

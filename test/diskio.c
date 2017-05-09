@@ -130,7 +130,7 @@ DRESULT disk_read (
 )
 {
     DRESULT res ;
-    fpos_t position ;
+    long position ;
 
     // Is the correct driver?
     if( pdrv == 0 )
@@ -141,8 +141,9 @@ DRESULT disk_read (
             // Yes.
             
             // So, set the position.
-            position = ( fpos_t ) ( sector * FILEDISK_SECTOR_SIZE ) ;
-            ( void ) fsetpos( fileDisk , &position ) ;
+            position  = ( long ) ( sector               ) ;
+            position *= ( long ) ( FILEDISK_SECTOR_SIZE ) ;
+            ( void ) fseek( fileDisk , position , SEEK_SET) ;
             
             // Read 
             ( void ) fread( buff , sizeof( BYTE ) , count * FILEDISK_SECTOR_SIZE , fileDisk ) ;
@@ -182,7 +183,7 @@ DRESULT disk_write (
 )
 {
     DRESULT res ;
-    fpos_t position ;
+    long position ;
 
     // Is the correct driver?
     if( pdrv == 0 )
@@ -193,8 +194,9 @@ DRESULT disk_write (
             // Yes.
             
             // So, set the position.
-            position = ( fpos_t ) ( sector * FILEDISK_SECTOR_SIZE ) ;
-            ( void ) fsetpos( fileDisk , &position ) ;
+            position  = ( long ) ( sector               ) ;
+            position *= ( long ) ( FILEDISK_SECTOR_SIZE ) ;
+            ( void ) fseek( fileDisk , position , SEEK_SET ) ;
             
             // Read 
             ( void ) fwrite( buff , sizeof( BYTE ) , count * FILEDISK_SECTOR_SIZE , fileDisk ) ;

@@ -3,7 +3,7 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 8 )
+#define VERSION_NUMBER                           ( 9 )
 
 #define FRESULT_POSITION                         ( 57 )
 
