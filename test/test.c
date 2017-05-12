@@ -3,7 +3,7 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 9 )
+#define VERSION_NUMBER                           ( 10 )
 
 #define FRESULT_POSITION                         ( 57 )
 
@@ -14,7 +14,7 @@ f_open() .............. OK
 f_close() ............. OK
 f_read() .............. OK
 f_write() ............. OK
-f_lseek()
+f_lseek() ............. OK
 f_truncate() .......... OK
 f_sync() .............. OK
 f_opendir() ........... OK
@@ -108,7 +108,7 @@ int main( int argc , char * argv[] )
         return( -1 ) ; 
     }
 
-    if( strcmp( buffer , "DISKTEST" ) != 0 )
+    if( strcmp( ( const char * ) buffer , "DISKTEST" ) != 0 )
     {
         printf( "\t\tWrong Label \"%s\"\n" , buffer ) ;
         return( -1 ) ;
@@ -134,6 +134,25 @@ int main( int argc , char * argv[] )
         return( -1 ) ;
     }
  
+    ffRet = f_lseek( &file , ( FSIZE_t ) ( sizeof( buffer ) / 2 ) ) ;
+    print_FRESULT( "f_lseek(&file,(FSIZE_t)(sizeof(buffer)/2))" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+    ( void ) memset( buffer , 0x3C , ( sizeof( buffer ) / 2 ) ) ;
+    ffRet = f_write( &file , ( const void * ) buffer , ( sizeof( buffer ) / 2 ) , &bw );
+    print_FRESULT( "f_write(&file,(const void *)buffer,sizeof(buffer),&bw)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+    if( bw != ( sizeof( buffer ) / 2 ) )
+    {
+        printf( "\t\tbw -> %d != %d\n" , bw , sizeof( buffer ) ) ;
+        return( -1 ) ;
+    }
+
     ffRet = f_close( &file );
     print_FRESULT( "f_close(&file)" , ffRet ) ;
     if( ffRet != FR_OK )
@@ -242,7 +261,7 @@ int main( int argc , char * argv[] )
     {
         return( -1 ) ; 
     }
-    if( strcmp( buffer , "0:/testdir" ) != 0 )
+    if( strcmp( ( const char * ) buffer , "0:/testdir" ) != 0 )
     {
         printf( "\t\tWrong Directory \"%s\"\n" , buffer ) ;
         return( -1 ) ;
@@ -432,7 +451,7 @@ int main( int argc , char * argv[] )
 
     if( ( freeClust * fatFsPointer->csize ) != 15996 )
     {
-        printf( "\t\tf_getfree() -> %u != %u\n" , ( unsigned long int ) ( freeClust * fatFsPointer->csize ) , 15996 ) ;
+        printf( "\t\tf_getfree() -> %lu != %lu\n" , ( unsigned long int ) ( freeClust * fatFsPointer->csize ) , ( unsigned long int ) 15996 ) ;
         return( -1 ) ;
     }
     
