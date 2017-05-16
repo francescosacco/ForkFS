@@ -3,7 +3,7 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 10 )
+#define VERSION_NUMBER                           ( 11 )
 
 #define FRESULT_POSITION                         ( 57 )
 
@@ -35,7 +35,7 @@ f_getfree() ........... OK
 f_getlabel() .......... OK
 f_setlabel() .......... OK
 f_forward()
-f_expand()
+f_expand() ............ OK
 f_mount() ............. OK
 f_mkfs() .............. OK
 f_fdisk() ............. OK
@@ -230,6 +230,19 @@ int main( int argc , char * argv[] )
     if( f_size( &file ) != 0 )
     {
         printf( "\t\tf_size() -> %d != %d\n" , ( int ) f_size( &file ) , 0 ) ;
+        return( -1 ) ;
+    }
+
+	ffRet = f_expand( &file , 1048576 , 1 ) ;
+    print_FRESULT( "f_expand(&file,1048576,1)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+	
+    if( f_size( &file ) != 1048576 )
+    {
+        printf( "\t\tf_size() -> %d != %d\n" , ( int ) f_size( &file ) , 1048576 ) ;
         return( -1 ) ;
     }
 

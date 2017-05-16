@@ -1,6 +1,10 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-05-16 - Version 011 - Added more tests to check the File System.
+  * Changed _USE_EXPAND to use f_expand().
+  * Added f_expand() test.
+
 * 2017-05-12 - Version 010 - Fixed warnings and added more test to check the File System.
   * Fixed Warning about cast using strcmp().
   * Fixed Warning about data type using printf().
