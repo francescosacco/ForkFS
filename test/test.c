@@ -3,7 +3,7 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 11 )
+#define VERSION_NUMBER                           ( 12 )
 
 #define FRESULT_POSITION                         ( 57 )
 
@@ -29,7 +29,7 @@ f_stat() .............. OK
 f_chmod() ............. OK
 f_utime() ............. OK
 f_chdir() ............. OK
-f_chdrive()
+f_chdrive() ........... OK
 f_getcwd() ............ OK
 f_getfree() ........... OK
 f_getlabel() .......... OK
@@ -53,7 +53,7 @@ int main( int argc , char * argv[] )
     unsigned char workBuffer[ _MAX_SS ] ;
     unsigned char buffer[ 1024 ] ;
     FRESULT ffRet ;
-    FATFS fatFs ;
+    FATFS fatFs[ _VOLUMES ] ;
     FIL file ;
     DIR dir ;
     FILINFO fileInfo ;
@@ -88,8 +88,15 @@ int main( int argc , char * argv[] )
         return( -1 ) ; 
     }
 
-    ffRet = f_mount( &fatFs , "0:" , 0 ) ;
-    print_FRESULT( "f_mount( &fatFs , \"0:\" , 0 )" , ffRet ) ;
+    ffRet = f_mount( &fatFs[ 0 ] , "0:" , 0 ) ;
+    print_FRESULT( "f_mount(&fatFs[0],\"0:\",0)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+  
+    ffRet = f_mount( &fatFs[ 1 ] , "1:" , 0 ) ;
+    print_FRESULT( "f_mount(&fatFs[1],\"1:\",0)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
@@ -468,6 +475,73 @@ int main( int argc , char * argv[] )
         return( -1 ) ;
     }
     
+    ffRet = f_open( &file, "1:/file.hex" , FA_WRITE | FA_CREATE_ALWAYS ) ;
+    print_FRESULT( "f_open(&file,\"1:/file.hex\",FA_WRITE|FA_CREATE_ALWAYS)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+    
+    ( void ) memset( buffer , 0x5A , sizeof( buffer ) ) ;
+    ffRet = f_write( &file , ( const void * ) buffer , sizeof( buffer ) , &bw );
+    print_FRESULT( "f_write(&file,(const void *)buffer,sizeof(buffer),&bw)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+    if( bw != sizeof( buffer ) )
+    {
+        printf( "\t\tbw -> %d != %d\n" , bw , sizeof( buffer ) ) ;
+        return( -1 ) ;
+    }
+ 
+    ffRet = f_close( &file );
+    print_FRESULT( "f_close(&file)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+	
+	ffRet = f_chdrive( "1:" ) ;
+    print_FRESULT( "f_chdrive(\"1:\")" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    ffRet = f_open( &file , "file.hex" , FA_READ ) ;
+    print_FRESULT( "f_open(&file,\"file.hex\",FA_READ)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    ( void ) memset( buffer , 0x00 , sizeof( buffer ) ) ;
+    ffRet = f_read( &file , ( void * ) buffer , sizeof( buffer ) , &bw ) ;
+    print_FRESULT( "f_read(&file,(void *)buffer,sizeof(buffer),&bw)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+    if( bw != sizeof( buffer ) )
+    {
+        printf( "\t\tbw -> %d != %d\n" , bw , sizeof( buffer ) ) ;
+        return( -1 ) ;
+    }
+
+    if( f_size( &file ) != sizeof( buffer ) )
+    {
+        printf( "\t\tf_size() -> %d != %d\n" , ( int ) f_size( &file ) , sizeof( buffer ) ) ;
+        return( -1 ) ;
+    }
+    
+    ffRet = f_close( &file );
+    print_FRESULT( "f_close(&file)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+	
     return( 0 ) ;
 }
 

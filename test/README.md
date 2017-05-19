@@ -1,6 +1,10 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-05-19 - Version 012 - Changed File System tests and added more tests.
+  * Changed File System struct to use buffer.
+  * Added f_chdrive() test.
+
 * 2017-05-16 - Version 011 - Added more tests to check the File System.
   * Changed _USE_EXPAND to use f_expand().
   * Added f_expand() test.
