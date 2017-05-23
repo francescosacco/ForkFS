@@ -3,7 +3,7 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 12 )
+#define VERSION_NUMBER                           ( 13 )
 
 #define FRESULT_POSITION                         ( 57 )
 
@@ -20,8 +20,8 @@ f_sync() .............. OK
 f_opendir() ........... OK
 f_closedir() .......... OK
 f_readdir() ........... OK
-f_findfirst()
-f_findnext()
+f_findfirst() ......... OK
+f_findnext() .......... OK
 f_mkdir() ............. OK
 f_unlink() ............ OK
 f_rename() ............ OK
@@ -50,10 +50,10 @@ PARTITION VolToPart[] =
 };
 int main( int argc , char * argv[] )
 {
-    unsigned char workBuffer[ _MAX_SS ] ;
+    unsigned char workBuffer[ FF_MAX_SS ] ;
     unsigned char buffer[ 1024 ] ;
     FRESULT ffRet ;
-    FATFS fatFs[ _VOLUMES ] ;
+    FATFS fatFs[ FF_VOLUMES ] ;
     FIL file ;
     DIR dir ;
     FILINFO fileInfo ;
@@ -412,9 +412,9 @@ int main( int argc , char * argv[] )
         printf( "\t\tf_stat() ftime -> %04Xh != %04Xh\n" , ( unsigned short int ) fileInfo.ftime , 0x0000 ) ;
         return( -1 ) ;
     }
-    if( fileInfo.fdate != 0x4821 )
+    if( fileInfo.fdate != 0x4A21 )
     {
-        printf( "\t\tf_stat() fdate -> %04Xh != %04Xh\n" , ( unsigned short int ) fileInfo.fdate , 0x4821 ) ;
+        printf( "\t\tf_stat() fdate -> %04Xh != %04Xh\n" , ( unsigned short int ) fileInfo.fdate , 0x4A21 ) ;
         return( -1 ) ;
     }
     if( fileInfo.fattrib != 0x20 )
@@ -542,6 +542,39 @@ int main( int argc , char * argv[] )
         return( -1 ) ; 
     }
 	
+    ffRet = f_findfirst( &dir , &fileInfo , "0:/testdir" , "*.dat" ) ;
+    print_FRESULT( "f_findfirst(&dir,&fileInfo,\"0:/testdir\",\"*.dat\")" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+	if( strcmp( "file.dat" , fileInfo.fname ) )
+    {
+        printf( "\t\tf_findfirst() -> \"%s\" != \"%s\"\n" , fileInfo.fname , "file.dat" ) ;
+        return( -1 ) ;
+    }
+
+    ffRet = f_findnext( &dir , &fileInfo ) ;
+    print_FRESULT( "f_findnext(&dir,&fileInfo\")" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+	
+	if( fileInfo.fname[ 0 ] )
+    {
+        printf( "\t\tf_findnext() -> \"%s\" != NULL\n" , fileInfo.fname ) ;
+        return( -1 ) ;
+    }
+
+    ffRet = f_closedir( &dir );
+    print_FRESULT( "f_closedir(&dir)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
     return( 0 ) ;
 }
 

@@ -1,9 +1,26 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-05-21 - [ELM-ChaN](http://elm-chan.org/) R0.13
+  * Changed heading character of configuration keywords "_" to "FF_".
+  * Removed ASCII-only configuration, FF_CODE_PAGE = 1. Use FF_CODE_PAGE = 437 instead.
+  * Added f_setcp(), run-time code page configuration. (FF_CODE_PAGE = 0)
+  * Improved cluster allocation time on stretch a deep buried cluster chain.
+  * Improved processing time of f_mkdir() with large cluster size by using FF_USE_LFN = 3.
+  * Improved NoFatChain flag of the fragmented file to be set after it is truncated and got contiguous.
+  * Fixed archive attribute is left not set when a file on the exFAT volume is renamed. (appeared at R0.12)
+  * Fixed exFAT FAT entry can be collapsed when write or lseek operation to the existing file is done. (appeared at R0.12c)
+  * Fixed creating a file can fail when a new cluster allocation to the exFAT directory occures. (appeared at R0.12c)
+
 * 2017-03-31 - 2017-03-31 - First version of the test project - 000.
 
-* 2016-10-13 - Added FatFS from ELM-ChaN version R0.12B
+* 2017-03-04 - [ELM-ChaN](http://elm-chan.org/) R0.12c
+  * Improved write throughput at the fragmented file on the exFAT volume.
+  * Made memory usage for exFAT be able to be reduced as decreasing _MAX_LFN.
+  * Fixed successive f_getfree() can return wrong count on the FAT12/16 volume. (appeared at R0.12)
+  * Fixed configuration option _VOLUMES cannot be set 10. (appeared at R0.10c)
+
+* 2016-10-13 - Added FatFS from ELM-ChaN version R0.12b
   * This initial code have no change from ELN-ChaN version.
   
 * 2016-09-04 - [ELM-ChaN](http://elm-chan.org/) R0.12b

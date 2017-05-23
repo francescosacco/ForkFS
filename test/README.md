@@ -1,6 +1,10 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-05-23 - Version 013 - Changed for FatFS R0.13 from ELM-ChaN.
+  * Fixed date check problems at f_stat().
+  * Changed Makefile.
+
 * 2017-05-19 - Version 012 - Changed File System tests and added more tests.
   * Changed File System struct to use buffer.
   * Added f_chdrive() test.

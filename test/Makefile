@@ -30,17 +30,17 @@
 
 CC=gcc
 CFLAGS=-c -Wall
-INCLUDES=-I../src/ -I../src/option/
+INCLUDES=-I../src/
 
-VPATH := ../src/ ../src/option/
+VPATH := ../src/
 
 all: test
 
-test: test.o diskio.o ff.o ccsbcs.o
-	$(CC) test.o diskio.o ff.o ccsbcs.o -o test.exe
+test: test.o diskio.o ff.o ffsystem.o ffunicode.o
+	$(CC) test.o diskio.o ff.o ffsystem.o ffunicode.o -o test.exe
 
 %.o : %.c    
 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
     
 clean:
-	rm -f test.o diskio.o ff.o ccsbcs.o test.exe filedisk.dsk
+	rm -f test.o diskio.o ff.o ffsystem.o ffunicode.o test.exe filedisk.dsk
