@@ -1,6 +1,9 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-05-26 - Version 014 - Added f_forward() test at the File System.
+  * Added f_forward() test.
+
 * 2017-05-23 - Version 013 - Changed for FatFS R0.13 from ELM-ChaN.
   * Fixed date check problems at f_stat().
   * Changed Makefile.

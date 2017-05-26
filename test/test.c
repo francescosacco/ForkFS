@@ -3,11 +3,12 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 13 )
-
+#define VERSION_NUMBER                           ( 14 )
 #define FRESULT_POSITION                         ( 57 )
+#define BUFFER_SIZE                              ( 1024 )
 
 void print_FRESULT( const char * str , FRESULT in ) ;
+UINT f_forward_Check( const BYTE * p , UINT btf ) ;
 
 /* Tests:
 f_open() .............. OK
@@ -34,7 +35,7 @@ f_getcwd() ............ OK
 f_getfree() ........... OK
 f_getlabel() .......... OK
 f_setlabel() .......... OK
-f_forward()
+f_forward() ........... OK
 f_expand() ............ OK
 f_mount() ............. OK
 f_mkfs() .............. OK
@@ -51,29 +52,29 @@ PARTITION VolToPart[] =
 int main( int argc , char * argv[] )
 {
     unsigned char workBuffer[ FF_MAX_SS ] ;
-    unsigned char buffer[ 1024 ] ;
+    unsigned char buffer[ BUFFER_SIZE ] ;
     FRESULT ffRet ;
     FATFS fatFs[ FF_VOLUMES ] ;
     FIL file ;
     DIR dir ;
     FILINFO fileInfo ;
-    UINT bw ;
+    UINT bw , bwt ;
     int i ;
-    
+
     FATFS * fatFsPointer ;
     DWORD freeClust ;
     
     printf( "ForkFS - Sanity Test Software - Version: %03d\n" , VERSION_NUMBER ) ;
-  
+
     DWORD plist[] = { 50 , 50 , 0 , 0 } ;  // Divide the drive into two partitions.
-    
+
     ffRet = f_fdisk( 0 , plist , workBuffer ) ;
     print_FRESULT( "f_fdisk(0,plist,workBuffer)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
-  
+
     ffRet = f_mkfs( "0:" , FM_ANY , 0 , workBuffer , sizeof( workBuffer ) ) ;
     print_FRESULT( "f_mkfs(\"0:\",FM_ANY,0,workBuffer,sizeof(workBuffer))" , ffRet ) ;
     if( ffRet != FR_OK )
@@ -94,14 +95,14 @@ int main( int argc , char * argv[] )
     {
         return( -1 ) ; 
     }
-  
+
     ffRet = f_mount( &fatFs[ 1 ] , "1:" , 0 ) ;
     print_FRESULT( "f_mount(&fatFs[1],\"1:\",0)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
-  
+
     ffRet = f_setlabel( "0:DiskTest" ) ;
     print_FRESULT( "f_setlabel(\"0:DiskTest\")" , ffRet ) ;
     if( ffRet != FR_OK )
@@ -120,14 +121,14 @@ int main( int argc , char * argv[] )
         printf( "\t\tWrong Label \"%s\"\n" , buffer ) ;
         return( -1 ) ;
     }
-  
+
     ffRet = f_open( &file, "file.bin" , FA_WRITE | FA_CREATE_ALWAYS ) ;
     print_FRESULT( "f_open(&file,\"file.bin\",FA_WRITE|FA_CREATE_ALWAYS)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
-    
+
     ( void ) memset( buffer , 0x5A , sizeof( buffer ) ) ;
     ffRet = f_write( &file , ( const void * ) buffer , sizeof( buffer ) , &bw );
     print_FRESULT( "f_write(&file,(const void *)buffer,sizeof(buffer),&bw)" , ffRet ) ;
@@ -140,7 +141,7 @@ int main( int argc , char * argv[] )
         printf( "\t\tbw -> %d != %d\n" , bw , sizeof( buffer ) ) ;
         return( -1 ) ;
     }
- 
+
     ffRet = f_lseek( &file , ( FSIZE_t ) ( sizeof( buffer ) / 2 ) ) ;
     print_FRESULT( "f_lseek(&file,(FSIZE_t)(sizeof(buffer)/2))" , ffRet ) ;
     if( ffRet != FR_OK )
@@ -166,7 +167,7 @@ int main( int argc , char * argv[] )
     {
         return( -1 ) ; 
     }
-  
+
     ffRet = f_open( &file , "file.bin" , FA_READ ) ;
     print_FRESULT( "f_open(&file,\"file.bin\",FA_READ)" , ffRet ) ;
     if( ffRet != FR_OK )
@@ -192,21 +193,21 @@ int main( int argc , char * argv[] )
         printf( "\t\tf_size() -> %d != %d\n" , ( int ) f_size( &file ) , sizeof( buffer ) ) ;
         return( -1 ) ;
     }
-    
+
     ffRet = f_close( &file );
     print_FRESULT( "f_close(&file)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
-    
+
     ffRet = f_mkdir( "/testdir" ) ;
     print_FRESULT( "f_mkdir(\"/testdir\")" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
-    
+
     ffRet = f_rename( "file.bin" , "/testdir/data.mem" ) ;
     print_FRESULT( "f_rename(\"file.bin\",\"/testdir/data.mem\")" , ffRet ) ;
     if( ffRet != FR_OK )
@@ -226,7 +227,7 @@ int main( int argc , char * argv[] )
         printf( "\t\tf_size() -> %d != %d\n" , ( int ) f_size( &file ) , sizeof( buffer ) ) ;
         return( -1 ) ;
     }
-    
+
     ffRet = f_truncate( &file );
     print_FRESULT( "f_truncate(&file)" , ffRet ) ;
     if( ffRet != FR_OK )
@@ -240,13 +241,13 @@ int main( int argc , char * argv[] )
         return( -1 ) ;
     }
 
-	ffRet = f_expand( &file , 1048576 , 1 ) ;
+    ffRet = f_expand( &file , 1048576 , 1 ) ;
     print_FRESULT( "f_expand(&file,1048576,1)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
-	
+
     if( f_size( &file ) != 1048576 )
     {
         printf( "\t\tf_size() -> %d != %d\n" , ( int ) f_size( &file ) , 1048576 ) ;
@@ -259,14 +260,14 @@ int main( int argc , char * argv[] )
     {
         return( -1 ) ; 
     }
-    
+
     ffRet = f_unlink( "/testdir/data.mem" ) ;
     print_FRESULT( "f_unlink(\"/testdir/data.mem\")" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
-    
+
     ffRet = f_chdir( "/testdir" ) ;
     print_FRESULT( "f_chdir(\"/testdir\")" , ffRet ) ;
     if( ffRet != FR_OK )
@@ -307,7 +308,7 @@ int main( int argc , char * argv[] )
         printf( "\t\tbw -> %d != %d\n" , bw , sizeof( buffer ) ) ;
         return( -1 ) ;
     }
- 
+
     ffRet = f_close( &file );
     print_FRESULT( "f_close(&file)" , ffRet ) ;
     if( ffRet != FR_OK )
@@ -354,21 +355,21 @@ int main( int argc , char * argv[] )
         printf( "\t\tf_size() -> %d != %d\n" , ( int ) f_size( &file ) , sizeof( buffer ) ) ;
         return( -1 ) ;
     }
-    
+
     ffRet = f_close( &file );
     print_FRESULT( "f_close(&file)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
-    
+
     ffRet = f_opendir( &dir , "/testdir" ) ;
     print_FRESULT( "f_opendir(&dir,\"/testdir\")" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
-    
+
     for( i = 0 ; ; i++ )
     {
         ffRet = f_readdir( &dir , &fileInfo ) ;
@@ -393,14 +394,14 @@ int main( int argc , char * argv[] )
             return( -1 ) ;
         }
     }
-    
+
     ffRet = f_closedir( &dir );
     print_FRESULT( "f_closedir(&dir)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
-    
+
     ffRet = f_stat( "/testdir/file.dat" , &fileInfo ) ;
     print_FRESULT( "f_stat(\"/testdir/file.dat\",&fileInfo)" , ffRet ) ;
     if( ffRet != FR_OK )
@@ -422,8 +423,8 @@ int main( int argc , char * argv[] )
         printf( "\t\tf_stat() fattrib -> %02Xh != %02Xh\n" , ( unsigned char ) fileInfo.fattrib , 0x20 ) ;
         return( -1 ) ;
     }
-	
-	ffRet = f_chmod( "/testdir/file.dat" , AM_RDO | AM_ARC , AM_RDO | AM_ARC ) ;
+
+    ffRet = f_chmod( "/testdir/file.dat" , AM_RDO | AM_ARC , AM_RDO | AM_ARC ) ;
     print_FRESULT( "f_chmod(\"/testdir/file.dat\",AM_RDO,AM_RDO|AM_ARC)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
@@ -461,7 +462,7 @@ int main( int argc , char * argv[] )
         printf( "\t\tf_stat() fattrib -> %02Xh != %02Xh\n" , ( unsigned char ) fileInfo.fattrib , 0x21 ) ;
         return( -1 ) ;
     }
-    
+
     ffRet = f_getfree( "0:" , &freeClust , &fatFsPointer ) ;
     print_FRESULT( "f_getfree(\"0:\",&freeClust,&fatFsPointer)" , ffRet ) ;
     if( ffRet != FR_OK )
@@ -474,14 +475,14 @@ int main( int argc , char * argv[] )
         printf( "\t\tf_getfree() -> %lu != %lu\n" , ( unsigned long int ) ( freeClust * fatFsPointer->csize ) , ( unsigned long int ) 15996 ) ;
         return( -1 ) ;
     }
-    
+
     ffRet = f_open( &file, "1:/file.hex" , FA_WRITE | FA_CREATE_ALWAYS ) ;
     print_FRESULT( "f_open(&file,\"1:/file.hex\",FA_WRITE|FA_CREATE_ALWAYS)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
-    
+
     ( void ) memset( buffer , 0x5A , sizeof( buffer ) ) ;
     ffRet = f_write( &file , ( const void * ) buffer , sizeof( buffer ) , &bw );
     print_FRESULT( "f_write(&file,(const void *)buffer,sizeof(buffer),&bw)" , ffRet ) ;
@@ -501,8 +502,8 @@ int main( int argc , char * argv[] )
     {
         return( -1 ) ; 
     }
-	
-	ffRet = f_chdrive( "1:" ) ;
+
+    ffRet = f_chdrive( "1:" ) ;
     print_FRESULT( "f_chdrive(\"1:\")" , ffRet ) ;
     if( ffRet != FR_OK )
     {
@@ -541,7 +542,7 @@ int main( int argc , char * argv[] )
     {
         return( -1 ) ; 
     }
-	
+
     ffRet = f_findfirst( &dir , &fileInfo , "0:/testdir" , "*.dat" ) ;
     print_FRESULT( "f_findfirst(&dir,&fileInfo,\"0:/testdir\",\"*.dat\")" , ffRet ) ;
     if( ffRet != FR_OK )
@@ -549,7 +550,7 @@ int main( int argc , char * argv[] )
         return( -1 ) ; 
     }
 
-	if( strcmp( "file.dat" , fileInfo.fname ) )
+    if( strcmp( "file.dat" , fileInfo.fname ) )
     {
         printf( "\t\tf_findfirst() -> \"%s\" != \"%s\"\n" , fileInfo.fname , "file.dat" ) ;
         return( -1 ) ;
@@ -561,8 +562,8 @@ int main( int argc , char * argv[] )
     {
         return( -1 ) ; 
     }
-	
-	if( fileInfo.fname[ 0 ] )
+
+    if( fileInfo.fname[ 0 ] )
     {
         printf( "\t\tf_findnext() -> \"%s\" != NULL\n" , fileInfo.fname ) ;
         return( -1 ) ;
@@ -575,21 +576,61 @@ int main( int argc , char * argv[] )
         return( -1 ) ; 
     }
 
+    ffRet = f_chdrive( "0:" ) ;
+    print_FRESULT( "f_chdrive(\"0:\")" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    ffRet = f_open( &file , "/testdir/file.dat" , FA_READ ) ;
+    print_FRESULT( "f_open(&file,\"/testdir/file.dat\",FA_READ)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    bwt = 0 ;
+    do
+    {
+        ffRet = f_forward( &file , f_forward_Check , sizeof( buffer ) , &bw ) ;
+        print_FRESULT( "f_forward(&file,out_stream,sizeof(buffer),&bw)" , ffRet ) ;
+        if( ffRet != FR_OK )
+        {
+            return( -1 ) ; 
+        }
+
+        if( bw != sizeof( buffer ) )
+        {
+            printf( "\t\tbw -> %d != %d\n" , bw , sizeof( buffer ) ) ;
+            return( -1 ) ;
+        }
+
+        bwt += bw ;
+    } while( bwt != sizeof( buffer ) ) ;
+
+    ffRet = f_close( &file );
+    print_FRESULT( "f_close(&file)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
     return( 0 ) ;
 }
 
 void print_FRESULT( const char * str , FRESULT in )
 {
     int numPrinted ;
-    
+
     numPrinted = printf( "\t%s" , str ) ;
-    
+
     numPrinted = ( numPrinted < FRESULT_POSITION ) ? ( FRESULT_POSITION - numPrinted ) : ( 0 ) ;
     while( numPrinted-- )
     {
         ( void ) putchar( ' ' ) ;
     }
-    
+
     switch( in )
     {
         case FR_OK :
@@ -676,4 +717,32 @@ void print_FRESULT( const char * str , FRESULT in )
             printf( "Unknown\n" ) ;
             break ;
     }
+}
+
+UINT f_forward_Check( const BYTE * p , UINT btf )
+{
+    UINT i ;
+
+    // Check Sense Call.
+    if( btf == 0 )
+    {
+        return( 1 ) ;
+    }
+
+    if( btf > BUFFER_SIZE )
+    {
+        printf( "\t\tbtf -> %d > %d\n" , btf , BUFFER_SIZE ) ;
+        return( 0 ) ;
+    }
+
+    for( i = 0 ; i < btf ; i++ )
+    {
+        if( p[ i ] != 0x5A )
+        {
+            printf( "\t\tp[ %d ] -> %02Xh != %02Xh\n" , i , p[ i ] , 0x5A ) ;
+            return( 0 ) ;
+        }
+    }
+
+    return( btf ) ;
 }
