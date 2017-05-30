@@ -3,14 +3,15 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 14 )
-#define FRESULT_POSITION                         ( 57 )
+#define VERSION_NUMBER                           ( 15 )
+#define FRESULT_POSITION                         ( 62 )
 #define BUFFER_SIZE                              ( 1024 )
 
 void print_FRESULT( const char * str , FRESULT in ) ;
 UINT f_forward_Check( const BYTE * p , UINT btf ) ;
 
 /* Tests:
+
 f_open() .............. OK
 f_close() ............. OK
 f_read() .............. OK
@@ -40,6 +41,11 @@ f_expand() ............ OK
 f_mount() ............. OK
 f_mkfs() .............. OK
 f_fdisk() ............. OK
+f_setcp()
+f_putc()
+f_puts()
+f_printf() ............ OK
+f_gets()
 */
 
 /* Volume management table defined by user (required when _MULTI_PARTITION == 1) */
@@ -59,7 +65,7 @@ int main( int argc , char * argv[] )
     DIR dir ;
     FILINFO fileInfo ;
     UINT bw , bwt ;
-    int i ;
+    int i , stdRet ;
 
     FATFS * fatFsPointer ;
     DWORD freeClust ;
@@ -425,7 +431,7 @@ int main( int argc , char * argv[] )
     }
 
     ffRet = f_chmod( "/testdir/file.dat" , AM_RDO | AM_ARC , AM_RDO | AM_ARC ) ;
-    print_FRESULT( "f_chmod(\"/testdir/file.dat\",AM_RDO,AM_RDO|AM_ARC)" , ffRet ) ;
+    print_FRESULT( "f_chmod(\"/testdir/file.dat\",AM_RDO|AM_ARC,AM_RDO|AM_ARC)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
@@ -608,6 +614,45 @@ int main( int argc , char * argv[] )
 
         bwt += bw ;
     } while( bwt != sizeof( buffer ) ) ;
+
+    ffRet = f_close( &file );
+    print_FRESULT( "f_close(&file)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    ffRet = f_chmod( "/testdir/file.dat" , AM_ARC , AM_RDO | AM_ARC ) ;
+    print_FRESULT( "f_chmod(\"/testdir/file.dat\",AM_ARC,AM_RDO|AM_ARC)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    ffRet = f_unlink( "/testdir/file.dat" ) ;
+    print_FRESULT( "f_unlink(\"/testdir/file.dat\")" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    ffRet = f_open( &file , "/testdir/file.dat" , FA_WRITE | FA_CREATE_ALWAYS ) ;
+    print_FRESULT( "f_open(&file,\"/testdir/file.dat\",FA_WRITE|FA_CREATE_ALWAYS)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+	
+	stdRet = f_printf( &file , "%08X" , 0x12345678 ) ;
+	if(  stdRet == 8 )
+	{
+		printf( "\tf_printf(&file,\"%%08X\",0x12345678)                            OK\n" ) ;
+	}
+	else
+    {
+		printf( "\t\tstdRet -> %d != %d\n" , bw , 8 ) ;
+		return( -1 ) ;
+	}
 
     ffRet = f_close( &file );
     print_FRESULT( "f_close(&file)" , ffRet ) ;
