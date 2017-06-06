@@ -3,7 +3,7 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 15 )
+#define VERSION_NUMBER                           ( 16 )
 #define FRESULT_POSITION                         ( 62 )
 #define BUFFER_SIZE                              ( 1024 )
 
@@ -42,7 +42,7 @@ f_mount() ............. OK
 f_mkfs() .............. OK
 f_fdisk() ............. OK
 f_setcp()
-f_putc()
+f_putc() .............. OK
 f_puts()
 f_printf() ............ OK
 f_gets()
@@ -281,7 +281,7 @@ int main( int argc , char * argv[] )
         return( -1 ) ; 
     }
 
-    memset( buffer , '\0' , sizeof( buffer ) ) ;
+    ( void ) memset( buffer , '\0' , sizeof( buffer ) ) ;
     ffRet = f_getcwd( ( TCHAR * ) buffer , sizeof( buffer ) ) ;
     print_FRESULT( "f_getcwd((TCHAR*)buffer,sizeof(buffer))" , ffRet ) ;
     if( ffRet != FR_OK )
@@ -636,24 +636,62 @@ int main( int argc , char * argv[] )
         return( -1 ) ; 
     }
 
-    ffRet = f_open( &file , "/testdir/file.dat" , FA_WRITE | FA_CREATE_ALWAYS ) ;
+    ffRet = f_open( &file , "/testdir/file.dat" , FA_WRITE | FA_READ | FA_CREATE_ALWAYS ) ;
     print_FRESULT( "f_open(&file,\"/testdir/file.dat\",FA_WRITE|FA_CREATE_ALWAYS)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
-	
-	stdRet = f_printf( &file , "%08X" , 0x12345678 ) ;
-	if(  stdRet == 8 )
-	{
-		printf( "\tf_printf(&file,\"%%08X\",0x12345678)                            OK\n" ) ;
-	}
-	else
+    
+    stdRet = f_printf( &file , "%08X" , 0x12345678 ) ;
+    if( stdRet == 8 )
     {
-		printf( "\t\tstdRet -> %d != %d\n" , bw , 8 ) ;
-		return( -1 ) ;
-	}
+        printf( "\tf_printf(&file,\"%%08X\",0x12345678)                            OK\n" ) ;
+    }
+    else
+    {
+        printf( "\t\tstdRet -> %d != %d\n" , stdRet , 8 ) ;
+        return( -1 ) ;
+    }
 
+    stdRet = f_putc( 'X' , &file ) ;
+    if( stdRet == 1 )
+    {
+        printf( "\tf_putc('X',&file)                                            OK\n" ) ;
+    }
+    else
+    {
+        printf( "\t\tstdRet -> %d != %d\n" , stdRet , 1 ) ;
+        return( -1 ) ;
+    }
+
+    
+    ffRet = f_lseek( &file , ( FSIZE_t ) ( 0 ) ) ;
+    print_FRESULT( "f_lseek(&file,(FSIZE_t)(0))" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+    
+    ( void ) memset( buffer , '\0' , sizeof( buffer ) ) ;
+    ffRet = f_read( &file , ( void * ) buffer , 9 , &bw ) ;
+    print_FRESULT( "f_read(&file,(void *)buffer,sizeof(buffer),&bw)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+    if( bw != 9 )
+    {
+        printf( "\t\tbw -> %d != %d\n" , bw , 9 ) ;
+        return( -1 ) ;
+    }
+    
+    if( strcmp( ( const char * ) buffer , "12345678X" ) != 0 )
+    {
+        printf( "\t\tWrong data \"%s\"\n" , buffer ) ;
+        return( -1 ) ;
+    }
+    
     ffRet = f_close( &file );
     print_FRESULT( "f_close(&file)" , ffRet ) ;
     if( ffRet != FR_OK )

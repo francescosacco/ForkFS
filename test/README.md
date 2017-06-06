@@ -1,6 +1,10 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-06-06 - Version 016 - Improved f_printf() and add f_putc() test.
+  * Improved f_printf() test.
+  * Added f_putc() test.
+
 * 2017-05-30 - Version 015 - Added f_printf() test at the File System.
   * Added f_printf() test.
 
