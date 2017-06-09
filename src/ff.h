@@ -50,19 +50,33 @@ extern PARTITION VolToPart[];	/* Volume - Partition resolution table */
 /* Type of path name strings on FatFs API */
 
 #if FF_LFN_UNICODE && FF_USE_LFN	/* Unicode (UTF-16) string */
-#ifndef _INC_TCHAR
-typedef WCHAR TCHAR;
-#define _T(x) L ## x
-#define _TEXT(x) L ## x
-#define _INC_TCHAR
-#endif
+  #ifndef _INC_TCHAR
+    typedef WCHAR TCHAR;
+    
+	#ifndef _T
+	  #define _T(x) L ## x
+	#endif
+    
+	#ifndef _TEXT
+	  #define _TEXT(x) L ## x
+	#endif
+
+    #define _INC_TCHAR
+  #endif
 #else						/* ANSI/OEM string */
-#ifndef _INC_TCHAR
-typedef char TCHAR;
-#define _T(x) x
-#define _TEXT(x) x
-#define _INC_TCHAR
-#endif
+  #ifndef _INC_TCHAR
+    typedef char TCHAR;
+
+	#ifndef _T
+      #define _T(x) x
+	#endif
+
+	#ifndef _TEXT
+      #define _TEXT(x) x
+	#endif
+
+    #define _INC_TCHAR
+  #endif
 #endif
 
 

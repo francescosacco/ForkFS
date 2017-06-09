@@ -1,6 +1,8 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-06-09 - Fixed warnings using MingW 5.3.0 Version.
+
 * 2017-05-21 - [ELM-ChaN](http://elm-chan.org/) R0.13
   * Changed heading character of configuration keywords "_" to "FF_".
   * Removed ASCII-only configuration, FF_CODE_PAGE = 1. Use FF_CODE_PAGE = 437 instead.
@@ -12,7 +14,7 @@ It's a fork from FatFS. The original project is from ELM-Chan.
   * Fixed exFAT FAT entry can be collapsed when write or lseek operation to the existing file is done. (appeared at R0.12c)
   * Fixed creating a file can fail when a new cluster allocation to the exFAT directory occures. (appeared at R0.12c)
 
-* 2017-03-31 - 2017-03-31 - First version of the test project - 000.
+* 2017-03-31 - First version of the test project - 000.
 
 * 2017-03-04 - [ELM-ChaN](http://elm-chan.org/) R0.12c
   * Improved write throughput at the fragmented file on the exFAT volume.
