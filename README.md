@@ -1,6 +1,10 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-06-13 - Changed Integer Types.
+  * Change BYTE type to uint8_t. Close #3
+  * Change TAB to space.
+
 * 2017-06-09 - Fixed warnings using MingW 5.3.0 Version.
 
 * 2017-05-21 - [ELM-ChaN](http://elm-chan.org/) R0.13
