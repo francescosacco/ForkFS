@@ -19,8 +19,6 @@ typedef int				INT;
 typedef unsigned int	UINT;
 
 /* These types MUST be 16-bit */
-typedef short			SHORT;
-typedef unsigned short	WORD;
 typedef unsigned short	WCHAR;
 
 /* These types MUST be 32-bit */

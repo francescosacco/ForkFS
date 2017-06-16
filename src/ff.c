@@ -250,7 +250,7 @@ typedef struct {
 	FATFS *fs;		/* Object ID 1, volume (NULL:blank entry) */
 	DWORD clu;		/* Object ID 2, containing directory (0:root) */
 	DWORD ofs;		/* Object ID 3, offset in the directory */
-	WORD ctr;		/* Object open counter, 0:none, 0x01..0xFF:read mode open count, 0x100:write mode */
+	uint16_t ctr;		/* Object open counter, 0:none, 0x01..0xFF:read mode open count, 0x100:write mode */
 } FILESEM;
 #endif
 
@@ -425,7 +425,7 @@ typedef struct {
 #error Wrong FF_VOLUMES setting
 #endif
 static FATFS *FatFs[FF_VOLUMES];	/* Pointer to the filesystem objects (logical drives) */
-static WORD Fsid;					/* File system mount ID */
+static uint16_t Fsid;					/* File system mount ID */
 
 #if FF_FS_RPATH != 0 && FF_VOLUMES >= 2
 static uint8_t CurrVol;				/* Current drive */
@@ -496,7 +496,7 @@ static WCHAR LfnBuf[FF_MAX_LFN + 1];		/* LFN working buffer */
 
 #if FF_CODE_PAGE == 0		/* Run-time code page configuration */
 #define CODEPAGE CodePage
-static WORD CodePage;	/* Current code page */
+static uint16_t CodePage;	/* Current code page */
 static const uint8_t *ExCvt, *DbcTbl;	/* Pointer to current SBCS up-case table and DBCS code range table below */
 static const uint8_t Ct437[] = TBL_CT437;
 static const uint8_t Ct720[] = TBL_CT720;
@@ -545,9 +545,9 @@ static const uint8_t DbcTbl[] = MKCVTBL(TBL_DC, FF_CODE_PAGE);
 /*-----------------------------------------------------------------------*/
 
 static
-WORD ld_word (const uint8_t* ptr)	/*	 Load a 2-byte little-endian word */
+uint16_t ld_word (const uint8_t* ptr)	/*	 Load a 2-byte little-endian word */
 {
-	WORD rv;
+	uint16_t rv;
 
 	rv = ptr[1];
 	rv = rv << 8 | ptr[0];
@@ -586,7 +586,7 @@ QWORD ld_qword (const uint8_t* ptr)	/* Load an 8-byte little-endian word */
 
 #if !FF_FS_READONLY
 static
-void st_word (uint8_t* ptr, WORD val)	/* Store a 2-byte word in little-endian */
+void st_word (uint8_t* ptr, uint16_t val)	/* Store a 2-byte word in little-endian */
 {
 	*ptr++ = (uint8_t)val; val >>= 8;
 	*ptr++ = (uint8_t)val;
@@ -827,7 +827,7 @@ FRESULT dec_lock (	/* Decrement object open counter */
 	UINT i			/* Semaphore index (1..) */
 )
 {
-	WORD n;
+	uint16_t n;
 	FRESULT res;
 
 
@@ -1085,7 +1085,7 @@ FRESULT put_fat (	/* FR_OK(0):succeeded, !=0:error */
 		case FS_FAT16 :
 			res = move_window(fs, fs->fatbase + (clst / (SS(fs) / 2)));
 			if (res != FR_OK) break;
-			st_word(fs->win + clst * 2 % SS(fs), (WORD)val);	/* Simple WORD array */
+			st_word(fs->win + clst * 2 % SS(fs), (uint16_t)val);	/* Simple WORD array */
 			fs->wflag = 1;
 			break;
 
@@ -1696,9 +1696,9 @@ void st_clust (
 	DWORD cl	/* Value to be set */
 )
 {
-	st_word(dir + DIR_FstClusLO, (WORD)cl);
+	st_word(dir + DIR_FstClusLO, (uint16_t)cl);
 	if (fs->fs_type == FS_FAT32) {
-		st_word(dir + DIR_FstClusHI, (WORD)(cl >> 16));
+		st_word(dir + DIR_FstClusHI, (uint16_t)(cl >> 16));
 	}
 }
 #endif
@@ -1904,12 +1904,12 @@ uint8_t sum_sfn (
 /*-----------------------------------------------------------------------*/
 
 static
-WORD xdir_sum (			/* Get checksum of the directoly entry block */
+uint16_t xdir_sum (			/* Get checksum of the directoly entry block */
 	const uint8_t* dir		/* Directory entry block to be calculated */
 )
 {
 	UINT i, szblk;
-	WORD sum;
+	uint16_t sum;
 
 
 	szblk = (dir[XDIR_NumSec] + 1) * SZDIRE;
@@ -1926,12 +1926,12 @@ WORD xdir_sum (			/* Get checksum of the directoly entry block */
 
 
 static
-WORD xname_sum (		/* Get check sum (to be used as hash) of the name */
+uint16_t xname_sum (		/* Get check sum (to be used as hash) of the name */
 	const WCHAR* name	/* File name to be calculated */
 )
 {
 	WCHAR chr;
-	WORD sum = 0;
+	uint16_t sum = 0;
 
 
 	while ((chr = *name++) != 0) {
@@ -2254,7 +2254,7 @@ FRESULT dir_find (	/* FR_OK(0):succeeded, !=0:error */
 	if (fs->fs_type == FS_EXFAT) {	/* On the exFAT volume */
 		uint8_t nc;
 		UINT di, ni;
-		WORD hash = xname_sum(fs->lfnbuf);		/* Hash value of the name to find */
+		uint16_t hash = xname_sum(fs->lfnbuf);		/* Hash value of the name to find */
 
 		while ((res = dir_read(dp, 0)) == FR_OK) {	/* Read an item */
 #if FF_MAX_LFN < 255
@@ -2563,7 +2563,7 @@ void get_fileinfo (		/* No return code */
 	fno->fattrib = dp->dir[DIR_Attr];				/* Attribute */
 	fno->fsize = ld_dword(dp->dir + DIR_FileSize);	/* Size */
 	tm = ld_dword(dp->dir + DIR_ModTime);			/* Timestamp */
-	fno->ftime = (WORD)tm; fno->fdate = (WORD)(tm >> 16);
+	fno->ftime = (uint16_t)tm; fno->fdate = (uint16_t)(tm >> 16);
 }
 
 #endif /* FF_FS_MINIMIZE <= 1 || FF_FS_RPATH >= 2 */
@@ -3046,7 +3046,7 @@ FRESULT find_volume (	/* FR_OK(0): successful, !=0: any error occurred */
 	int vol;
 	DSTATUS stat;
 	DWORD bsect, fasize, tsect, sysect, nclst, szbfat, br[4];
-	WORD nrsv;
+	uint16_t nrsv;
 	FATFS *fs;
 	UINT i;
 
@@ -4772,7 +4772,7 @@ FRESULT f_rename (
 #if FF_FS_EXFAT
 			if (fs->fs_type == FS_EXFAT) {	/* At exFAT volume */
 				uint8_t nf, nn;
-				WORD nh;
+				uint16_t nh;
 
 				mem_cpy(buf, fs->dirbuf, SZDIRE * 2);	/* Save 85+C0 entry of old object */
 				mem_cpy(&djn, &djo, sizeof djo);
@@ -5337,10 +5337,10 @@ FRESULT f_mkfs (
 {
 	const UINT n_fats = 1;		/* Number of FATs for FAT/FAT32 volume (1 or 2) */
 	const UINT n_rootdir = 512;	/* Number of root directory entries for FAT volume */
-	static const WORD cst[] = {1, 4, 16, 64, 256, 512, 0};	/* Cluster size boundary for FAT volume (4Ks unit) */
-	static const WORD cst32[] = {1, 2, 4, 8, 16, 32, 0};	/* Cluster size boundary for FAT32 volume (128Ks unit) */
+	static const uint16_t cst[] = {1, 4, 16, 64, 256, 512, 0};	/* Cluster size boundary for FAT volume (4Ks unit) */
+	static const uint16_t cst32[] = {1, 2, 4, 8, 16, 32, 0};	/* Cluster size boundary for FAT32 volume (128Ks unit) */
 	uint8_t fmt, sys, *buf, *pte, pdrv, part;
-	WORD ss;
+	uint16_t ss;
 	DWORD szb_buf, sz_buf, sz_blk, n_clst, pau, sect, nsect, n;
 	DWORD b_vol, b_fat, b_data;				/* Base LBA for volume, fat, data */
 	DWORD sz_vol, sz_rsv, sz_fat, sz_dir;	/* Size for volume, fat, dir, data */
@@ -5658,11 +5658,11 @@ FRESULT f_mkfs (
 		mem_cpy(buf + BS_JmpBoot, "\xEB\xFE\x90" "MSDOS5.0", 11);/* Boot jump code (x86), OEM name */
 		st_word(buf + BPB_BytsPerSec, ss);				/* Sector size [byte] */
 		buf[BPB_SecPerClus] = (uint8_t)pau;				/* Cluster size [sector] */
-		st_word(buf + BPB_RsvdSecCnt, (WORD)sz_rsv);	/* Size of reserved area */
+		st_word(buf + BPB_RsvdSecCnt, (uint16_t)sz_rsv);	/* Size of reserved area */
 		buf[BPB_NumFATs] = (uint8_t)n_fats;				/* Number of FATs */
-		st_word(buf + BPB_RootEntCnt, (WORD)((fmt == FS_FAT32) ? 0 : n_rootdir));	/* Number of root directory entries */
+		st_word(buf + BPB_RootEntCnt, (uint16_t)((fmt == FS_FAT32) ? 0 : n_rootdir));	/* Number of root directory entries */
 		if (sz_vol < 0x10000) {
-			st_word(buf + BPB_TotSec16, (WORD)sz_vol);	/* Volume size in 16-bit LBA */
+			st_word(buf + BPB_TotSec16, (uint16_t)sz_vol);	/* Volume size in 16-bit LBA */
 		} else {
 			st_dword(buf + BPB_TotSec32, sz_vol);		/* Volume size in 32-bit LBA */
 		}
@@ -5681,7 +5681,7 @@ FRESULT f_mkfs (
 			mem_cpy(buf + BS_VolLab32, "NO NAME    " "FAT32   ", 19);	/* Volume label, FAT signature */
 		} else {
 			st_dword(buf + BS_VolID, GET_FATTIME());	/* VSN */
-			st_word(buf + BPB_FATSz16, (WORD)sz_fat);	/* FAT size [sector] */
+			st_word(buf + BPB_FATSz16, (uint16_t)sz_fat);	/* FAT size [sector] */
 			buf[BS_DrvNum] = 0x80;						/* Drive number (for int13) */
 			buf[BS_BootSig] = 0x29;						/* Extended boot signature */
 			mem_cpy(buf + BS_VolLab, "NO NAME    " "FAT     ", 19);	/* Volume label, FAT signature */
@@ -6178,10 +6178,10 @@ int f_printf (
 /*-----------------------------------------------------------------------*/
 
 FRESULT f_setcp (
-	WORD cp		/* Value to be set as active code page */
+	uint16_t cp		/* Value to be set as active code page */
 )
 {
-	static const WORD       validcp[] = {  437,   720,   737,   771,   775,   850,   852,   857,   860,   861,   862,   863,   864,   865,   866,   869,   932,   936,   949,   950, 0};
+	static const uint16_t       validcp[] = {  437,   720,   737,   771,   775,   850,   852,   857,   860,   861,   862,   863,   864,   865,   866,   869,   932,   936,   949,   950, 0};
 	static const uint8_t *const tables[] = {Ct437, Ct720, Ct737, Ct771, Ct775, Ct850, Ct852, Ct857, Ct860, Ct861, Ct862, Ct863, Ct864, Ct865, Ct866, Ct869, Dc932, Dc936, Dc949, Dc950, 0};
 	UINT i;
 

@@ -1,6 +1,11 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-06-16 - Changed Integer Types.
+  * Change WORD type to uint16_t.
+  * Change SHORT type to int16_t.
+  * Close #4
+
 * 2017-06-13 - Changed Integer Types.
   * Change BYTE type to uint8_t. Close #3
   * Change TAB to space.

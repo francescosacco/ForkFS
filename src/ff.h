@@ -104,11 +104,11 @@ typedef struct {
     uint8_t    n_fats;            /* Number of FATs (1 or 2) */
     uint8_t    wflag;            /* win[] flag (b0:dirty) */
     uint8_t    fsi_flag;        /* FSINFO flags (b7:disabled, b0:dirty) */
-    WORD    id;                /* Volume mount ID */
-    WORD    n_rootdir;        /* Number of root directory entries (FAT12/16) */
-    WORD    csize;            /* Cluster size [sectors] */
+    uint16_t    id;                /* Volume mount ID */
+    uint16_t    n_rootdir;        /* Number of root directory entries (FAT12/16) */
+    uint16_t    csize;            /* Cluster size [sectors] */
 #if FF_MAX_SS != FF_MIN_SS
-    WORD    ssize;            /* Sector size (512, 1024, 2048 or 4096) */
+    uint16_t    ssize;            /* Sector size (512, 1024, 2048 or 4096) */
 #endif
 #if FF_USE_LFN
     WCHAR*    lfnbuf;            /* LFN working buffer */
@@ -147,7 +147,7 @@ typedef struct {
 
 typedef struct {
     FATFS*    fs;                /* Pointer to the hosting volume of this object */
-    WORD    id;                /* Hosting volume mount ID */
+    uint16_t    id;                /* Hosting volume mount ID */
     uint8_t    attr;            /* Object attribute */
     uint8_t    stat;            /* Object chain status (b1-0: =0:not contiguous, =2:contiguous, =3:flagmented in this session, b2:sub-directory stretched) */
     DWORD    sclust;            /* Object data start cluster (0:no cluster or root directory) */
@@ -212,8 +212,8 @@ typedef struct {
 
 typedef struct {
     FSIZE_t    fsize;            /* File size */
-    WORD    fdate;            /* Modified date */
-    WORD    ftime;            /* Modified time */
+    uint16_t    fdate;            /* Modified date */
+    uint16_t    ftime;            /* Modified time */
     uint8_t    fattrib;        /* File attribute */
 #if FF_USE_LFN
     TCHAR    altname[13];            /* Altenative file name */
@@ -284,7 +284,7 @@ FRESULT f_expand (FIL* fp, FSIZE_t szf, uint8_t opt);                    /* Allo
 FRESULT f_mount (FATFS* fs, const TCHAR* path, uint8_t opt);            /* Mount/Unmount a logical drive */
 FRESULT f_mkfs (const TCHAR* path, uint8_t opt, DWORD au, void* work, UINT len);    /* Create a FAT volume */
 FRESULT f_fdisk (uint8_t pdrv, const DWORD* szt, void* work);            /* Divide a physical drive into some partitions */
-FRESULT f_setcp (WORD cp);                                            /* Set current code page */
+FRESULT f_setcp (uint16_t cp);                                            /* Set current code page */
 int f_putc (TCHAR c, FIL* fp);                                        /* Put a character to the file */
 int f_puts (const TCHAR* str, FIL* cp);                                /* Put a string to the file */
 int f_printf (FIL* fp, const TCHAR* str, ...);                        /* Put a formatted string to the file */
@@ -316,8 +316,8 @@ DWORD get_fattime (void);
 
 /* LFN support functions */
 #if FF_USE_LFN                        /* Code conversion (defined in unicode.c) */
-WCHAR ff_oem2uni (WCHAR oem, WORD cp);    /* OEM code to Unicode conversion */
-WCHAR ff_uni2oem (WCHAR uni, WORD cp);    /* Unicode to OEM code conversion */
+WCHAR ff_oem2uni (WCHAR oem, uint16_t cp);    /* OEM code to Unicode conversion */
+WCHAR ff_uni2oem (WCHAR uni, uint16_t cp);    /* Unicode to OEM code conversion */
 WCHAR ff_wtoupper (WCHAR uni);            /* Unicode upper-case conversion */
 #endif
 #if FF_USE_LFN == 3                        /* Dynamic memory allocation */
