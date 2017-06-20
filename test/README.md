@@ -1,6 +1,9 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-06-20 - Version 017 - Changed UINT and BYTE types.
+  * Removed UINT and INT types from integer.h file.
+
 * 2017-06-06 - Version 016 - Improved f_printf() and add f_putc() test.
   * Improved f_printf() test.
   * Added f_putc() test.

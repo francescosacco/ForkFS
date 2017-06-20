@@ -3,12 +3,12 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 16 )
+#define VERSION_NUMBER                           ( 17 )
 #define FRESULT_POSITION                         ( 62 )
 #define BUFFER_SIZE                              ( 1024 )
 
 void print_FRESULT( const char * str , FRESULT in ) ;
-UINT f_forward_Check( const BYTE * p , UINT btf ) ;
+unsigned int f_forward_Check( const uint8_t * p , unsigned int btf ) ;
 
 /* Tests:
 
@@ -64,15 +64,15 @@ int main( int argc , char * argv[] )
     FIL file ;
     DIR dir ;
     FILINFO fileInfo ;
-    UINT bw , bwt ;
+    unsigned int bw , bwt ;
     int i , stdRet ;
 
     FATFS * fatFsPointer ;
-    DWORD freeClust ;
+    uint32_t freeClust ;
     
     printf( "ForkFS - Sanity Test Software - Version: %03d\n" , VERSION_NUMBER ) ;
 
-    DWORD plist[] = { 50 , 50 , 0 , 0 } ;  // Divide the drive into two partitions.
+    uint32_t plist[] = { 50 , 50 , 0 , 0 } ;  // Divide the drive into two partitions.
 
     ffRet = f_fdisk( 0 , plist , workBuffer ) ;
     print_FRESULT( "f_fdisk(0,plist,workBuffer)" , ffRet ) ;
@@ -802,9 +802,9 @@ void print_FRESULT( const char * str , FRESULT in )
     }
 }
 
-UINT f_forward_Check( const BYTE * p , UINT btf )
+unsigned int f_forward_Check( const uint8_t * p , unsigned int btf )
 {
-    UINT i ;
+    unsigned int i ;
 
     // Check Sense Call.
     if( btf == 0 )
