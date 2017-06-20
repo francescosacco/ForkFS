@@ -15,7 +15,7 @@
 /*------------------------------------------------------------------------*/
 
 void* ff_memalloc (	/* Returns pointer to the allocated memory block (null on not enough core) */
-	UINT msize		/* Number of bytes to allocate */
+	unsigned int msize		/* Number of bytes to allocate */
 )
 {
 	return malloc(msize);	/* Allocate a new memory block with POSIX API */

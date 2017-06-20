@@ -1,6 +1,10 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-06-20 - Changed Integer Types.
+  * Change LONG and DWORD types to int32_t and uint32_t. Close #5
+  * Change INT and UINT types to int and unsigned int. Close #2
+
 * 2017-06-16 - Changed Integer Types.
   * Change WORD type to uint16_t.
   * Change SHORT type to int16_t.
