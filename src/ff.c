@@ -568,9 +568,9 @@ uint32_t ld_dword (const uint8_t* ptr)	/* Load a 4-byte little-endian word */
 
 #if FF_FS_EXFAT
 static
-QWORD ld_qword (const uint8_t* ptr)	/* Load an 8-byte little-endian word */
+uint64_t ld_qword (const uint8_t* ptr)	/* Load an 8-byte little-endian word */
 {
-	QWORD rv;
+	uint64_t rv;
 
 	rv = ptr[7];
 	rv = rv << 8 | ptr[6];
@@ -603,7 +603,7 @@ void st_dword (uint8_t* ptr, uint32_t val)	/* Store a 4-byte word in little-endi
 
 #if FF_FS_EXFAT
 static
-void st_qword (uint8_t* ptr, QWORD val)	/* Store an 8-byte word in little-endian */
+void st_qword (uint8_t* ptr, uint64_t val)	/* Store an 8-byte word in little-endian */
 {
 	*ptr++ = (uint8_t)val; val >>= 8;
 	*ptr++ = (uint8_t)val; val >>= 8;
@@ -3114,7 +3114,7 @@ FRESULT find_volume (	/* FR_OK(0): successful, !=0: any error occurred */
 
 #if FF_FS_EXFAT
 	if (fmt == 1) {
-		QWORD maxlba;
+		uint64_t maxlba;
 
 		for (i = BPB_ZeroedEx; i < BPB_ZeroedEx + 53 && fs->win[i] == 0; i++) ;	/* Check zero filler */
 		if (i < BPB_ZeroedEx + 53) return FR_NO_FILESYSTEM;
@@ -3144,7 +3144,7 @@ FRESULT find_volume (	/* FR_OK(0): successful, !=0: any error occurred */
 		fs->volbase = bsect;
 		fs->database = bsect + ld_dword(fs->win + BPB_DataOfsEx);
 		fs->fatbase = bsect + ld_dword(fs->win + BPB_FatOfsEx);
-		if (maxlba < (QWORD)fs->database + nclst * fs->csize) return FR_NO_FILESYSTEM;	/* (Volume size must not be smaller than the size requiered) */
+		if (maxlba < (uint64_t)fs->database + nclst * fs->csize) return FR_NO_FILESYSTEM;	/* (Volume size must not be smaller than the size requiered) */
 		fs->dirbase = ld_dword(fs->win + BPB_RootClusEx);
 
 		/* Check if bitmap location is in assumption (at the first cluster) */

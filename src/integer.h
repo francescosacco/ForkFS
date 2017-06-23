@@ -17,9 +17,6 @@ typedef unsigned __int64 QWORD;
 /* These types MUST be 16-bit */
 typedef unsigned short	WCHAR;
 
-/* This type MUST be 64-bit (Remove this for ANSI C (C89) compatibility) */
-typedef unsigned long long QWORD;
-
 #endif
 
 #endif

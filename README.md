@@ -1,6 +1,11 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-06-23 - Changed Integer Types.
+  * It's possible to check the 64 bits support if there is the definition UINT64_MAX or C99 version. Close #1
+  * Enable FF_FS_EXFAT to test 64 bits variables.
+  * Change QWORD type to uint64_t. Close #6
+
 * 2017-06-20 - Changed Integer Types.
   * Change LONG and DWORD types to int32_t and uint32_t. Close #5
   * Change INT and UINT types to int and unsigned int. Close #2

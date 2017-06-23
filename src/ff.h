@@ -89,7 +89,7 @@ extern PARTITION VolToPart[];    /* Volume - Partition resolution table */
 #if !FF_USE_LFN
 #error LFN must be enabled when enable exFAT
 #endif
-typedef QWORD FSIZE_t;
+typedef uint64_t FSIZE_t;
 #else
 typedef uint32_t FSIZE_t;
 #endif
