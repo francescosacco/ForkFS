@@ -1,9 +1,10 @@
 #include <stdio.h>  // To use printf().
 #include <stdlib.h> // To use malloc() and free().
+#include <string.h> // To use strcpy() and memset().
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 17 )
+#define VERSION_NUMBER                           ( 18 )
 #define FRESULT_POSITION                         ( 62 )
 #define BUFFER_SIZE                              ( 1024 )
 
@@ -438,8 +439,8 @@ int main( int argc , char * argv[] )
     }
 
     // Set date and time to 2017-05-03 20:02:44
-    fileInfo.fdate = ( WORD )( ( ( 2017 - 1980 ) * 512U ) | 5 * 32U | 3 ) ;
-    fileInfo.ftime = ( WORD )( 20 * 2048U | 2 * 32U | 44 / 2U ) ;
+    fileInfo.fdate = ( uint16_t )( ( ( 2017 - 1980 ) * 512U ) | 5 * 32U | 3 ) ;
+    fileInfo.ftime = ( uint16_t )( 20 * 2048U | 2 * 32U | 44 / 2U ) ;
     ffRet = f_utime( "/testdir/file.dat" , &fileInfo ) ;
     print_FRESULT( "f_utime(\"/testdir/file.dat\",&fileInfo)" , ffRet ) ;
     if( ffRet != FR_OK )

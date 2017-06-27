@@ -20,24 +20,19 @@
 
 
 #ifndef FF_DEFINED
-#define FF_DEFINED    87030    /* Revision ID */
+#define FF_DEFINED
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "integer.h"    /* Basic integer types */
 #include "ffconf.h"        /* FatFs configuration options */
 
 #include <stdint.h>
 
-#if FF_DEFINED != FFCONF_DEF
-#error Wrong configuration file (ffconf.h).
-#endif
-
-
-
 /* Definitions of volume management */
+
+typedef uint16_t WCHAR ;
 
 #if FF_MULTI_PARTITION        /* Multiple partition configuration */
 typedef struct {
@@ -119,10 +114,8 @@ typedef struct {
 #if FF_FS_REENTRANT
     FF_SYNC_t    sobj;        /* Identifier of sync object */
 #endif
-#if !FF_FS_READONLY
     uint32_t    last_clst;        /* Last allocated cluster */
     uint32_t    free_clst;        /* Number of free clusters */
-#endif
 #if FF_FS_RPATH
     uint32_t    cdir;            /* Current directory start cluster (0:root) */
 #if FF_FS_EXFAT
@@ -175,10 +168,8 @@ typedef struct {
     FSIZE_t    fptr;            /* File read/write pointer (Zeroed on file open) */
     uint32_t    clust;            /* Current cluster of fpter (invalid when fptr is 0) */
     uint32_t    sect;            /* Sector number appearing in buf[] (0:invalid) */
-#if !FF_FS_READONLY
     uint32_t    dir_sect;        /* Sector number containing the directory entry (not used at exFAT) */
     uint8_t *    dir_ptr;        /* Pointer to the directory entry in the win[] (not used at exFAT) */
-#endif
 #if FF_USE_FASTSEEK
     uint32_t*    cltbl;            /* Pointer to the cluster link map table (nulled on open, set by application) */
 #endif
@@ -310,7 +301,7 @@ TCHAR* f_gets (TCHAR* buff, int len, FIL* fp);                        /* Get a s
 /* Additional user defined functions                            */
 
 /* RTC function */
-#if !FF_FS_READONLY && !FF_FS_NORTC
+#if !FF_FS_NORTC
 uint32_t get_fattime (void);
 #endif
 

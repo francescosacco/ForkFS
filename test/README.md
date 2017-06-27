@@ -1,8 +1,12 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-06-27 - Version 018 - Fix libraries and types.
+  * Add string.h to use memset() and strcmp().
+  * Change WORD type.
+
 * 2017-06-20 - Version 017 - Changed UINT and BYTE types.
-  * Removed UINT and INT types from integer.h file.
+  * Remove UINT and INT types from integer.h file.
 
 * 2017-06-06 - Version 016 - Improved f_printf() and add f_putc() test.
   * Improved f_printf() test.

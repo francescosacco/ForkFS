@@ -1,6 +1,14 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-06-27 - Remove some definitions and integer file.
+  * Remove FF_DEFINED and FFCONF_DEF. Close #10
+  * Remove _WIN32 for Windows compilation.
+  * Remove FF_FS_READONLY definition.
+  * Add WCHAR type to keep with support.
+  * Fix types at diskio.h and diskio.c files.
+  * Remove integer.h file. Close #7
+
 * 2017-06-23 - Changed Integer Types.
   * It's possible to check the 64 bits support if there is the definition UINT64_MAX or C99 version. Close #1
   * Enable FF_FS_EXFAT to test 64 bits variables.

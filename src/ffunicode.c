@@ -15246,7 +15246,7 @@ const WCHAR uc869[] = {	/*  CP869(Greek 2) to Unicode conversion table */
 #if FF_CODE_PAGE != 0 && FF_CODE_PAGE < 900
 WCHAR ff_uni2oem (	/* Returns OEM code character, zero on error */
 	WCHAR	uni,	/* Unicode character to be converted */
-	WORD	cp		/* Code page for the conversion */
+	uint16_t cp		/* Code page for the conversion */
 )
 {
 	WCHAR c = 0;
@@ -15267,7 +15267,7 @@ WCHAR ff_uni2oem (	/* Returns OEM code character, zero on error */
 
 WCHAR ff_oem2uni (	/* Returns Unicode character, zero on error */
 	WCHAR	oem,	/* OEM code to be converted */
-	WORD	cp		/* Code page for the conversion */
+	uint16_t	cp		/* Code page for the conversion */
 )
 {
 	WCHAR c = 0;
@@ -15297,7 +15297,7 @@ WCHAR ff_oem2uni (	/* Returns Unicode character, zero on error */
 #if FF_CODE_PAGE != 0 && FF_CODE_PAGE >= 900
 WCHAR ff_uni2oem (	/* Returns OEM code character, zero on error */
 	WCHAR	uni,	/* Unicode character to be converted */
-	WORD	cp		/* Code page for the conversion */
+	uint16_t	cp		/* Code page for the conversion */
 )
 {
 	const WCHAR *p;
@@ -15331,7 +15331,7 @@ WCHAR ff_uni2oem (	/* Returns OEM code character, zero on error */
 
 WCHAR ff_oem2uni (	/* Returns Unicode character, zero on error */
 	WCHAR	oem,	/* OEM code to be converted */
-	WORD	cp		/* Code page for the conversion */
+	uint16_t	cp		/* Code page for the conversion */
 )
 {
 	const WCHAR *p;
@@ -15371,13 +15371,13 @@ WCHAR ff_oem2uni (	/* Returns Unicode character, zero on error */
 
 #if FF_CODE_PAGE == 0
 
-static const WORD cp_code[]          = {  437,   720,   737,   771,   775,   850,   852,   855,   857,   860,   861,   862,   863,   864,   865,   866,   869, 0};
+static const uint16_t cp_code[]          = {  437,   720,   737,   771,   775,   850,   852,   855,   857,   860,   861,   862,   863,   864,   865,   866,   869, 0};
 static const WCHAR *const cp_table[] = {uc437, uc720, uc737, uc771, uc775, uc850, uc852, uc855, uc857, uc860, uc861, uc862, uc863, uc864, uc865, uc866, uc869, 0};
 
 
 WCHAR ff_uni2oem (	/* Returns OEM code character, zero on error */
 	WCHAR	uni,	/* Unicode character to be converted */
-	WORD	cp		/* Code page for the conversion */
+	uint16_t	cp		/* Code page for the conversion */
 )
 {
 	const WCHAR *p;
@@ -15425,7 +15425,7 @@ WCHAR ff_uni2oem (	/* Returns OEM code character, zero on error */
 
 WCHAR ff_oem2uni (	/* Returns Unicode character, zero on error */
 	WCHAR	oem,	/* OEM code to be converted */
-	WORD	cp		/* Code page for the conversion */
+	uint16_t	cp		/* Code page for the conversion */
 )
 {
 	const WCHAR *p;

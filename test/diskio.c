@@ -23,7 +23,7 @@ FILE * fileDisk = ( FILE * ) NULL ;
 /*-----------------------------------------------------------------------*/
 
 DSTATUS disk_status (
-    BYTE pdrv       /* Physical drive nmuber to identify the drive */
+    uint8_t pdrv       /* Physical drive nmuber to identify the drive */
 )
 {
     DSTATUS stat;
@@ -63,7 +63,7 @@ DSTATUS disk_status (
 /*-----------------------------------------------------------------------*/
 
 DSTATUS disk_initialize (
-    BYTE pdrv               /* Physical drive nmuber to identify the drive */
+    uint8_t pdrv               /* Physical drive nmuber to identify the drive */
 )
 {
     DSTATUS stat ;
@@ -123,10 +123,10 @@ DSTATUS disk_initialize (
 /*-----------------------------------------------------------------------*/
 
 DRESULT disk_read (
-    BYTE pdrv,      /* Physical drive nmuber to identify the drive */
-    BYTE *buff,     /* Data buffer to store read data */
-    DWORD sector,   /* Start sector in LBA */
-    UINT count      /* Number of sectors to read */
+    uint8_t pdrv,      /* Physical drive nmuber to identify the drive */
+    uint8_t *buff,     /* Data buffer to store read data */
+    uint32_t sector,   /* Start sector in LBA */
+    unsigned int count      /* Number of sectors to read */
 )
 {
     DRESULT res ;
@@ -146,7 +146,7 @@ DRESULT disk_read (
             ( void ) fseek( fileDisk , position , SEEK_SET) ;
             
             // Read 
-            ( void ) fread( buff , sizeof( BYTE ) , count * FILEDISK_SECTOR_SIZE , fileDisk ) ;
+            ( void ) fread( buff , sizeof( uint8_t ) , count * FILEDISK_SECTOR_SIZE , fileDisk ) ;
             
             res = RES_OK ;
         }
@@ -176,10 +176,10 @@ DRESULT disk_read (
 /*-----------------------------------------------------------------------*/
 
 DRESULT disk_write (
-    BYTE pdrv,          /* Physical drive nmuber to identify the drive */
-    const BYTE *buff,   /* Data to be written */
-    DWORD sector,       /* Start sector in LBA */
-    UINT count          /* Number of sectors to write */
+    uint8_t pdrv,          /* Physical drive nmuber to identify the drive */
+    const uint8_t *buff,   /* Data to be written */
+    uint32_t sector,       /* Start sector in LBA */
+    unsigned int count          /* Number of sectors to write */
 )
 {
     DRESULT res ;
@@ -199,7 +199,7 @@ DRESULT disk_write (
             ( void ) fseek( fileDisk , position , SEEK_SET ) ;
             
             // Read 
-            ( void ) fwrite( buff , sizeof( BYTE ) , count * FILEDISK_SECTOR_SIZE , fileDisk ) ;
+            ( void ) fwrite( buff , sizeof( uint8_t ) , count * FILEDISK_SECTOR_SIZE , fileDisk ) ;
             
             res = RES_OK ;
         }
@@ -229,8 +229,8 @@ DRESULT disk_write (
 /*-----------------------------------------------------------------------*/
 
 DRESULT disk_ioctl (
-    BYTE pdrv,      /* Physical drive nmuber (0..) */
-    BYTE cmd,       /* Control code */
+    uint8_t pdrv,      /* Physical drive nmuber (0..) */
+    uint8_t cmd,       /* Control code */
     void *buff      /* Buffer to send/receive control data */
 )
 {
