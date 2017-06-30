@@ -116,13 +116,11 @@ typedef struct {
 #endif
     uint32_t    last_clst;        /* Last allocated cluster */
     uint32_t    free_clst;        /* Number of free clusters */
-#if FF_FS_RPATH
     uint32_t    cdir;            /* Current directory start cluster (0:root) */
 #if FF_FS_EXFAT
     uint32_t    cdc_scl;        /* Containing directory start cluster (invalid when cdir is 0) */
     uint32_t    cdc_size;        /* b31-b8:Size of containing directory, b7-b0: Chain status */
     uint32_t    cdc_ofs;        /* Offset in the containing directory (invalid when cdir is 0) */
-#endif
 #endif
     uint32_t    n_fatent;        /* Number of FAT entries (number of clusters + 2) */
     uint32_t    fsize;            /* Size of an FAT [sectors] */
@@ -173,9 +171,7 @@ typedef struct {
 #if FF_USE_FASTSEEK
     uint32_t*    cltbl;            /* Pointer to the cluster link map table (nulled on open, set by application) */
 #endif
-#if !FF_FS_TINY
     uint8_t    buf[FF_MAX_SS];    /* File private data read/write window */
-#endif
 } FIL;
 
 

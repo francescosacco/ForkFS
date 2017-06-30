@@ -127,15 +127,6 @@
 */
 
 
-#define FF_FS_RPATH		2
-/* This option configures support for relative path.
-/
-/   0: Disable relative path and remove related functions.
-/   1: Enable relative path. f_chdir() and f_chdrive() are available.
-/   2: f_getcwd() function is available in addition to 1.
-*/
-
-
 /*---------------------------------------------------------------------------/
 / Drive/Volume Configurations
 /---------------------------------------------------------------------------*/
@@ -194,13 +185,6 @@
 /*---------------------------------------------------------------------------/
 / System Configurations
 /---------------------------------------------------------------------------*/
-
-#define FF_FS_TINY		0
-/* This option switches tiny buffer configuration. (0:Normal or 1:Tiny)
-/  At the tiny configuration, size of file object (FIL) is shrinked FF_MAX_SS bytes.
-/  Instead of private sector buffer eliminated from the file object, common sector
-/  buffer in the file system object (FATFS) is used for the file data transfer. */
-
 
 #define FF_FS_EXFAT		1
 /* This option switches support for exFAT file system. (0:Disable or 1:Enable)

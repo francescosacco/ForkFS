@@ -419,7 +419,7 @@ typedef struct {
 static FATFS *FatFs[FF_VOLUMES];	/* Pointer to the filesystem objects (logical drives) */
 static uint16_t Fsid;					/* File system mount ID */
 
-#if FF_FS_RPATH != 0 && FF_VOLUMES >= 2
+#if FF_VOLUMES >= 2
 static uint8_t CurrVol;				/* Current drive */
 #endif
 
@@ -1702,7 +1702,7 @@ int cmp_lfn (				/* 1:matched, 0:not matched */
 }
 
 
-#if FF_FS_MINIMIZE <= 1 || FF_FS_RPATH >= 2 || FF_USE_LABEL || FF_FS_EXFAT
+#if FF_FS_MINIMIZE <= 1 || FF_USE_LABEL || FF_FS_EXFAT
 /*-----------------------------------------------------*/
 /* FAT-LFN: Pick a part of file name from an LFN entry */
 /*-----------------------------------------------------*/
@@ -1914,7 +1914,7 @@ uint32_t xsum32 (
 #endif
 
 
-#if FF_FS_MINIMIZE <= 1 || FF_FS_RPATH >= 2
+#if FF_FS_MINIMIZE <= 1
 /*------------------------------------------------------*/
 /* exFAT: Get object information from a directory block */
 /*------------------------------------------------------*/
@@ -1951,7 +1951,7 @@ void get_xdir_info (
 	fno->fdate = ld_word(dirb + XDIR_ModTime + 2);	/* Date */
 }
 
-#endif	/* FF_FS_MINIMIZE <= 1 || FF_FS_RPATH >= 2 */
+#endif	/* FF_FS_MINIMIZE <= 1 */
 
 
 /*-----------------------------------*/
@@ -2106,7 +2106,7 @@ void create_xdir (
 
 
 
-#if FF_FS_MINIMIZE <= 1 || FF_FS_RPATH >= 2 || FF_USE_LABEL || FF_FS_EXFAT
+#if FF_FS_MINIMIZE <= 1 || FF_USE_LABEL || FF_FS_EXFAT
 /*-----------------------------------------------------------------------*/
 /* Read an object from the directory                                     */
 /*-----------------------------------------------------------------------*/
@@ -2182,7 +2182,7 @@ FRESULT dir_read (
 	return res;
 }
 
-#endif	/* FF_FS_MINIMIZE <= 1 || FF_USE_LABEL || FF_FS_RPATH >= 2 */
+#endif	/* FF_FS_MINIMIZE <= 1 || FF_USE_LABEL */
 
 
 
@@ -2419,7 +2419,7 @@ FRESULT dir_remove (	/* FR_OK:Succeeded, FR_DISK_ERR:A disk error */
 
 
 
-#if FF_FS_MINIMIZE <= 1 || FF_FS_RPATH >= 2
+#if FF_FS_MINIMIZE <= 1
 /*-----------------------------------------------------------------------*/
 /* Get file information from directory entry                             */
 /*-----------------------------------------------------------------------*/
@@ -2517,7 +2517,7 @@ void get_fileinfo (		/* No return code */
 	fno->ftime = (uint16_t)tm; fno->fdate = (uint16_t)(tm >> 16);
 }
 
-#endif /* FF_FS_MINIMIZE <= 1 || FF_FS_RPATH >= 2 */
+#endif /* FF_FS_MINIMIZE <= 1 */
 
 
 
@@ -2639,7 +2639,7 @@ FRESULT create_name (	/* FR_OK: successful, FR_INVALID_NAME: could not create */
 	}
 	*path = &p[si];						/* Return pointer to the next segment */
 	cf = (w < ' ') ? NS_LAST : 0;		/* Set last segment flag if end of the path */
-#if FF_FS_RPATH != 0
+
 	if ((di == 1 && lfn[di - 1] == '.') ||
 		(di == 2 && lfn[di - 1] == '.' && lfn[di - 2] == '.')) {	/* Is this segment a dot name? */
 		lfn[di] = 0;
@@ -2648,7 +2648,7 @@ FRESULT create_name (	/* FR_OK: successful, FR_INVALID_NAME: could not create */
 		dp->fn[i] = cf | NS_DOT;		/* This is a dot entry */
 		return FR_OK;
 	}
-#endif
+
 	while (di) {						/* Snip off trailing spaces and dots if exist */
 		w = lfn[di - 1];
 		if (w != ' ' && w != '.') break;
@@ -2745,7 +2745,7 @@ FRESULT create_name (	/* FR_OK: successful, FR_INVALID_NAME: could not create */
 	p = *path; sfn = dp->fn;
 	mem_set(sfn, ' ', 11);
 	si = i = 0; ni = 8;
-#if FF_FS_RPATH != 0
+
 	if (p[si] == '.') { /* Is this a dot entry? */
 		for (;;) {
 			c = (uint8_t)p[si++];
@@ -2757,7 +2757,7 @@ FRESULT create_name (	/* FR_OK: successful, FR_INVALID_NAME: could not create */
 		sfn[NSFLAG] = (c <= ' ') ? NS_LAST | NS_DOT : NS_DOT;	/* Set last segment flag if end of the path */
 		return FR_OK;
 	}
-#endif
+
 	for (;;) {
 		c = (uint8_t)p[si++];
 		if (c <= ' ') break; 			/* Break if end of the path name */
@@ -2817,19 +2817,16 @@ FRESULT follow_path (	/* FR_OK(0): successful, !=0: error code */
 	uint8_t ns;
 	FATFS *fs = dp->obj.fs;
 
-
-#if FF_FS_RPATH != 0
 	if (*path != '/' && *path != '\\') {	/* Without heading separator */
 		dp->obj.sclust = fs->cdir;				/* Start from current directory */
 	} else
-#endif
 	{										/* With heading separator */
 		while (*path == '/' || *path == '\\') path++;	/* Strip heading separator */
 		dp->obj.sclust = 0;					/* Start from root directory */
 	}
 #if FF_FS_EXFAT
 	dp->obj.n_frag = 0;	/* Invalidate last fragment counter of the object */
-#if FF_FS_RPATH != 0
+
 	if (fs->fs_type == FS_EXFAT && dp->obj.sclust) {	/* exFAT: Retrieve the sub-directory's status */
 		DIR dj;
 
@@ -2841,7 +2838,6 @@ FRESULT follow_path (	/* FR_OK(0): successful, !=0: error code */
 		dp->obj.objsize = ld_dword(fs->dirbuf + XDIR_FileSize);
 		dp->obj.stat = fs->dirbuf[XDIR_GenFlags] & 2;
 	}
-#endif
 #endif
 
 	if ((unsigned int)*path < ' ') {				/* Null path name is the origin directory itself */
@@ -2856,7 +2852,7 @@ FRESULT follow_path (	/* FR_OK(0): successful, !=0: error code */
 			ns = dp->fn[NSFLAG];
 			if (res != FR_OK) {				/* Failed to find the object */
 				if (res == FR_NO_FILE) {	/* Object is not found */
-					if (FF_FS_RPATH && (ns & NS_DOT)) {	/* If dot entry is not exist, stay there */
+					if (ns & NS_DOT) {	/* If dot entry is not exist, stay there */
 						if (!(ns & NS_LAST)) continue;	/* Continue to follow if not last segment */
 						dp->fn[NSFLAG] = NS_NONAME;
 						res = FR_OK;
@@ -2941,7 +2937,7 @@ int get_ldnumber (		/* Returns logical drive number (-1:invalid drive) */
 			}
 #endif
 		} else {	/* No volume id and use default drive */
-#if FF_FS_RPATH != 0 && FF_VOLUMES >= 2
+#if FF_VOLUMES >= 2
 			vol = CurrVol;	/* Current drive */
 #else
 			vol = 0;		/* Drive 0 */
@@ -3192,9 +3188,7 @@ FRESULT find_volume (	/* FR_OK(0): successful, !=0: any error occurred */
 	fs->dirbuf = DirBuf;	/* Static directory block scratchpad buuffer */
 #endif
 #endif
-#if FF_FS_RPATH != 0
 	fs->cdir = 0;			/* Initialize current directory */
-#endif
 #if FF_FS_LOCK != 0			/* Clear file lock semaphores */
 	clear_lock(fs);
 #endif
@@ -3440,9 +3434,8 @@ FRESULT f_open (
 			fp->err = 0;			/* Clear error flag */
 			fp->sect = 0;			/* Invalidate current data sector */
 			fp->fptr = 0;			/* Set file pointer top of the file */
-#if !FF_FS_TINY
 			mem_set(fp->buf, 0, FF_MAX_SS);	/* Clear sector buffer */
-#endif
+
 			if ((mode & FA_SEEKEND) && fp->obj.objsize > 0) {	/* Seek to end of file if FA_OPEN_APPEND is specified */
 				fp->fptr = fp->obj.objsize;			/* Offset to seek */
 				bcs = (uint32_t)fs->csize * SS(fs);	/* Cluster size in byte */
@@ -3458,9 +3451,7 @@ FRESULT f_open (
 						res = FR_INT_ERR;
 					} else {
 						fp->sect = sc + (uint32_t)(ofs / SS(fs));
-#if !FF_FS_TINY
 						if (disk_read(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) res = FR_DISK_ERR;
-#endif
 					}
 				}
 			}
@@ -3534,20 +3525,14 @@ FRESULT f_read (
 				}
 				if (disk_read(fs->pdrv, rbuff, sect, cc) != RES_OK) ABORT(fs, FR_DISK_ERR);
 #if FF_FS_MINIMIZE <= 2		/* Replace one of the read sectors with cached data if it contains a dirty sector */
-#if FF_FS_TINY
-				if (fs->wflag && fs->winsect - sect < cc) {
-					mem_cpy(rbuff + ((fs->winsect - sect) * SS(fs)), fs->win, SS(fs));
-				}
-#else
 				if ((fp->flag & FA_DIRTY) && fp->sect - sect < cc) {
 					mem_cpy(rbuff + ((fp->sect - sect) * SS(fs)), fp->buf, SS(fs));
 				}
 #endif
-#endif
 				rcnt = SS(fs) * cc;				/* Number of bytes transferred */
 				continue;
 			}
-#if !FF_FS_TINY
+
 			if (fp->sect != sect) {			/* Load data sector if not in cache */
 				if (fp->flag & FA_DIRTY) {		/* Write-back dirty sector cache */
 					if (disk_write(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);
@@ -3555,17 +3540,11 @@ FRESULT f_read (
 				}
 				if (disk_read(fs->pdrv, fp->buf, sect, 1) != RES_OK)	ABORT(fs, FR_DISK_ERR);	/* Fill sector cache */
 			}
-#endif
 			fp->sect = sect;
 		}
 		rcnt = SS(fs) - (unsigned int)fp->fptr % SS(fs);	/* Number of bytes left in the sector */
 		if (rcnt > btr) rcnt = btr;					/* Clip it by btr if needed */
-#if FF_FS_TINY
-		if (move_window(fs, fp->sect) != FR_OK) ABORT(fs, FR_DISK_ERR);	/* Move sector window */
-		mem_cpy(rbuff, fs->win + fp->fptr % SS(fs), rcnt);	/* Extract partial sector */
-#else
 		mem_cpy(rbuff, fp->buf + fp->fptr % SS(fs), rcnt);	/* Extract partial sector */
-#endif
 	}
 
 	LEAVE_FF(fs, FR_OK);
@@ -3628,14 +3607,11 @@ FRESULT f_write (
 				fp->clust = clst;			/* Update current cluster */
 				if (fp->obj.sclust == 0) fp->obj.sclust = clst;	/* Set start cluster if the first write */
 			}
-#if FF_FS_TINY
-			if (fs->winsect == fp->sect && sync_window(fs) != FR_OK) ABORT(fs, FR_DISK_ERR);	/* Write-back sector cache */
-#else
 			if (fp->flag & FA_DIRTY) {		/* Write-back sector cache */
 				if (disk_write(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);
 				fp->flag &= (uint8_t)~FA_DIRTY;
 			}
-#endif
+
 			sect = clst2sect(fs, fp->clust);	/* Get current sector */
 			if (sect == 0) ABORT(fs, FR_INT_ERR);
 			sect += csect;
@@ -3646,45 +3622,25 @@ FRESULT f_write (
 				}
 				if (disk_write(fs->pdrv, wbuff, sect, cc) != RES_OK) ABORT(fs, FR_DISK_ERR);
 #if FF_FS_MINIMIZE <= 2
-#if FF_FS_TINY
-				if (fs->winsect - sect < cc) {	/* Refill sector cache if it gets invalidated by the direct write */
-					mem_cpy(fs->win, wbuff + ((fs->winsect - sect) * SS(fs)), SS(fs));
-					fs->wflag = 0;
-				}
-#else
 				if (fp->sect - sect < cc) { /* Refill sector cache if it gets invalidated by the direct write */
 					mem_cpy(fp->buf, wbuff + ((fp->sect - sect) * SS(fs)), SS(fs));
 					fp->flag &= (uint8_t)~FA_DIRTY;
 				}
 #endif
-#endif
 				wcnt = SS(fs) * cc;		/* Number of bytes transferred */
 				continue;
 			}
-#if FF_FS_TINY
-			if (fp->fptr >= fp->obj.objsize) {	/* Avoid silly cache filling on the growing edge */
-				if (sync_window(fs) != FR_OK) ABORT(fs, FR_DISK_ERR);
-				fs->winsect = sect;
-			}
-#else
 			if (fp->sect != sect && 		/* Fill sector cache with file data */
 				fp->fptr < fp->obj.objsize &&
 				disk_read(fs->pdrv, fp->buf, sect, 1) != RES_OK) {
 					ABORT(fs, FR_DISK_ERR);
 			}
-#endif
 			fp->sect = sect;
 		}
 		wcnt = SS(fs) - (unsigned int)fp->fptr % SS(fs);	/* Number of bytes left in the sector */
 		if (wcnt > btw) wcnt = btw;					/* Clip it by btw if needed */
-#if FF_FS_TINY
-		if (move_window(fs, fp->sect) != FR_OK) ABORT(fs, FR_DISK_ERR);	/* Move sector window */
-		mem_cpy(fs->win + fp->fptr % SS(fs), wbuff, wcnt);	/* Fit data to the sector */
-		fs->wflag = 1;
-#else
 		mem_cpy(fp->buf + fp->fptr % SS(fs), wbuff, wcnt);	/* Fit data to the sector */
 		fp->flag |= FA_DIRTY;
-#endif
 	}
 
 	fp->flag |= FA_MODIFIED;				/* Set file change flag */
@@ -3712,12 +3668,10 @@ FRESULT f_sync (
 	res = validate(&fp->obj, &fs);	/* Check validity of the file object */
 	if (res == FR_OK) {
 		if (fp->flag & FA_MODIFIED) {	/* Is there any change to the file? */
-#if !FF_FS_TINY
 			if (fp->flag & FA_DIRTY) {	/* Write-back cached data if needed */
 				if (disk_write(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) LEAVE_FF(fs, FR_DISK_ERR);
 				fp->flag &= (uint8_t)~FA_DIRTY;
 			}
-#endif
 			/* Update the directory entry */
 			tm = GET_FATTIME();				/* Modified time */
 #if FF_FS_EXFAT
@@ -3807,7 +3761,6 @@ FRESULT f_close (
 
 
 
-#if FF_FS_RPATH >= 1
 /*-----------------------------------------------------------------------*/
 /* Change Current Directory or Current Drive, Get Current Directory      */
 /*-----------------------------------------------------------------------*/
@@ -3882,7 +3835,6 @@ FRESULT f_chdir (
 }
 
 
-#if FF_FS_RPATH >= 2
 FRESULT f_getcwd (
 	TCHAR* buff,	/* Pointer to the directory path */
 	unsigned int len		/* Size of path */
@@ -3953,10 +3905,6 @@ FRESULT f_getcwd (
 	LEAVE_FF(fs, res);
 }
 
-#endif /* FF_FS_RPATH >= 2 */
-#endif /* FF_FS_RPATH >= 1 */
-
-
 
 #if FF_FS_MINIMIZE <= 2
 /*-----------------------------------------------------------------------*/
@@ -4021,13 +3969,11 @@ FRESULT f_lseek (
 				if (dsc == 0) ABORT(fs, FR_INT_ERR);
 				dsc += (uint32_t)((ofs - 1) / SS(fs)) & (fs->csize - 1);
 				if (fp->fptr % SS(fs) && dsc != fp->sect) {	/* Refill sector cache if needed */
-#if !FF_FS_TINY
 					if (fp->flag & FA_DIRTY) {		/* Write-back dirty sector cache */
 						if (disk_write(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);
 						fp->flag &= (uint8_t)~FA_DIRTY;
 					}
 					if (disk_read(fs->pdrv, fp->buf, dsc, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);	/* Load current sector */
-#endif
 					fp->sect = dsc;
 				}
 			}
@@ -4096,13 +4042,11 @@ FRESULT f_lseek (
 			fp->flag |= FA_MODIFIED;
 		}
 		if (fp->fptr % SS(fs) && nsect != fp->sect) {	/* Fill sector cache if needed */
-#if !FF_FS_TINY
 			if (fp->flag & FA_DIRTY) {			/* Write-back dirty sector cache */
 				if (disk_write(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);
 				fp->flag &= (uint8_t)~FA_DIRTY;
 			}
 			if (disk_read(fs->pdrv, fp->buf, nsect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);	/* Fill sector cache */
-#endif
 			fp->sect = nsect;
 		}
 	}
@@ -4454,7 +4398,6 @@ FRESULT f_truncate (
 		}
 		fp->obj.objsize = fp->fptr;	/* Set file size to current read/write point */
 		fp->flag |= FA_MODIFIED;
-#if !FF_FS_TINY
 		if (res == FR_OK && (fp->flag & FA_DIRTY)) {
 			if (disk_write(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) {
 				res = FR_DISK_ERR;
@@ -4462,7 +4405,6 @@ FRESULT f_truncate (
 				fp->flag &= (uint8_t)~FA_DIRTY;
 			}
 		}
-#endif
 		if (res != FR_OK) ABORT(fs, res);
 	}
 
@@ -4496,7 +4438,7 @@ FRESULT f_unlink (
 		dj.obj.fs = fs;
 		INIT_NAMBUF(fs);
 		res = follow_path(&dj, path);		/* Follow the file path */
-		if (FF_FS_RPATH && res == FR_OK && (dj.fn[NSFLAG] & NS_DOT)) {
+		if (res == FR_OK && (dj.fn[NSFLAG] & NS_DOT)) {
 			res = FR_INVALID_NAME;			/* Cannot remove dot entry */
 		}
 #if FF_FS_LOCK != 0
@@ -4523,11 +4465,9 @@ FRESULT f_unlink (
 					dclst = ld_clust(fs, dj.dir);
 				}
 				if (dj.obj.attr & AM_DIR) {			/* Is it a sub-directory? */
-#if FF_FS_RPATH != 0
 					if (dclst == fs->cdir) {		 	/* Is it the current directory? */
 						res = FR_DENIED;
 					} else
-#endif
 					{
 						sdj.obj.fs = fs;				/* Open the sub-directory */
 						sdj.obj.sclust = dclst;
@@ -4590,7 +4530,7 @@ FRESULT f_mkdir (
 		INIT_NAMBUF(fs);
 		res = follow_path(&dj, path);			/* Follow the file path */
 		if (res == FR_OK) res = FR_EXIST;		/* Any object with same name is already existing */
-		if (FF_FS_RPATH && res == FR_NO_FILE && (dj.fn[NSFLAG] & NS_DOT)) {
+		if (res == FR_NO_FILE && (dj.fn[NSFLAG] & NS_DOT)) {
 			res = FR_INVALID_NAME;
 		}
 		if (res == FR_NO_FILE) {				/* Can create a new directory */
@@ -5206,10 +5146,6 @@ FRESULT f_forward (
 		sect = clst2sect(fs, fp->clust);			/* Get current data sector */
 		if (sect == 0) ABORT(fs, FR_INT_ERR);
 		sect += csect;
-#if FF_FS_TINY
-		if (move_window(fs, sect) != FR_OK) ABORT(fs, FR_DISK_ERR);	/* Move sector window to the file data */
-		dbuf = fs->win;
-#else
 		if (fp->sect != sect) {		/* Fill sector cache with file data */
 			if (fp->flag & FA_DIRTY) {		/* Write-back dirty sector cache */
 				if (disk_write(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);
@@ -5218,7 +5154,6 @@ FRESULT f_forward (
 			if (disk_read(fs->pdrv, fp->buf, sect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);
 		}
 		dbuf = fp->buf;
-#endif
 		fp->sect = sect;
 		rcnt = SS(fs) - (unsigned int)fp->fptr % SS(fs);	/* Number of bytes left in the sector */
 		if (rcnt > btf) rcnt = btf;					/* Clip it by btr if needed */

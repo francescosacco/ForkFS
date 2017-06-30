@@ -1,6 +1,10 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-06-30 - Remove definition.
+  * Remove FF_FS_TINY. Close #13
+  * Remove FF_FS_RPATH. Close #14
+
 * 2017-06-27 - Remove some definitions and integer file.
   * Remove FF_DEFINED and FFCONF_DEF. Close #10
   * Remove _WIN32 for Windows compilation.
