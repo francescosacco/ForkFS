@@ -6,16 +6,6 @@
 / Function Configurations
 /---------------------------------------------------------------------------*/
 
-#define FF_FS_MINIMIZE	0
-/* This option defines minimization level to remove some basic API functions.
-/
-/   0: All basic functions are enabled.
-/   1: f_stat(), f_getfree(), f_unlink(), f_mkdir(), f_truncate() and f_rename()
-/      are removed.
-/   2: f_opendir(), f_readdir() and f_closedir() are removed in addition to 1.
-/   3: f_lseek() function is removed in addition to 2. */
-
-
 #define FF_USE_STRFUNC	2
 /* This option switches string functions, f_gets(), f_putc(), f_puts() and
 /  f_printf().
@@ -28,18 +18,6 @@
 #define FF_USE_FIND		1
 /* This option switches filtered directory read functions, f_findfirst() and
 /  f_findnext(). (0:Disable, 1:Enable 2:Enable with matching altname[] too) */
-
-
-#define FF_USE_MKFS		1
-/* This option switches f_mkfs() function. (0:Disable or 1:Enable) */
-
-
-#define FF_USE_FASTSEEK	1
-/* This option switches fast seek function. (0:Disable or 1:Enable) */
-
-
-#define FF_USE_EXPAND	1
-/* This option switches f_expand function. (0:Disable or 1:Enable) */
 
 
 #define FF_USE_CHMOD	1

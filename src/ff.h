@@ -168,9 +168,7 @@ typedef struct {
     uint32_t    sect;            /* Sector number appearing in buf[] (0:invalid) */
     uint32_t    dir_sect;        /* Sector number containing the directory entry (not used at exFAT) */
     uint8_t *    dir_ptr;        /* Pointer to the directory entry in the win[] (not used at exFAT) */
-#if FF_USE_FASTSEEK
     uint32_t*    cltbl;            /* Pointer to the cluster link map table (nulled on open, set by application) */
-#endif
     uint8_t    buf[FF_MAX_SS];    /* File private data read/write window */
 } FIL;
 

@@ -1,6 +1,12 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-07-04 - Remove FF_FS_MINIMIZE, FF_USE_MKFS, FF_USE_FASTSEEK and FF_USE_EXPAND definitions.
+  * Remove FF_FS_MINIMIZE definition. Close #11
+  * Remove FF_USE_MKFS definition. Close #16
+  * Remove FF_USE_FASTSEEK definition. Close #17
+  * Remove FF_USE_EXPAND definition. Close #18
+
 * 2017-06-30 - Remove definition.
   * Remove FF_FS_TINY. Close #13
   * Remove FF_FS_RPATH. Close #14

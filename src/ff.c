@@ -1417,7 +1417,6 @@ uint32_t create_chain (	/* 0:No free cluster, 1:Internal error, 0xFFFFFFFF:Disk 
 
 
 
-#if FF_USE_FASTSEEK
 /*-----------------------------------------------------------------------*/
 /* FAT handling - Convert offset into cluster with link map table        */
 /*-----------------------------------------------------------------------*/
@@ -1442,10 +1441,6 @@ uint32_t clmt_clust (	/* <2:Error, >=2:Cluster number */
 	}
 	return cl + *tbl;	/* Return the cluster number */
 }
-
-#endif	/* FF_USE_FASTSEEK */
-
-
 
 
 /*-----------------------------------------------------------------------*/
@@ -1702,7 +1697,7 @@ int cmp_lfn (				/* 1:matched, 0:not matched */
 }
 
 
-#if FF_FS_MINIMIZE <= 1 || FF_USE_LABEL || FF_FS_EXFAT
+#if FF_USE_LABEL || FF_FS_EXFAT
 /*-----------------------------------------------------*/
 /* FAT-LFN: Pick a part of file name from an LFN entry */
 /*-----------------------------------------------------*/
@@ -1900,10 +1895,7 @@ uint16_t xname_sum (		/* Get check sum (to be used as hash) of the name */
 	return sum;
 }
 
-
-#if FF_USE_MKFS
-static
-uint32_t xsum32 (
+static uint32_t xsum32 (
 	uint8_t  dat,	/* Byte to be calculated */
 	uint32_t sum	/* Previous sum */
 )
@@ -1911,10 +1903,7 @@ uint32_t xsum32 (
 	sum = ((sum & 1) ? 0x80000000 : 0) + (sum >> 1) + dat;
 	return sum;
 }
-#endif
 
-
-#if FF_FS_MINIMIZE <= 1
 /*------------------------------------------------------*/
 /* exFAT: Get object information from a directory block */
 /*------------------------------------------------------*/
@@ -1950,9 +1939,6 @@ void get_xdir_info (
 	fno->ftime = ld_word(dirb + XDIR_ModTime + 0);	/* Time */
 	fno->fdate = ld_word(dirb + XDIR_ModTime + 2);	/* Date */
 }
-
-#endif	/* FF_FS_MINIMIZE <= 1 */
-
 
 /*-----------------------------------*/
 /* exFAT: Get a directry entry block */
@@ -2106,7 +2092,7 @@ void create_xdir (
 
 
 
-#if FF_FS_MINIMIZE <= 1 || FF_USE_LABEL || FF_FS_EXFAT
+#if FF_USE_LABEL || FF_FS_EXFAT
 /*-----------------------------------------------------------------------*/
 /* Read an object from the directory                                     */
 /*-----------------------------------------------------------------------*/
@@ -2182,7 +2168,7 @@ FRESULT dir_read (
 	return res;
 }
 
-#endif	/* FF_FS_MINIMIZE <= 1 || FF_USE_LABEL */
+#endif	/* FF_USE_LABEL */
 
 
 
@@ -2371,7 +2357,6 @@ FRESULT dir_register (	/* FR_OK:succeeded, FR_DENIED:no free entry or too many S
 
 
 
-#if FF_FS_MINIMIZE == 0
 /*-----------------------------------------------------------------------*/
 /* Remove an object from the directory                                   */
 /*-----------------------------------------------------------------------*/
@@ -2415,11 +2400,6 @@ FRESULT dir_remove (	/* FR_OK:Succeeded, FR_DISK_ERR:A disk error */
 	return res;
 }
 
-#endif /* FF_FS_MINIMIZE == 0 */
-
-
-
-#if FF_FS_MINIMIZE <= 1
 /*-----------------------------------------------------------------------*/
 /* Get file information from directory entry                             */
 /*-----------------------------------------------------------------------*/
@@ -2517,11 +2497,7 @@ void get_fileinfo (		/* No return code */
 	fno->ftime = (uint16_t)tm; fno->fdate = (uint16_t)(tm >> 16);
 }
 
-#endif /* FF_FS_MINIMIZE <= 1 */
-
-
-
-#if FF_USE_FIND && FF_FS_MINIMIZE <= 1
+#if FF_USE_FIND
 /*-----------------------------------------------------------------------*/
 /* Pattern matching                                                      */
 /*-----------------------------------------------------------------------*/
@@ -2593,7 +2569,7 @@ int pattern_matching (	/* 0:not matched, 1:matched */
 	return 0;
 }
 
-#endif /* FF_USE_FIND && FF_FS_MINIMIZE <= 1 */
+#endif /* FF_USE_FIND */
 
 
 
@@ -3425,9 +3401,7 @@ FRESULT f_open (
 				fp->obj.sclust = ld_clust(fs, dj.dir);					/* Get object allocation info */
 				fp->obj.objsize = ld_dword(dj.dir + DIR_FileSize);
 			}
-#if FF_USE_FASTSEEK
 			fp->cltbl = 0;			/* Disable fast seek mode */
-#endif
 			fp->obj.fs = fs;	 	/* Validate the file object */
 			fp->obj.id = fs->id;
 			fp->flag = mode;		/* Set file access mode */
@@ -3502,11 +3476,10 @@ FRESULT f_read (
 				if (fp->fptr == 0) {			/* On the top of the file? */
 					clst = fp->obj.sclust;		/* Follow cluster chain from the origin */
 				} else {						/* Middle or end of the file */
-#if FF_USE_FASTSEEK
-					if (fp->cltbl) {
+
+    				if (fp->cltbl) {
 						clst = clmt_clust(fp, fp->fptr);	/* Get cluster# from the CLMT */
 					} else
-#endif
 					{
 						clst = get_fat(&fp->obj, fp->clust);	/* Follow cluster chain on the FAT */
 					}
@@ -3524,11 +3497,12 @@ FRESULT f_read (
 					cc = fs->csize - csect;
 				}
 				if (disk_read(fs->pdrv, rbuff, sect, cc) != RES_OK) ABORT(fs, FR_DISK_ERR);
-#if FF_FS_MINIMIZE <= 2		/* Replace one of the read sectors with cached data if it contains a dirty sector */
+
+                /* Replace one of the read sectors with cached data if it contains a dirty sector */
 				if ((fp->flag & FA_DIRTY) && fp->sect - sect < cc) {
 					mem_cpy(rbuff + ((fp->sect - sect) * SS(fs)), fp->buf, SS(fs));
 				}
-#endif
+
 				rcnt = SS(fs) * cc;				/* Number of bytes transferred */
 				continue;
 			}
@@ -3592,11 +3566,9 @@ FRESULT f_write (
 						clst = create_chain(&fp->obj, 0);	/* create a new cluster chain */
 					}
 				} else {					/* On the middle or end of the file */
-#if FF_USE_FASTSEEK
 					if (fp->cltbl) {
 						clst = clmt_clust(fp, fp->fptr);	/* Get cluster# from the CLMT */
 					} else
-#endif
 					{
 						clst = create_chain(&fp->obj, fp->clust);	/* Follow or stretch cluster chain on the FAT */
 					}
@@ -3621,12 +3593,12 @@ FRESULT f_write (
 					cc = fs->csize - csect;
 				}
 				if (disk_write(fs->pdrv, wbuff, sect, cc) != RES_OK) ABORT(fs, FR_DISK_ERR);
-#if FF_FS_MINIMIZE <= 2
+
 				if (fp->sect - sect < cc) { /* Refill sector cache if it gets invalidated by the direct write */
 					mem_cpy(fp->buf, wbuff + ((fp->sect - sect) * SS(fs)), SS(fs));
 					fp->flag &= (uint8_t)~FA_DIRTY;
 				}
-#endif
+
 				wcnt = SS(fs) * cc;		/* Number of bytes transferred */
 				continue;
 			}
@@ -3906,7 +3878,6 @@ FRESULT f_getcwd (
 }
 
 
-#if FF_FS_MINIMIZE <= 2
 /*-----------------------------------------------------------------------*/
 /* Seek File Read/Write Pointer                                          */
 /*-----------------------------------------------------------------------*/
@@ -3920,9 +3891,7 @@ FRESULT f_lseek (
 	FATFS *fs;
 	uint32_t clst, bcs, nsect;
 	FSIZE_t ifptr;
-#if FF_USE_FASTSEEK
 	uint32_t cl, pcl, ncl, tcl, dsc, tlen, ulen, *tbl;
-#endif
 
 	res = validate(&fp->obj, &fs);		/* Check validity of the file object */
 	if (res == FR_OK) res = (FRESULT)fp->err;
@@ -3933,7 +3902,6 @@ FRESULT f_lseek (
 #endif
 	if (res != FR_OK) LEAVE_FF(fs, res);
 
-#if FF_USE_FASTSEEK
 	if (fp->cltbl) {	/* Fast seek */
 		if (ofs == CREATE_LINKMAP) {	/* Create CLMT */
 			tbl = fp->cltbl;
@@ -3979,8 +3947,6 @@ FRESULT f_lseek (
 			}
 		}
 	} else
-#endif
-
 	/* Normal Seek */
 	{
 #if FF_FS_EXFAT
@@ -4056,7 +4022,6 @@ FRESULT f_lseek (
 
 
 
-#if FF_FS_MINIMIZE <= 1
 /*-----------------------------------------------------------------------*/
 /* Create a Directory Object                                             */
 /*-----------------------------------------------------------------------*/
@@ -4242,7 +4207,6 @@ FRESULT f_findfirst (
 
 
 
-#if FF_FS_MINIMIZE == 0
 /*-----------------------------------------------------------------------*/
 /* Get File Status                                                       */
 /*-----------------------------------------------------------------------*/
@@ -4697,10 +4661,6 @@ FRESULT f_rename (
 	LEAVE_FF(fs, res);
 }
 
-#endif /* FF_FS_MINIMIZE == 0 */
-#endif /* FF_FS_MINIMIZE <= 1 */
-#endif /* FF_FS_MINIMIZE <= 2 */
-
 
 
 #if FF_USE_CHMOD
@@ -5013,7 +4973,6 @@ FRESULT f_setlabel (
 
 
 
-#if FF_USE_EXPAND
 /*-----------------------------------------------------------------------*/
 /* Allocate a Contiguous Blocks to the File                              */
 /*-----------------------------------------------------------------------*/
@@ -5099,7 +5058,6 @@ FRESULT f_expand (
 	LEAVE_FF(fs, res);
 }
 
-#endif /* FF_USE_EXPAND */
 
 
 
@@ -5167,7 +5125,6 @@ FRESULT f_forward (
 
 
 
-#if FF_USE_MKFS
 /*-----------------------------------------------------------------------*/
 /* Create an FAT/exFAT volume                                            */
 /*-----------------------------------------------------------------------*/
@@ -5691,7 +5648,6 @@ FRESULT f_fdisk (
 }
 
 #endif /* FF_MULTI_PARTITION */
-#endif /* FF_USE_MKFS */
 
 
 
