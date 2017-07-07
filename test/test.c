@@ -4,7 +4,7 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 18 )
+#define VERSION_NUMBER                           ( 19 )
 #define FRESULT_POSITION                         ( 62 )
 #define BUFFER_SIZE                              ( 1024 )
 
@@ -73,10 +73,18 @@ int main( int argc , char * argv[] )
     
     printf( "ForkFS - Sanity Test Software - Version: %03d\n" , VERSION_NUMBER ) ;
 
-    uint32_t plist[] = { 50 , 50 , 0 , 0 } ;  // Divide the drive into two partitions.
+    uint32_t plist0[] = { 50  , 50 , 0 , 0 } ;  // Divide the drive into two partitions.
+    uint32_t plist1[] = { 100 ,  0 , 0 , 0 } ;  // Divide the drive into two partitions.
 
-    ffRet = f_fdisk( 0 , plist , workBuffer ) ;
-    print_FRESULT( "f_fdisk(0,plist,workBuffer)" , ffRet ) ;
+    ffRet = f_fdisk( 0 , plist0 , workBuffer ) ;
+    print_FRESULT( "f_fdisk(0,plist0,workBuffer)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    ffRet = f_fdisk( 1 , plist1 , workBuffer ) ;
+    print_FRESULT( "f_fdisk(1,plist1,workBuffer)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
@@ -96,6 +104,13 @@ int main( int argc , char * argv[] )
         return( -1 ) ; 
     }
 
+    ffRet = f_mkfs( "2:" , FM_ANY , 0 , workBuffer , sizeof( workBuffer ) ) ;
+    print_FRESULT( "f_mkfs(\"2:\",FM_ANY,0,workBuffer,sizeof(workBuffer))" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
     ffRet = f_mount( &fatFs[ 0 ] , "0:" , 0 ) ;
     print_FRESULT( "f_mount(&fatFs[0],\"0:\",0)" , ffRet ) ;
     if( ffRet != FR_OK )
@@ -105,6 +120,13 @@ int main( int argc , char * argv[] )
 
     ffRet = f_mount( &fatFs[ 1 ] , "1:" , 0 ) ;
     print_FRESULT( "f_mount(&fatFs[1],\"1:\",0)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    ffRet = f_mount( &fatFs[ 2 ] , "2:" , 0 ) ;
+    print_FRESULT( "f_mount(&fatFs[2],\"2:\",0)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
@@ -700,6 +722,33 @@ int main( int argc , char * argv[] )
         return( -1 ) ; 
     }
 
+    ffRet = f_open( &file, "2:/file.bin" , FA_WRITE | FA_CREATE_ALWAYS ) ;
+    print_FRESULT( "f_open(&file,\"2:/file.bin\",FA_WRITE|FA_CREATE_ALWAYS)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+
+    ( void ) memset( buffer , 0x5A , sizeof( buffer ) ) ;
+    ffRet = f_write( &file , ( const void * ) buffer , sizeof( buffer ) , &bw );
+    print_FRESULT( "f_write(&file,(const void *)buffer,sizeof(buffer),&bw)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+    if( bw != sizeof( buffer ) )
+    {
+        printf( "\t\tbw -> %d != %d\n" , bw , sizeof( buffer ) ) ;
+        return( -1 ) ;
+    }
+ 
+    ffRet = f_close( &file );
+    print_FRESULT( "f_close(&file)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+    
     return( 0 ) ;
 }
 

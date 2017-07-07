@@ -1,6 +1,11 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-07-07 - Version 019 - Add flush and new drive to DiskIO, improve test.
+  * Add fflush() to disk_ioctl().
+  * Add new drive with 128MB.
+  * Improve test using new drive.
+
 * 2017-06-27 - Version 018 - Fix libraries and types.
   * Add string.h to use memset() and strcmp().
   * Change WORD type.

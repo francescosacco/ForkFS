@@ -1,6 +1,11 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-07-07 - Remove FF_USE_CHMOD definition.
+  * Remove FF_USE_CHMOD definition. Close #19
+  * Remove FF_USE_LABEL definition. Close #20
+  * Change mem_cpy() to memcpy() from String.h. Close #24
+
 * 2017-07-04 - Remove FF_FS_MINIMIZE, FF_USE_MKFS, FF_USE_FASTSEEK and FF_USE_EXPAND definitions.
   * Remove FF_FS_MINIMIZE definition. Close #11
   * Remove FF_USE_MKFS definition. Close #16

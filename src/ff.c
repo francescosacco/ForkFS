@@ -22,6 +22,7 @@
 #include "ff.h"			/* Declarations of FatFs API */
 #include "diskio.h"		/* Declarations of device I/O functions */
 
+#include <string.h>
 
 /*--------------------------------------------------------------------------
 
@@ -612,21 +613,6 @@ void st_qword (uint8_t* ptr, uint64_t val)	/* Store an 8-byte word in little-end
 /*-----------------------------------------------------------------------*/
 /* String functions                                                      */
 /*-----------------------------------------------------------------------*/
-
-/* Copy memory to memory */
-static
-void mem_cpy (void* dst, const void* src, unsigned int cnt)
-{
-	uint8_t *d = (uint8_t*)dst;
-	const uint8_t *s = (const uint8_t*)src;
-
-	if (cnt != 0) {
-		do {
-			*d++ = *s++;
-		} while (--cnt);
-	}
-}
-
 
 /* Fill memory block */
 static
@@ -1697,7 +1683,7 @@ int cmp_lfn (				/* 1:matched, 0:not matched */
 }
 
 
-#if FF_USE_LABEL || FF_FS_EXFAT
+#if FF_FS_EXFAT
 /*-----------------------------------------------------*/
 /* FAT-LFN: Pick a part of file name from an LFN entry */
 /*-----------------------------------------------------*/
@@ -1788,7 +1774,7 @@ void gen_numname (
 	uint32_t sr;
 
 
-	mem_cpy(dst, src, 11);
+    ( void ) memcpy( ( void * ) dst , ( const void * ) src , 11 ) ;
 
 	if (seq > 5) {	/* In case of many collisions, generate a hash number instead of sequential number */
 		sr = seq;
@@ -1958,7 +1944,9 @@ FRESULT load_xdir (	/* FR_INT_ERR: invalid entry block */
 	res = move_window(dp->obj.fs, dp->sect);
 	if (res != FR_OK) return res;
 	if (dp->dir[XDIR_Type] != 0x85) return FR_INT_ERR;	/* Invalid order */
-	mem_cpy(dirb + 0 * SZDIRE, dp->dir, SZDIRE);
+
+    ( void ) memcpy( ( void * ) ( dirb + 0 * SZDIRE ) , ( const void * ) dp->dir , ( size_t ) SZDIRE ) ;
+    
 	sz_ent = (dirb[XDIR_NumSec] + 1) * SZDIRE;
 	if (sz_ent < 3 * SZDIRE || sz_ent > 19 * SZDIRE) return FR_INT_ERR;
 
@@ -1969,7 +1957,9 @@ FRESULT load_xdir (	/* FR_INT_ERR: invalid entry block */
 	res = move_window(dp->obj.fs, dp->sect);
 	if (res != FR_OK) return res;
 	if (dp->dir[XDIR_Type] != 0xC0) return FR_INT_ERR;	/* Invalid order */
-	mem_cpy(dirb + 1 * SZDIRE, dp->dir, SZDIRE);
+
+    ( void ) memcpy( ( void * ) ( dirb + 1 * SZDIRE ) , ( const void * ) ( dp->dir ) , ( size_t ) SZDIRE ) ;
+    
 	if (MAXDIRB(dirb[XDIR_NumName]) > sz_ent) return FR_INT_ERR;
 
 	/* Load C1 entries */
@@ -1981,8 +1971,13 @@ FRESULT load_xdir (	/* FR_INT_ERR: invalid entry block */
 		res = move_window(dp->obj.fs, dp->sect);
 		if (res != FR_OK) return res;
 		if (dp->dir[XDIR_Type] != 0xC1) return FR_INT_ERR;	/* Invalid order */
-		if (i < MAXDIRB(FF_MAX_LFN)) mem_cpy(dirb + i, dp->dir, SZDIRE);
-	} while ((i += SZDIRE) < sz_ent);
+
+		if( i < MAXDIRB( FF_MAX_LFN ) )
+        {
+            ( void ) memcpy( ( void * ) ( dirb + i ) , ( const void * ) dp->dir , ( size_t ) SZDIRE ) ;
+        }
+
+    } while ((i += SZDIRE) < sz_ent);
 
 	/* Sanity check (do it for only accessible object) */
 	if (i <= MAXDIRB(FF_MAX_LFN)) {
@@ -2039,8 +2034,13 @@ FRESULT store_xdir (
 	res = dir_sdi(dp, dp->blk_ofs);
 	while (res == FR_OK) {
 		res = move_window(dp->obj.fs, dp->sect);
-		if (res != FR_OK) break;
-		mem_cpy(dp->dir, dirb, SZDIRE);
+		if( res != FR_OK )
+        {
+            break ;
+        }
+		
+        ( void ) memcpy( ( void * ) ( dp->dir ) , ( const void * ) ( dirb ) , ( size_t ) SZDIRE ) ;
+        
 		dp->obj.fs->wflag = 1;
 		if (--nent == 0) break;
 		dirb += SZDIRE;
@@ -2092,7 +2092,7 @@ void create_xdir (
 
 
 
-#if FF_USE_LABEL || FF_FS_EXFAT
+#if FF_FS_EXFAT
 /*-----------------------------------------------------------------------*/
 /* Read an object from the directory                                     */
 /*-----------------------------------------------------------------------*/
@@ -2119,7 +2119,7 @@ FRESULT dir_read (
 		}
 #if FF_FS_EXFAT
 		if (fs->fs_type == FS_EXFAT) {	/* On the exFAT volume */
-			if (FF_USE_LABEL && vol) {
+			if (vol) {
 				if (c == 0x83) break;	/* Volume label entry? */
 			} else {
 				if (c == 0x85) {		/* Start of the file entry block? */
@@ -2168,7 +2168,7 @@ FRESULT dir_read (
 	return res;
 }
 
-#endif	/* FF_USE_LABEL */
+#endif
 
 
 
@@ -2304,7 +2304,8 @@ FRESULT dir_register (	/* FR_OK:succeeded, FR_DENIED:no free entry or too many S
 	}
 #endif
 	/* On the FAT/FAT32 volume */
-	mem_cpy(sn, dp->fn, 12);
+    ( void ) memcpy( ( void * ) ( sn ) , ( const void * ) ( dp->fn ) , 12 ) ;
+    
 	if (sn[NSFLAG] & NS_LOSS) {			/* When LFN is out of 8.3 format, generate a numbered name */
 		dp->fn[NSFLAG] = NS_NOLFN;		/* Find only SFN */
 		for (n = 1; n < 100; n++) {
@@ -2344,7 +2345,10 @@ FRESULT dir_register (	/* FR_OK:succeeded, FR_DENIED:no free entry or too many S
 		res = move_window(fs, dp->sect);
 		if (res == FR_OK) {
 			mem_set(dp->dir, 0, SZDIRE);	/* Clean the entry */
-			mem_cpy(dp->dir + DIR_Name, dp->fn, 11);	/* Put SFN */
+			
+            // Put SFN.
+            ( void ) memcpy( ( void * ) ( dp->dir + DIR_Name ) , ( const void * ) ( dp->fn ) , 11 ) ;
+
 #if FF_USE_LFN
 			dp->dir[DIR_NTres] = dp->fn[NSFLAG] & (NS_BODY | NS_EXT);	/* Put NT flag */
 #endif
@@ -3499,8 +3503,9 @@ FRESULT f_read (
 				if (disk_read(fs->pdrv, rbuff, sect, cc) != RES_OK) ABORT(fs, FR_DISK_ERR);
 
                 /* Replace one of the read sectors with cached data if it contains a dirty sector */
-				if ((fp->flag & FA_DIRTY) && fp->sect - sect < cc) {
-					mem_cpy(rbuff + ((fp->sect - sect) * SS(fs)), fp->buf, SS(fs));
+				if( ( fp->flag & FA_DIRTY ) && fp->sect - sect < cc )
+                {
+				    ( void ) memcpy( ( void * ) ( rbuff + ( ( fp->sect - sect ) * SS( fs ) ) ) , ( const void * ) ( fp->buf ) , ( size_t ) SS( fs ) ) ;
 				}
 
 				rcnt = SS(fs) * cc;				/* Number of bytes transferred */
@@ -3517,8 +3522,15 @@ FRESULT f_read (
 			fp->sect = sect;
 		}
 		rcnt = SS(fs) - (unsigned int)fp->fptr % SS(fs);	/* Number of bytes left in the sector */
-		if (rcnt > btr) rcnt = btr;					/* Clip it by btr if needed */
-		mem_cpy(rbuff, fp->buf + fp->fptr % SS(fs), rcnt);	/* Extract partial sector */
+        
+        // Clip it by btr if needed.
+		if( rcnt > btr )
+        {
+            rcnt = btr ;
+        }
+        
+        // Extract partial sector.
+		( void ) memcpy( ( void * ) rbuff , ( const void * ) ( fp->buf + fp->fptr % SS( fs ) ) , ( size_t ) rcnt ) ;
 	}
 
 	LEAVE_FF(fs, FR_OK);
@@ -3594,13 +3606,15 @@ FRESULT f_write (
 				}
 				if (disk_write(fs->pdrv, wbuff, sect, cc) != RES_OK) ABORT(fs, FR_DISK_ERR);
 
-				if (fp->sect - sect < cc) { /* Refill sector cache if it gets invalidated by the direct write */
-					mem_cpy(fp->buf, wbuff + ((fp->sect - sect) * SS(fs)), SS(fs));
-					fp->flag &= (uint8_t)~FA_DIRTY;
+				// Refill sector cache if it gets invalidated by the direct write.
+                if( fp->sect - sect < cc )
+                {
+					( void ) memcpy( ( void * ) fp->buf , ( const void * ) ( wbuff + ( ( fp->sect - sect ) * SS( fs ) ) ) , ( size_t ) SS( fs ) ) ;
+					fp->flag &= ( uint8_t ) ~FA_DIRTY ;
 				}
 
 				wcnt = SS(fs) * cc;		/* Number of bytes transferred */
-				continue;
+				continue ;
 			}
 			if (fp->sect != sect && 		/* Fill sector cache with file data */
 				fp->fptr < fp->obj.objsize &&
@@ -3610,9 +3624,16 @@ FRESULT f_write (
 			fp->sect = sect;
 		}
 		wcnt = SS(fs) - (unsigned int)fp->fptr % SS(fs);	/* Number of bytes left in the sector */
-		if (wcnt > btw) wcnt = btw;					/* Clip it by btw if needed */
-		mem_cpy(fp->buf + fp->fptr % SS(fs), wbuff, wcnt);	/* Fit data to the sector */
-		fp->flag |= FA_DIRTY;
+
+        // Clip it by btw if needed.
+		if( wcnt > btw )
+        {
+            wcnt = btw ;
+        }
+
+		// Fit data to the sector.
+        ( void ) memcpy( ( void * ) ( fp->buf + fp->fptr % SS( fs ) ) , ( const void * ) wbuff , ( size_t ) wcnt ) ;
+		fp->flag |= FA_DIRTY ;
 	}
 
 	fp->flag |= FA_MODIFIED;				/* Set file change flag */
@@ -4515,7 +4536,10 @@ FRESULT f_mkdir (
 					dir[DIR_Attr] = AM_DIR;
 					st_dword(dir + DIR_ModTime, tm);
 					st_clust(fs, dir, dcl);
-					mem_cpy(dir + SZDIRE, dir, SZDIRE); /* Create ".." entry */
+
+                    // Create ".." entry.
+					( void ) memcpy( ( void * ) ( dir + SZDIRE ) , ( const void * ) dir , ( size_t ) SZDIRE ) ;
+
 					dir[SZDIRE + 1] = '.'; pcl = dj.obj.sclust;
 					st_clust(fs, dir + SZDIRE, pcl);
 					fs->wflag = 1;
@@ -4594,8 +4618,10 @@ FRESULT f_rename (
 				uint8_t nf, nn;
 				uint16_t nh;
 
-				mem_cpy(buf, fs->dirbuf, SZDIRE * 2);	/* Save 85+C0 entry of old object */
-				mem_cpy(&djn, &djo, sizeof djo);
+				// Save 85+C0 entry of old object.
+                ( void ) memcpy( ( void * ) buf  , ( const void * ) ( fs->dirbuf ) , ( size_t ) ( SZDIRE * 2 ) ) ;
+				( void ) memcpy( ( void * ) &djn , ( const void * )   &djo         ,             sizeof( djo ) ) ;
+
 				res = follow_path(&djn, path_new);		/* Make sure if new object name is not in use */
 				if (res == FR_OK) {						/* Is new name already in use by any other object? */
 					res = (djn.obj.sclust == djo.obj.sclust && djn.dptr == djo.dptr) ? FR_NO_FILE : FR_EXIST;
@@ -4605,7 +4631,10 @@ FRESULT f_rename (
 					if (res == FR_OK) {
 						nf = fs->dirbuf[XDIR_NumSec]; nn = fs->dirbuf[XDIR_NumName];
 						nh = ld_word(fs->dirbuf + XDIR_NameHash);
-						mem_cpy(fs->dirbuf, buf, SZDIRE * 2);	/* Restore 85+C0 entry */
+						
+                        // Restore 85+C0 entry.
+                        ( void ) memcpy( ( void * ) fs->dirbuf , ( const void * ) buf , ( size_t ) ( SZDIRE * 2 ) ) ;
+
 						fs->dirbuf[XDIR_NumSec] = nf; fs->dirbuf[XDIR_NumName] = nn;
 						st_word(fs->dirbuf + XDIR_NameHash, nh);
 						if (!(fs->dirbuf[XDIR_Attr] & AM_DIR)) fs->dirbuf[XDIR_Attr] |= AM_ARC;	/* Set archive attribute if it is a file */
@@ -4616,8 +4645,12 @@ FRESULT f_rename (
 			} else
 #endif
 			{	/* At FAT/FAT32 volume */
-				mem_cpy(buf, djo.dir, SZDIRE);			/* Save directory entry of the object */
-				mem_cpy(&djn, &djo, sizeof (DIR));		/* Duplicate the directory object */
+				// Save directory entry of the object.
+                ( void ) memcpy( ( void * ) buf , ( const void * ) djo.dir , ( size_t ) SZDIRE ) ;
+
+				// Duplicate the directory object.
+                ( void ) memcpy( ( void * ) &djn , ( const void * ) &djo , sizeof( DIR ) ) ;
+
 				res = follow_path(&djn, path_new);		/* Make sure if new object name is not in use */
 				if (res == FR_OK) {						/* Is new name already in use by any other object? */
 					res = (djn.obj.sclust == djo.obj.sclust && djn.dptr == djo.dptr) ? FR_NO_FILE : FR_EXIST;
@@ -4626,7 +4659,7 @@ FRESULT f_rename (
 					res = dir_register(&djn);			/* Register the new entry */
 					if (res == FR_OK) {
 						dir = djn.dir;					/* Copy directory entry of the object except name */
-						mem_cpy(dir + 13, buf + 13, SZDIRE - 13);
+						( void ) memcpy( ( void * ) ( dir + 13 ) , ( const void * ) ( buf + 13 ) , ( size_t ) ( SZDIRE - 13 ) ) ;
 						dir[DIR_Attr] = buf[DIR_Attr];
 						if (!(dir[DIR_Attr] & AM_DIR)) dir[DIR_Attr] |= AM_ARC;	/* Set archive attribute if it is a file */
 						fs->wflag = 1;
@@ -4662,8 +4695,6 @@ FRESULT f_rename (
 }
 
 
-
-#if FF_USE_CHMOD
 /*-----------------------------------------------------------------------*/
 /* Change Attribute                                                      */
 /*-----------------------------------------------------------------------*/
@@ -4753,11 +4784,7 @@ FRESULT f_utime (
 	LEAVE_FF(fs, res);
 }
 
-#endif	/* FF_USE_CHMOD */
 
-
-
-#if FF_USE_LABEL
 /*-----------------------------------------------------------------------*/
 /* Get Volume Label                                                      */
 /*-----------------------------------------------------------------------*/
@@ -4931,14 +4958,22 @@ FRESULT f_setlabel (
 	if (res == FR_OK) {
 		res = dir_read(&dj, 1);	/* Get volume label entry */
 		if (res == FR_OK) {
-			if (FF_FS_EXFAT && fs->fs_type == FS_EXFAT) {
+			if (FF_FS_EXFAT && fs->fs_type == FS_EXFAT)
+            {
 				dj.dir[XDIR_NumLabel] = (uint8_t)(slen / 2);	/* Change the volume label */
-				mem_cpy(dj.dir + XDIR_Label, dirvn, slen);
-			} else {
-				if (slen != 0) {
-					mem_cpy(dj.dir, dirvn, 11);	/* Change the volume label */
-				} else {
-					dj.dir[DIR_Name] = DDEM;	/* Remove the volume label */
+				( void ) memcpy( ( void * ) ( dj.dir + XDIR_Label ) , ( const void * ) dirvn , ( size_t ) slen ) ;
+			}
+            else
+            {
+				if( slen != 0 )
+                {
+					// Change the volume label.
+                    ( void ) memcpy( ( void * ) dj.dir , ( const void * ) dirvn , 11 ) ;
+				}
+                else
+                {
+					// Remove the volume label.
+                    dj.dir[DIR_Name] = DDEM;
 				}
 			}
 			fs->wflag = 1;
@@ -4953,10 +4988,10 @@ FRESULT f_setlabel (
 						if (FF_FS_EXFAT && fs->fs_type == FS_EXFAT) {
 							dj.dir[XDIR_Type] = 0x83;		/* Create 83 entry */
 							dj.dir[XDIR_NumLabel] = (uint8_t)(slen / 2);
-							mem_cpy(dj.dir + XDIR_Label, dirvn, slen);
+							( void ) memcpy( ( void * ) ( dj.dir + XDIR_Label ) , ( const void * ) dirvn , ( size_t ) slen ) ;
 						} else {
 							dj.dir[DIR_Attr] = AM_VOL;		/* Create volume label entry */
-							mem_cpy(dj.dir, dirvn, 11);
+							( void ) memcpy( ( void * ) dj.dir , ( const void * ) dirvn , 11 ) ;
 						}
 						fs->wflag = 1;
 						res = sync_fs(fs);
@@ -4968,9 +5003,6 @@ FRESULT f_setlabel (
 
 	LEAVE_FF(fs, res);
 }
-
-#endif /* FF_USE_LABEL */
-
 
 
 /*-----------------------------------------------------------------------*/
@@ -5339,7 +5371,10 @@ FRESULT f_mkfs (
 		for (n = 0; n < 2; n++) {
 			/* Main record (+0) */
 			mem_set(buf, 0, ss);
-			mem_cpy(buf + BS_JmpBoot, "\xEB\x76\x90" "EXFAT   ", 11);	/* Boot jump code (x86), OEM name */
+			
+            // Boot jump code (x86), OEM name.
+            ( void ) memcpy( ( void * ) ( buf + BS_JmpBoot ) , ( const void * ) "\xEB\x76\x90" "EXFAT   " , 11 ) ;
+            
 			st_dword(buf + BPB_VolOfsEx, b_vol);					/* Volume offset in the physical drive [sector] */
 			st_dword(buf + BPB_TotSecEx, sz_vol);					/* Volume size [sector] */
 			st_dword(buf + BPB_FatOfsEx, b_fat - b_vol);			/* FAT offset [sector] */
@@ -5457,7 +5492,10 @@ FRESULT f_mkfs (
 #endif
 		/* Create FAT VBR */
 		mem_set(buf, 0, ss);
-		mem_cpy(buf + BS_JmpBoot, "\xEB\xFE\x90" "MSDOS5.0", 11);/* Boot jump code (x86), OEM name */
+		
+        // Boot jump code (x86), OEM name.
+        ( void ) memcpy( ( void * ) ( buf + BS_JmpBoot ) , ( const void * ) "\xEB\xFE\x90" "MSDOS5.0" , 11 ) ;
+
 		st_word(buf + BPB_BytsPerSec, ss);				/* Sector size [byte] */
 		buf[BPB_SecPerClus] = (uint8_t)pau;				/* Cluster size [sector] */
 		st_word(buf + BPB_RsvdSecCnt, (uint16_t)sz_rsv);	/* Size of reserved area */
@@ -5472,7 +5510,8 @@ FRESULT f_mkfs (
 		st_word(buf + BPB_SecPerTrk, 63);				/* Number of sectors per track (for int13) */
 		st_word(buf + BPB_NumHeads, 255);				/* Number of heads (for int13) */
 		st_dword(buf + BPB_HiddSec, b_vol);				/* Volume offset in the physical drive [sector] */
-		if (fmt == FS_FAT32) {
+		if (fmt == FS_FAT32)
+        {
 			st_dword(buf + BS_VolID32, GET_FATTIME());	/* VSN */
 			st_dword(buf + BPB_FATSz32, sz_fat);		/* FAT size [sector] */
 			st_dword(buf + BPB_RootClus32, 2);			/* Root directory cluster # (2) */
@@ -5480,13 +5519,19 @@ FRESULT f_mkfs (
 			st_word(buf + BPB_BkBootSec32, 6);			/* Offset of backup VBR (VBR + 6) */
 			buf[BS_DrvNum32] = 0x80;					/* Drive number (for int13) */
 			buf[BS_BootSig32] = 0x29;					/* Extended boot signature */
-			mem_cpy(buf + BS_VolLab32, "NO NAME    " "FAT32   ", 19);	/* Volume label, FAT signature */
-		} else {
+			
+            // Volume label, FAT signature.
+            ( void ) memcpy( ( void * ) ( buf + BS_VolLab32 ) , ( const void * ) "NO NAME    " "FAT32   " , 19 ) ;
+		}
+        else
+        {
 			st_dword(buf + BS_VolID, GET_FATTIME());	/* VSN */
 			st_word(buf + BPB_FATSz16, (uint16_t)sz_fat);	/* FAT size [sector] */
 			buf[BS_DrvNum] = 0x80;						/* Drive number (for int13) */
 			buf[BS_BootSig] = 0x29;						/* Extended boot signature */
-			mem_cpy(buf + BS_VolLab, "NO NAME    " "FAT     ", 19);	/* Volume label, FAT signature */
+			
+            // Volume label, FAT signature.
+            ( void ) memcpy( ( void * ) ( buf + BS_VolLab ) , ( const void * ) "NO NAME    " "FAT     " , 19 ) ;
 		}
 		st_word(buf + BS_55AA, 0xAA55);					/* Signature (offset is fixed here regardless of sector size) */
 		if (disk_write(pdrv, buf, b_vol, 1) != RES_OK) return FR_DISK_ERR;	/* Write it to the VBR sector */

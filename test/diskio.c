@@ -10,13 +10,18 @@
 #include <stdio.h>
 #include "diskio.h"     /* FatFs lower layer API */
 
-#define FILEDISK_NAME                            "filedisk.dsk"
-#define FILEDISK_SIZE                            ( 16 * 1024 * 1024 ) // 16MBytes.
-#define FILEDISK_SECTOR_SIZE                     ( 512 ) // Sector Size = 512Bytes.
-#define FILEDISK_NUMBER_OF_SECTORS               ( FILEDISK_SIZE / FILEDISK_SECTOR_SIZE )
+#define FILEDISK0_NAME                           "filedisk0.dsk"
+#define FILEDISK0_SIZE                           ( 16 * 1024 * 1024 ) // 16MBytes.
+#define FILEDISK0_SECTOR_SIZE                    ( 512 ) // Sector Size = 512Bytes.
+#define FILEDISK0_NUMBER_OF_SECTORS              ( FILEDISK0_SIZE / FILEDISK0_SECTOR_SIZE )
 
+#define FILEDISK1_NAME                           "filedisk1.dsk"
+#define FILEDISK1_SIZE                           ( 128 * 1024 * 1024 ) // 128MBytes.
+#define FILEDISK1_SECTOR_SIZE                    ( 2048 ) // Sector Size = 2KBytes.
+#define FILEDISK1_NUMBER_OF_SECTORS              ( FILEDISK1_SIZE / FILEDISK1_SECTOR_SIZE )
 
-FILE * fileDisk = ( FILE * ) NULL ;
+FILE * fileDisk0 = ( FILE * ) NULL ;
+FILE * fileDisk1 = ( FILE * ) NULL ;
 
 /*-----------------------------------------------------------------------*/
 /* Get Drive Status                                                      */
@@ -27,14 +32,32 @@ DSTATUS disk_status (
 )
 {
     DSTATUS stat;
-
+    
     // Is the correct driver?
     if( pdrv == 0 )
     {
         // Yes.
         
         // Is the file open?
-        if( fileDisk != ( ( FILE * ) NULL ) )
+        if( fileDisk0 != ( ( FILE * ) NULL ) )
+        {
+            // Yes.
+            // So, it's ok.
+            stat = 0 ;          
+        }
+        else
+        {
+            // No.
+            // So return "Not Initialized".
+            stat = STA_NOINIT ;
+        }
+    }
+    else if( pdrv == 1 )
+    {
+        // Yes.
+        
+        // Is the file open?
+        if( fileDisk1 != ( ( FILE * ) NULL ) )
         {
             // Yes.
             // So, it's ok.
@@ -54,7 +77,7 @@ DSTATUS disk_status (
         // Return "No Disk".
         stat = STA_NODISK ;
     }
-    
+
     return( stat ) ;
 }
 
@@ -73,7 +96,7 @@ DSTATUS disk_initialize (
     if( pdrv == 0 )
     {
         // Is the file open?
-        if( fileDisk != ( ( FILE * ) NULL ) )
+        if( fileDisk0 != ( ( FILE * ) NULL ) )
         {
             // Yes.
             // So, return Ok.
@@ -85,16 +108,53 @@ DSTATUS disk_initialize (
             // So, criate the file.
             
             // Open the file to Read and Write.
-            fileDisk = fopen( FILEDISK_NAME , "wb+" ) ;
+            fileDisk0 = fopen( FILEDISK0_NAME , "wb+" ) ;
             // Did the file open correctly?
-            if( fileDisk != ( ( FILE * ) NULL ) )
+            if( fileDisk0 != ( ( FILE * ) NULL ) )
             {
                 // Yes.
 
                 // So, fill the file with 00h.
-                for( i = 0 ; i < FILEDISK_SIZE ; i++ )
+                for( i = 0 ; i < FILEDISK0_SIZE ; i++ )
                 {
-                    ( void ) fputc( 0x00 , fileDisk ) ;
+                    ( void ) fputc( 0x00 , fileDisk0 ) ;
+                }
+                stat = 0 ;
+            }
+            else
+            {
+                // No, there is a problem.
+                // Return "No Disk".
+                stat = STA_NODISK ;
+            }
+            
+        }
+    }
+    else if( pdrv == 1 )
+    {
+        // Is the file open?
+        if( fileDisk1 != ( ( FILE * ) NULL ) )
+        {
+            // Yes.
+            // So, return Ok.
+            stat = 0 ;
+        }
+        else
+        {
+            // No.
+            // So, criate the file.
+            
+            // Open the file to Read and Write.
+            fileDisk1 = fopen( FILEDISK1_NAME , "wb+" ) ;
+            // Did the file open correctly?
+            if( fileDisk1 != ( ( FILE * ) NULL ) )
+            {
+                // Yes.
+
+                // So, fill the file with 00h.
+                for( i = 0 ; i < FILEDISK1_SIZE ; i++ )
+                {
+                    ( void ) fputc( 0x00 , fileDisk1 ) ;
                 }
                 stat = 0 ;
             }
@@ -114,7 +174,7 @@ DSTATUS disk_initialize (
         // Return "No Disk".
         stat = STA_NODISK ;
     }
-    
+
     return( stat ) ;
 }
 
@@ -136,17 +196,42 @@ DRESULT disk_read (
     if( pdrv == 0 )
     {
         // Is the file open?
-        if( fileDisk != ( ( FILE * ) NULL ) )
+        if( fileDisk0 != ( ( FILE * ) NULL ) )
         {
             // Yes.
             
             // So, set the position.
             position  = ( long ) ( sector               ) ;
-            position *= ( long ) ( FILEDISK_SECTOR_SIZE ) ;
-            ( void ) fseek( fileDisk , position , SEEK_SET) ;
+            position *= ( long ) ( FILEDISK0_SECTOR_SIZE ) ;
+            ( void ) fseek( fileDisk0 , position , SEEK_SET ) ;
             
             // Read 
-            ( void ) fread( buff , sizeof( uint8_t ) , count * FILEDISK_SECTOR_SIZE , fileDisk ) ;
+            ( void ) fread( buff , sizeof( uint8_t ) , count * FILEDISK0_SECTOR_SIZE , fileDisk0 ) ;
+            
+            res = RES_OK ;
+        }
+        else
+        {
+            // No.
+            
+            //So, the disk is not ready.
+            res = RES_NOTRDY ;
+        }
+    }
+    else if( pdrv == 1 )
+    {
+        // Is the file open?
+        if( fileDisk1 != ( ( FILE * ) NULL ) )
+        {
+            // Yes.
+            
+            // So, set the position.
+            position  = ( long ) ( sector               ) ;
+            position *= ( long ) ( FILEDISK1_SECTOR_SIZE ) ;
+            ( void ) fseek( fileDisk1 , position , SEEK_SET ) ;
+            
+            // Read 
+            ( void ) fread( buff , sizeof( uint8_t ) , count * FILEDISK1_SECTOR_SIZE , fileDisk1 ) ;
             
             res = RES_OK ;
         }
@@ -165,7 +250,7 @@ DRESULT disk_read (
         // Return Error.
         res = RES_ERROR ;
     }
-    
+
     return( res ) ;
 }
 
@@ -189,17 +274,42 @@ DRESULT disk_write (
     if( pdrv == 0 )
     {
         // Is the file open?
-        if( fileDisk != ( ( FILE * ) NULL ) )
+        if( fileDisk0 != ( ( FILE * ) NULL ) )
         {
             // Yes.
             
             // So, set the position.
             position  = ( long ) ( sector               ) ;
-            position *= ( long ) ( FILEDISK_SECTOR_SIZE ) ;
-            ( void ) fseek( fileDisk , position , SEEK_SET ) ;
+            position *= ( long ) ( FILEDISK0_SECTOR_SIZE ) ;
+            ( void ) fseek( fileDisk0 , position , SEEK_SET ) ;
             
             // Read 
-            ( void ) fwrite( buff , sizeof( uint8_t ) , count * FILEDISK_SECTOR_SIZE , fileDisk ) ;
+            ( void ) fwrite( buff , sizeof( uint8_t ) , count * FILEDISK0_SECTOR_SIZE , fileDisk0 ) ;
+            
+            res = RES_OK ;
+        }
+        else
+        {
+            // No.
+            
+            //So, the disk is not ready.
+            res = RES_NOTRDY ;
+        }
+    }
+    else if( pdrv == 1 )
+    {
+        // Is the file open?
+        if( fileDisk1 != ( ( FILE * ) NULL ) )
+        {
+            // Yes.
+            
+            // So, set the position.
+            position  = ( long ) ( sector               ) ;
+            position *= ( long ) ( FILEDISK1_SECTOR_SIZE ) ;
+            ( void ) fseek( fileDisk1 , position , SEEK_SET ) ;
+            
+            // Read 
+            ( void ) fwrite( buff , sizeof( uint8_t ) , count * FILEDISK1_SECTOR_SIZE , fileDisk1 ) ;
             
             res = RES_OK ;
         }
@@ -218,7 +328,7 @@ DRESULT disk_write (
         // Return Error.
         res = RES_ERROR ;
     }
-    
+
     return( res ) ;
 }
 
@@ -236,6 +346,7 @@ DRESULT disk_ioctl (
 {
     DRESULT res ;
     DSTATUS diskStatus_ret ;
+    int stdRet ;
 
     // Check the disk status.
     // If 'pdrv' is wrong, it'll return error.
@@ -250,25 +361,62 @@ DRESULT disk_ioctl (
         {
             // Sync buffer.
             case CTRL_SYNC :
-                res = RES_OK ;
+                if( ( pdrv == 0 ) && ( fileDisk0 != ( ( FILE * ) NULL ) ) )
+                {
+                    stdRet = fflush( fileDisk0 ) ;
+                    res = ( stdRet == 0 ) ? RES_OK : RES_ERROR ;
+                }
+                else if( ( pdrv == 1 ) && ( fileDisk1 != ( ( FILE * ) NULL ) ) )
+                {
+                    stdRet = fflush( fileDisk1 ) ;
+                    res = ( stdRet == 0 ) ? RES_OK : RES_ERROR ;
+                }
+                else
+                {
+                    res = RES_ERROR ;
+                }
                 break ;
 
             // Return the number of sectors of the disk.
             case GET_SECTOR_COUNT :
-                *( ( unsigned long int * ) buff ) = FILEDISK_NUMBER_OF_SECTORS ;
-                res = RES_OK ;
+                if( pdrv == 0 )
+                {
+                    *( ( unsigned long int * ) buff ) = FILEDISK0_NUMBER_OF_SECTORS ;
+                    res = RES_OK ;
+                }
+                else if( pdrv == 1 )
+                {
+                    *( ( unsigned long int * ) buff ) = FILEDISK1_NUMBER_OF_SECTORS ;
+                    res = RES_OK ;
+                }
                 break ;
 
             // Return the size of the sector.
             case GET_SECTOR_SIZE :
-                *( ( unsigned long int * ) buff ) = FILEDISK_SECTOR_SIZE ;
-                res = RES_OK ;
+                if( pdrv == 0 )
+                {
+                    *( ( unsigned long int * ) buff ) = FILEDISK0_SECTOR_SIZE ;
+                    res = RES_OK ;
+                }
+                else if( pdrv == 1 )
+                {
+                    *( ( unsigned long int * ) buff ) = FILEDISK1_SECTOR_SIZE ;
+                    res = RES_OK ;
+                }
                 break ;
 
             // Return the size of the erasable block.
             case GET_BLOCK_SIZE :
-                *( ( unsigned long int * ) buff ) = 1 ;
-                res = RES_OK ;
+                if( pdrv == 0 )
+                {
+                    *( ( unsigned long int * ) buff ) = 1 ;
+                    res = RES_OK ;
+                }
+                else if( pdrv == 1 )
+                {
+                    *( ( unsigned long int * ) buff ) = 1 ;
+                    res = RES_OK ;
+                }
                 break ;
 
             // Unknown command.
@@ -284,6 +432,6 @@ DRESULT disk_ioctl (
         // So, return error.
         res = RES_ERROR ;
     }
-    
+
     return( res ) ;
 }

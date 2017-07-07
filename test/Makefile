@@ -43,4 +43,4 @@ test: test.o diskio.o ff.o ffsystem.o ffunicode.o
 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
     
 clean:
-	rm -f test.o diskio.o ff.o ffsystem.o ffunicode.o test.exe filedisk.dsk
+	rm -f test.o diskio.o ff.o ffsystem.o ffunicode.o test.exe filedisk0.dsk filedisk1.dsk
