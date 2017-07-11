@@ -1,6 +1,9 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-07-11 - Change mem_set() to LibC.
+  * Change mem_set() to memset() from String.h. Close #25
+
 * 2017-07-07 - Remove FF_USE_CHMOD definition.
   * Remove FF_USE_CHMOD definition. Close #19
   * Remove FF_USE_LABEL definition. Close #20
