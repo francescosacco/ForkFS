@@ -615,21 +615,6 @@ void st_qword (uint8_t* ptr, uint64_t val)	/* Store an 8-byte word in little-end
 /*-----------------------------------------------------------------------*/
 
 
-/* Compare memory block */
-static
-int mem_cmp (const void* dst, const void* src, unsigned int cnt)	/* ZR:same, NZ:different */
-{
-	const uint8_t *d = (const uint8_t *)dst, *s = (const uint8_t *)src;
-	int r = 0;
-
-	do {
-		r = *d++ - *s++;
-	} while (--cnt && r == 0);
-
-	return r;
-}
-
-
 /* Check if chr is contained in the string */
 static
 int chk_chr (const char* str, int chr)	/* NZ:contained, ZR:not contained */
@@ -2225,13 +2210,15 @@ FRESULT dir_find (	/* FR_OK(0):succeeded, !=0:error */
 				}
 			} else {					/* An SFN entry is found */
 				if (!ord && sum == sum_sfn(dp->dir)) break;	/* LFN matched? */
-				if (!(dp->fn[NSFLAG] & NS_LOSS) && !mem_cmp(dp->dir, dp->fn, 11)) break;	/* SFN matched? */
+				if( !( dp->fn[ NSFLAG ] & NS_LOSS ) && !memcmp( ( const void * ) dp->dir, ( const void * ) dp->fn , 11 ) )
+                    break;	/* SFN matched? */
 				ord = 0xFF; dp->blk_ofs = 0xFFFFFFFF;	/* Reset LFN sequence */
 			}
 		}
 #else		/* Non LFN configuration */
 		dp->obj.attr = dp->dir[DIR_Attr] & AM_MASK;
-		if (!(dp->dir[DIR_Attr] & AM_VOL) && !mem_cmp(dp->dir, dp->fn, 11)) break;	/* Is it a valid entry? */
+		if( !( dp->dir[ DIR_Attr ] & AM_VOL ) && !memcmp( ( const void * ) dp->dir , ( const void * ) dp->fn , 11 ) )
+            break ;	/* Is it a valid entry? */
 #endif
 		res = dir_next(dp, 0);	/* Next entry */
 	} while (res == FR_OK);
@@ -2935,11 +2922,14 @@ uint8_t check_fs (	/* 0:FAT, 1:exFAT, 2:Valid BS but not FAT, 3:Not a BS, 4:Disk
 	if (ld_word(fs->win + BS_55AA) != 0xAA55) return 3;	/* Check boot record signature (always placed here even if the sector size is >512) */
 
 #if FF_FS_EXFAT
-	if (!mem_cmp(fs->win + BS_JmpBoot, "\xEB\x76\x90" "EXFAT   ", 11)) return 1;	/* Check if exFAT VBR */
+	if( !memcmp( ( const void * ) ( fs->win + BS_JmpBoot ) , ( const void * ) "\xEB\x76\x90" "EXFAT   " , 11 ) )
+        return( 1 ) ; /* Check if exFAT VBR */
 #endif
 	if (fs->win[BS_JmpBoot] == 0xE9 || (fs->win[BS_JmpBoot] == 0xEB && fs->win[BS_JmpBoot + 2] == 0x90)) {	/* Valid JumpBoot code? */
-		if (!mem_cmp(fs->win + BS_FilSysType, "FAT", 3)) return 0;		/* Is it an FAT VBR? */
-		if (!mem_cmp(fs->win + BS_FilSysType32, "FAT32", 5)) return 0;	/* Is it an FAT32 VBR? */
+		if( !memcmp( ( const void * ) ( fs->win + BS_FilSysType ) , ( const void * ) "FAT" , 3 ) )
+            return( 0 ) ; /* Is it an FAT VBR? */
+		if( !memcmp( ( const void * ) ( fs->win + BS_FilSysType32 ) , ( const void * ) "FAT32" , 5 ) )
+            return( 0 ) ; /* Is it an FAT32 VBR? */
 	}
 	return 2;	/* Valid BS but not FAT */
 }
