@@ -106,16 +106,6 @@
 /  logical drives. Number of items must be equal to FF_VOLUMES. Valid characters for
 /  the drive ID strings are: A-Z and 0-9. */
 
-
-#define FF_MULTI_PARTITION	1
-/* This option switches support for multiple volumes on the physical drive.
-/  By default (0), each logical drive number is bound to the same physical drive
-/  number and only an FAT volume found on the physical drive will be mounted.
-/  When this function is enabled (1), each logical drive number can be bound to
-/  arbitrary physical drive and partition listed in the VolToPart[]. Also f_fdisk()
-/  funciton will be available. */
-
-
 #define FF_MIN_SS		512
 #define FF_MAX_SS		4096
 /* This set of options configures the range of sector size to be supported. (512,

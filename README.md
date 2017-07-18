@@ -6,6 +6,7 @@ It's a fork from FatFS. The original project is from ELM-Chan.
   * Add Doxygen descriptions'.
   * Remove functions from if() conditions.
   * Define FF_CODE_PAGE as 0 to include all Code Pages.
+  * Remove FF_MULTI_PARTITION definition. Close #34
   * Stack Size:
     * Text : 589,196
     * Data :   2,028

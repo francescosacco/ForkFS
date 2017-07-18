@@ -34,13 +34,11 @@ extern "C" {
 
 typedef uint16_t WCHAR ;
 
-#if FF_MULTI_PARTITION        /* Multiple partition configuration */
 typedef struct {
     uint8_t pd;    /* Physical drive number */
     uint8_t pt;    /* Partition: 0:Auto detect, 1-4:Forced partition) */
 } PARTITION;
 extern PARTITION VolToPart[];    /* Volume - Partition resolution table */
-#endif
 
 /* Type of path name strings on FatFs API */
 

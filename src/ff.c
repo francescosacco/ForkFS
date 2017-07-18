@@ -199,14 +199,8 @@
 
 
 /* Definitions of volume - partition conversion */
-#if FF_MULTI_PARTITION
-  #define LD2PD(vol) VolToPart[vol].pd	/* Get physical drive number */
-  #define LD2PT(vol) VolToPart[vol].pt	/* Get partition index */
-#else
-  #define LD2PD(vol) (uint8_t)(vol)	/* Each logical drive is bound to the same physical drive number */
-  #define LD2PT(vol) 0			/* Find first valid partition or in SFD */
-#endif
-
+#define LD2PD(vol) VolToPart[vol].pd	/* Get physical drive number */
+#define LD2PT(vol) VolToPart[vol].pt	/* Get partition index */
 
 /* Definitions of sector size */
 #if (FF_MAX_SS < FF_MIN_SS) || (FF_MAX_SS != 512 && FF_MAX_SS != 1024 && FF_MAX_SS != 2048 && FF_MAX_SS != 4096) || (FF_MIN_SS != 512 && FF_MIN_SS != 1024 && FF_MIN_SS != 2048 && FF_MIN_SS != 4096)
@@ -5291,7 +5285,8 @@ FRESULT f_mkfs (
 	if (szb_buf == 0) return FR_MKFS_ABORTED;
 
 	/* Determine where the volume to be located (b_vol, sz_vol) */
-	if (FF_MULTI_PARTITION && part != 0) {
+	if( part != 0 )
+    {
 		/* Get partition information from partition table in the MBR */
 		if (disk_read(pdrv, buf, 0, 1) != RES_OK) return FR_DISK_ERR;	/* Load MBR */
 		if (ld_word(buf + BS_55AA) != 0xAA55) return FR_MKFS_ABORTED;	/* Check if MBR is valid */
@@ -5716,7 +5711,8 @@ FRESULT f_mkfs (
 	}
 
 	/* Update partition information */
-	if (FF_MULTI_PARTITION && part != 0) {	/* Created in the existing partition */
+	if( part != 0 )
+    {	/* Created in the existing partition */
 		/* Update system ID in the partition table */
 		if (disk_read(pdrv, buf, 0, 1) != RES_OK) return FR_DISK_ERR;	/* Read the MBR */
 		buf[MBR_Table + (part - 1) * SZ_PTE + PTE_System] = sys;		/* Set system ID */
@@ -5746,9 +5742,6 @@ FRESULT f_mkfs (
 	return FR_OK;
 }
 
-
-
-#if FF_MULTI_PARTITION
 /*-----------------------------------------------------------------------*/
 /* Create Partition Table on the Physical Drive                          */
 /*-----------------------------------------------------------------------*/
@@ -5813,11 +5806,6 @@ FRESULT f_fdisk (
 	/* Write it to the MBR */
 	return (disk_write(pdrv, buf, 0, 1) != RES_OK || disk_ioctl(pdrv, CTRL_SYNC, 0) != RES_OK) ? FR_DISK_ERR : FR_OK;
 }
-
-#endif /* FF_MULTI_PARTITION */
-
-
-
 
 #if FF_USE_STRFUNC
 /*-----------------------------------------------------------------------*/
