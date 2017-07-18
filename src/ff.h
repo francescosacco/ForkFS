@@ -1,26 +1,23 @@
-/*----------------------------------------------------------------------------/
-/  FatFs - Generic FAT Filesystem module  R0.13                               /
-/-----------------------------------------------------------------------------/
-/
-/ Copyright (C) 2017, ChaN, all right reserved.
-/
-/ FatFs module is an open source software. Redistribution and use of FatFs in
-/ source and binary forms, with or without modification, are permitted provided
-/ that the following condition is met:
-
-/ 1. Redistributions of source code must retain the above copyright notice,
-/    this condition and the following disclaimer.
-/
-/ This software is provided by the copyright holder and contributors "AS IS"
-/ and any warranties related to this software are DISCLAIMED.
-/ The copyright owner or contributors be NOT LIABLE for any damages caused
-/ by use of this software.
-/
-/----------------------------------------------------------------------------*/
-
-
-#ifndef FF_DEFINED
-#define FF_DEFINED
+/**********
+ * ForkFs - Generic FAT Filesystem Module - Preliminary.
+ *
+ * Copyright (C) 2017, ChaN, all right reserved.
+ *
+ * FatFs module is an open source software. Redistribution and use of FatFs in
+ * source and binary forms, with or without modification, are permitted provided
+ * that the following condition is met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this condition and the following disclaimer.
+ *
+ * This software is provided by the copyright holder and contributors "AS IS"
+ * and any warranties related to this software are DISCLAIMED.
+ * The copyright owner or contributors be NOT LIABLE for any damages caused
+ * by use of this software.
+ *
+ **********/
+#ifndef _FORKFS_
+#define _FORKFS_
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,18 +71,17 @@ extern PARTITION VolToPart[];    /* Volume - Partition resolution table */
 
 
 
-/* Type of file size variables */
-
+// Type of file size variables.
 #if FF_FS_EXFAT
-#if !FF_USE_LFN
-#error LFN must be enabled when enable exFAT
-#endif
-typedef uint64_t FSIZE_t;
+  #if !FF_USE_LFN
+    #error LFN must be enabled when enable exFAT
+  #endif
+  typedef uint64_t FSIZE_t;
 #else
-typedef uint32_t FSIZE_t;
+  typedef uint32_t FSIZE_t;
 #endif
 
-/* Filesystem type (FATFS.fs_type) */
+// Filesystem type (FATFS.fs_type).
 typedef enum _FS_TYPE_T_
 {
     fsType_NO_FILESYSTEM ,
@@ -95,11 +91,10 @@ typedef enum _FS_TYPE_T_
     fsType_EXFAT
 } fs_type_t ;
 
-
-/* Filesystem object structure (FATFS) */
-
-typedef struct {
-    fs_type_t    fs_type;        /* Filesystem type (0:N/A) */
+// Filesystem object structure (FATFS).
+typedef struct
+{
+    fs_type_t    fs_type ;        /* Filesystem type (0:N/A) */
     uint8_t    pdrv;            /* Physical drive number */
     uint8_t    n_fats;            /* Number of FATs (1 or 2) */
     uint8_t    wflag;            /* win[] flag (b0:dirty) */
@@ -127,120 +122,110 @@ typedef struct {
     uint32_t    cdc_size;        /* b31-b8:Size of containing directory, b7-b0: Chain status */
     uint32_t    cdc_ofs;        /* Offset in the containing directory (invalid when cdir is 0) */
 #endif
-    uint32_t    n_fatent;        /* Number of FAT entries (number of clusters + 2) */
-    uint32_t    fsize;            /* Size of an FAT [sectors] */
-    uint32_t    volbase;        /* Volume base sector */
-    uint32_t    fatbase;        /* FAT base sector */
-    uint32_t    dirbase;        /* Root directory base sector/cluster */
-    uint32_t    database;        /* Data base sector */
-    uint32_t    winsect;        /* Current sector appearing in the win[] */
-    uint8_t    win[FF_MAX_SS];    /* Disk access window for Directory, FAT (and file data at tiny cfg) */
+    uint32_t    n_fatent ;        /* Number of FAT entries (number of clusters + 2) */
+    uint32_t    fsize    ;            /* Size of an FAT [sectors] */
+    uint32_t    volbase  ;        /* Volume base sector */
+    uint32_t    fatbase  ;        /* FAT base sector */
+    uint32_t    dirbase  ;        /* Root directory base sector/cluster */
+    uint32_t    database ;        /* Data base sector */
+    uint32_t    winsect  ;        /* Current sector appearing in the win[] */
+    uint8_t     win[ FF_MAX_SS ] ;    /* Disk access window for Directory, FAT (and file data at tiny cfg) */
 } FATFS;
 
-
-
-/* Object ID and allocation information (FFOBJID) */
-
-typedef struct {
-    FATFS*    fs;                /* Pointer to the hosting volume of this object */
-    uint16_t    id;                /* Hosting volume mount ID */
-    uint8_t    attr;            /* Object attribute */
-    uint8_t    stat;            /* Object chain status (b1-0: =0:not contiguous, =2:contiguous, =3:flagmented in this session, b2:sub-directory stretched) */
-    uint32_t    sclust;            /* Object data start cluster (0:no cluster or root directory) */
-    FSIZE_t    objsize;        /* Object size (valid when sclust != 0) */
+// Object ID and allocation information (FFOBJID).
+typedef struct
+{
+    FATFS    * fs      ; // Pointer to the hosting volume of this object.
+    uint16_t   id      ; // Hosting volume mount ID.
+    uint8_t    attr    ; // Object attribute.
+    uint8_t    stat    ; // Object chain status (b1-0: =0:not contiguous, =2:contiguous, =3:flagmented in this session, b2:sub-directory stretched).
+    uint32_t   sclust  ; // Object data start cluster (0:no cluster or root directory).
+    FSIZE_t    objsize ; // Object size (valid when sclust != 0).
 #if FF_FS_EXFAT
-    uint32_t    n_cont;            /* Size of first fragment - 1 (valid when stat == 3) */
-    uint32_t    n_frag;            /* Size of last fragment needs to be written to FAT (valid when not zero) */
-    uint32_t    c_scl;            /* Containing directory start cluster (valid when sclust != 0) */
-    uint32_t    c_size;            /* b31-b8:Size of containing directory, b7-b0: Chain status (valid when c_scl != 0) */
-    uint32_t    c_ofs;            /* Offset in the containing directory (valid when file object and sclust != 0) */
+    uint32_t   n_cont  ; // Size of first fragment - 1 (valid when stat == 3).
+    uint32_t   n_frag  ; // Size of last fragment needs to be written to FAT (valid when not zero).
+    uint32_t   c_scl   ; // Containing directory start cluster (valid when sclust != 0).
+    uint32_t   c_size  ; // b31-b8:Size of containing directory, b7-b0: Chain status (valid when c_scl != 0).
+    uint32_t   c_ofs   ; // Offset in the containing directory (valid when file object and sclust != 0).
 #endif
 #if FF_FS_LOCK
-    unsigned int    lockid;            /* File lock ID origin from 1 (index of file semaphore table Files[]) */
+    unsigned int lockid ; // File lock ID origin from 1 (index of file semaphore table Files[]).
 #endif
-} FFOBJID;
+} FFOBJID ;
 
+// File object structure (FIL).
+typedef struct
+{
+    FFOBJID    obj              ; // Object identifier (must be the 1st member to detect invalid object pointer).
+    uint8_t    flag             ; // File status flags.
+    uint8_t    err              ; // Abort flag (error code).
+    FSIZE_t    fptr             ; // File read/write pointer (Zeroed on file open).
+    uint32_t   clust            ; // Current cluster of fpter (invalid when fptr is 0).
+    uint32_t   sect             ; // Sector number appearing in buf[] (0:invalid).
+    uint32_t   dir_sect         ; // Sector number containing the directory entry (not used at exFAT).
+    uint8_t  * dir_ptr          ; // Pointer to the directory entry in the win[] (not used at exFAT).
+    uint32_t * cltbl            ; // Pointer to the cluster link map table (nulled on open, set by application).
+    uint8_t    buf[ FF_MAX_SS ] ; // File private data read/write window.
+} FIL ;
 
+// Directory object structure (DIR).
+typedef struct
+{
+    FFOBJID    obj      ; // Object identifier.
+    uint32_t   dptr     ; // Current read/write offset.
+    uint32_t   clust    ; // Current cluster.
+    uint32_t   sect     ; // Current sector (0:Read operation has terminated).
+    uint8_t  * dir      ; // Pointer to the directory item in the win[].
+    uint8_t    fn[ 12 ] ; // SFN (in/out) {body[8],ext[3],status[1]}.
 
-/* File object structure (FIL) */
-
-typedef struct {
-    FFOBJID    obj;            /* Object identifier (must be the 1st member to detect invalid object pointer) */
-    uint8_t    flag;            /* File status flags */
-    uint8_t    err;            /* Abort flag (error code) */
-    FSIZE_t    fptr;            /* File read/write pointer (Zeroed on file open) */
-    uint32_t    clust;            /* Current cluster of fpter (invalid when fptr is 0) */
-    uint32_t    sect;            /* Sector number appearing in buf[] (0:invalid) */
-    uint32_t    dir_sect;        /* Sector number containing the directory entry (not used at exFAT) */
-    uint8_t *    dir_ptr;        /* Pointer to the directory entry in the win[] (not used at exFAT) */
-    uint32_t*    cltbl;            /* Pointer to the cluster link map table (nulled on open, set by application) */
-    uint8_t    buf[FF_MAX_SS];    /* File private data read/write window */
-} FIL;
-
-
-
-/* Directory object structure (DIR) */
-
-typedef struct {
-    FFOBJID    obj;            /* Object identifier */
-    uint32_t    dptr;            /* Current read/write offset */
-    uint32_t    clust;            /* Current cluster */
-    uint32_t    sect;            /* Current sector (0:Read operation has terminated) */
-    uint8_t *    dir;            /* Pointer to the directory item in the win[] */
-    uint8_t     fn[12];            /* SFN (in/out) {body[8],ext[3],status[1]} */
 #if FF_USE_LFN
-    uint32_t    blk_ofs;        /* Offset of current entry block being processed (0xFFFFFFFF:Invalid) */
+    uint32_t   blk_ofs  ; // Offset of current entry block being processed (0xFFFFFFFF:Invalid).
 #endif
+
 #if FF_USE_FIND
-    const TCHAR* pat;        /* Pointer to the name matching pattern */
+    const TCHAR * pat   ; // Pointer to the name matching pattern.
 #endif
-} DIR;
+} DIR ;
 
-
-
-/* File information structure (FILINFO) */
-
-typedef struct {
-    FSIZE_t    fsize;            /* File size */
-    uint16_t    fdate;            /* Modified date */
-    uint16_t    ftime;            /* Modified time */
-    uint8_t    fattrib;        /* File attribute */
+// File information structure (FILINFO).
+typedef struct
+{
+    FSIZE_t  fsize   ; // File size.
+    uint16_t fdate   ; // Modified date.
+    uint16_t ftime   ; // Modified time.
+    uint8_t  fattrib ; // File attribute.
 #if FF_USE_LFN
-    TCHAR    altname[13];            /* Altenative file name */
-    TCHAR    fname[FF_MAX_LFN + 1];    /* Primary file name */
+    TCHAR    altname[ 13 ]           ; // Altenative file name.
+    TCHAR    fname[ FF_MAX_LFN + 1 ] ; // Primary file name.
 #else
-    TCHAR    fname[13];        /* File name */
+    TCHAR    fname[ 13 ] ; // File name.
 #endif
-} FILINFO;
+} FILINFO ;
 
-
-
-/* File function return code (FRESULT) */
-
-typedef enum {
-    FR_OK = 0,                /* (0) Succeeded */
-    FR_DISK_ERR,            /* (1) A hard error occurred in the low level disk I/O layer */
-    FR_INT_ERR,                /* (2) Assertion failed */
-    FR_NOT_READY,            /* (3) The physical drive cannot work */
-    FR_NO_FILE,                /* (4) Could not find the file */
-    FR_NO_PATH,                /* (5) Could not find the path */
-    FR_INVALID_NAME,        /* (6) The path name format is invalid */
-    FR_DENIED,                /* (7) Access denied due to prohibited access or directory full */
-    FR_EXIST,                /* (8) Access denied due to prohibited access */
-    FR_INVALID_OBJECT,        /* (9) The file/directory object is invalid */
-    FR_WRITE_PROTECTED,        /* (10) The physical drive is write protected */
-    FR_INVALID_DRIVE,        /* (11) The logical drive number is invalid */
-    FR_NOT_ENABLED,            /* (12) The volume has no work area */
-    FR_NO_FILESYSTEM,        /* (13) There is no valid FAT volume */
-    FR_MKFS_ABORTED,        /* (14) The f_mkfs() aborted due to any problem */
-    FR_TIMEOUT,                /* (15) Could not get a grant to access the volume within defined period */
-    FR_LOCKED,                /* (16) The operation is rejected according to the file sharing policy */
-    FR_NOT_ENOUGH_CORE,        /* (17) LFN working buffer could not be allocated */
-    FR_TOO_MANY_OPEN_FILES,    /* (18) Number of open files > FF_FS_LOCK */
-    FR_INVALID_PARAMETER    /* (19) Given parameter is invalid */
-} FRESULT;
-
-
+// File function return code (FRESULT).
+typedef enum
+{
+    FR_OK = 0              , // (0) Succeeded.
+    FR_DISK_ERR            , // (1) A hard error occurred in the low level disk I/O layer.
+    FR_INT_ERR             , // (2) Assertion failed.
+    FR_NOT_READY           , // (3) The physical drive cannot work.
+    FR_NO_FILE             , // (4) Could not find the file.
+    FR_NO_PATH             , // (5) Could not find the path.
+    FR_INVALID_NAME        , // (6) The path name format is invalid.
+    FR_DENIED              , // (7) Access denied due to prohibited access or directory full.
+    FR_EXIST               , // (8) Access denied due to prohibited access.
+    FR_INVALID_OBJECT      , // (9) The file/directory object is invalid.
+    FR_WRITE_PROTECTED     , // (10) The physical drive is write protected.
+    FR_INVALID_DRIVE       , // (11) The logical drive number is invalid.
+    FR_NOT_ENABLED         , // (12) The volume has no work area.
+    FR_NO_FILESYSTEM       , // (13) There is no valid FAT volume.
+    FR_MKFS_ABORTED        , // (14) The f_mkfs() aborted due to any problem.
+    FR_TIMEOUT             , // (15) Could not get a grant to access the volume within defined period.
+    FR_LOCKED              , // (16) The operation is rejected according to the file sharing policy.
+    FR_NOT_ENOUGH_CORE     , // (17) LFN working buffer could not be allocated.
+    FR_TOO_MANY_OPEN_FILES , // (18) Number of open files > FF_FS_LOCK.
+    FR_INVALID_PARAMETER     // (19) Given parameter is invalid.
+} FRESULT ;
 
 /*--------------------------------------------------------------*/
 /* FatFs module application interface                           */
@@ -290,7 +275,7 @@ TCHAR* f_gets (TCHAR* buff, int len, FIL* fp);                        /* Get a s
 #define f_unmount(path) f_mount(0, path, 0)
 
 #ifndef EOF
-#define EOF (-1)
+  #define EOF (-1)
 #endif
 
 
@@ -361,4 +346,4 @@ int ff_del_syncobj (FF_SYNC_t sobj);    /* Delete a sync object */
 }
 #endif
 
-#endif /* FF_DEFINED */
+#endif // _FORKFS_

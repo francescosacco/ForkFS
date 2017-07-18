@@ -54,17 +54,15 @@
 #define NS_NONAME                                0x80 // Not followed.
 
 /* Limits and boundaries */
-#define MAX_DIR		0x200000		/* Max size of FAT directory */
-#define MAX_DIR_EX	0x10000000		/* Max size of exFAT directory */
-#define MAX_FAT12	0xFF5			/* Max FAT12 clusters (differs from specs, but correct for real DOS/Windows behavior) */
-#define MAX_FAT16	0xFFF5			/* Max FAT16 clusters (differs from specs, but correct for real DOS/Windows behavior) */
-#define MAX_FAT32	0x0FFFFFF5		/* Max FAT32 clusters (not specified, practical limit) */
-#define MAX_EXFAT	0x7FFFFFFD		/* Max exFAT clusters (differs from specs, implementation limit) */
+#define MAX_DIR                                  0x200000   // Max size of FAT directory.
+#define MAX_DIR_EX                               0x10000000 // Max size of exFAT directory.
+#define MAX_FAT12                                0xFF5      // Max FAT12 clusters (differs from specs, but correct for real DOS/Windows behavior).
+#define MAX_FAT16                                0xFFF5     // Max FAT16 clusters (differs from specs, but correct for real DOS/Windows behavior).
+#define MAX_FAT32                                0x0FFFFFF5 // Max FAT32 clusters (not specified, practical limit).
+#define MAX_EXFAT                                0x7FFFFFFD // Max exFAT clusters (differs from specs, implementation limit).
 
-
-/* FatFs refers the FAT structure as simple byte array instead of structure member
-/ because the C structure is not binary compatible between different platforms */
-
+// FatFs refers the FAT structure as simple byte array instead of structure member
+// because the C structure is not binary compatible between different platforms.
 #define BS_JmpBoot			0		/* x86 jump instruction (3-byte) */
 #define BS_OEMName			3		/* OEM name (8-byte) */
 #define BPB_BytsPerSec		11		/* Sector size [byte] (WORD) */
