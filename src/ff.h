@@ -42,8 +42,6 @@ typedef struct {
 extern PARTITION VolToPart[];    /* Volume - Partition resolution table */
 #endif
 
-
-
 /* Type of path name strings on FatFs API */
 
 #if FF_LFN_UNICODE && FF_USE_LFN    /* Unicode (UTF-16) string */
@@ -89,12 +87,21 @@ typedef uint64_t FSIZE_t;
 typedef uint32_t FSIZE_t;
 #endif
 
+/* Filesystem type (FATFS.fs_type) */
+typedef enum _FS_TYPE_T_
+{
+    fsType_NO_FILESYSTEM ,
+    fsType_FAT12 ,
+    fsType_FAT16 ,
+    fsType_FAT32 ,
+    fsType_EXFAT
+} fs_type_t ;
 
 
 /* Filesystem object structure (FATFS) */
 
 typedef struct {
-    uint8_t    fs_type;        /* Filesystem type (0:N/A) */
+    fs_type_t    fs_type;        /* Filesystem type (0:N/A) */
     uint8_t    pdrv;            /* Physical drive number */
     uint8_t    n_fats;            /* Number of FATs (1 or 2) */
     uint8_t    wflag;            /* win[] flag (b0:dirty) */
@@ -343,12 +350,6 @@ int ff_del_syncobj (FF_SYNC_t sobj);    /* Delete a sync object */
 #define FM_EXFAT    0x04
 #define FM_ANY        0x07
 #define FM_SFD        0x08
-
-/* Filesystem type (FATFS.fs_type) */
-#define FS_FAT12    1
-#define FS_FAT16    2
-#define FS_FAT32    3
-#define FS_EXFAT    4
 
 /* File attribute bits for directory entry (FILINFO.fattrib) */
 #define    AM_RDO    0x01    /* Read only */

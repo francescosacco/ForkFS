@@ -37,7 +37,7 @@ VPATH := ../src/
 all: test
 
 test: test.o diskio.o ff.o ffsystem.o ffunicode.o
-	$(CC) test.o diskio.o ff.o ffsystem.o ffunicode.o -o test.exe
+	$(CC) test.o diskio.o ff.o ffsystem.o ffunicode.o -Wall -o test.exe
 
 %.o : %.c    
 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@

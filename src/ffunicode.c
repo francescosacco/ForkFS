@@ -24,6 +24,7 @@
 
 
 #include "ff.h"
+#include <stdint.h>
 
 #if FF_USE_LFN
 
@@ -15302,7 +15303,7 @@ WCHAR ff_uni2oem (	/* Returns OEM code character, zero on error */
 {
 	const WCHAR *p;
 	WCHAR c = 0;
-	UINT i, n, li, hi;
+	unsigned int i, n, li, hi;
 
 
 	if (uni < 0x80) {	/* ASCII char */
@@ -15336,7 +15337,7 @@ WCHAR ff_oem2uni (	/* Returns Unicode character, zero on error */
 {
 	const WCHAR *p;
 	WCHAR c = 0;
-	UINT i, n, li, hi;
+	unsigned int i, n, li, hi;
 
 
 	if (oem < 0x80) {	/* ASCII char */
@@ -15382,7 +15383,7 @@ WCHAR ff_uni2oem (	/* Returns OEM code character, zero on error */
 {
 	const WCHAR *p;
 	WCHAR c = 0;
-	UINT i, n, li, hi;
+	unsigned int i, n, li, hi;
 
 
 	if (uni < 0x80) {	/* ASCII char */
@@ -15430,7 +15431,7 @@ WCHAR ff_oem2uni (	/* Returns Unicode character, zero on error */
 {
 	const WCHAR *p;
 	WCHAR c = 0;
-	UINT i, n, li, hi;
+	unsigned int i, n, li, hi;
 
 
 	if (oem < 0x80) {	/* ASCII char */

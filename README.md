@@ -1,6 +1,16 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-07-18 - Change fs_type to enum, improve code standard and add all Code Pages.
+  * Change fs_type to enum.
+  * Add Doxygen descriptions'.
+  * Remove functions from if() conditions.
+  * Define FF_CODE_PAGE as 0 to include all Code Pages.
+  * Stack Size:
+    * Text : 589,196
+    * Data :   2,028
+    * Bss  :   3,828
+
 * 2017-07-14 - Remove FF_USE FORWARD.
   * Remove FF_USE_FORWARD definition. Close #21.
 
