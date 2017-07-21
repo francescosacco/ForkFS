@@ -1,6 +1,9 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-07-21 - Version 020 - Add Set Codepage function.
+  * Add f_setcp().
+
 * 2017-07-07 - Version 019 - Add flush and new drive to DiskIO, improve test.
   * Add fflush() to disk_ioctl().
   * Add new drive with 128MB.

@@ -7,6 +7,10 @@ It's a fork from FatFS. The original project is from ELM-Chan.
   * Move defines to column 50.
   * Change some functions as if() conditions.
   * Add Doxygen descriptions'.
+  * Stack Size:
+    * Text : 589,308
+    * Data :   2,028
+    * Bss  :   3,860
 
 * 2017-07-18 - Change fs_type to enum, improve code standard and add all Code Pages.
   * Change fs_type to enum.

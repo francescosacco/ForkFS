@@ -4,7 +4,7 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 19 )
+#define VERSION_NUMBER                           ( 20 )
 #define FRESULT_POSITION                         ( 62 )
 #define BUFFER_SIZE                              ( 1024 )
 
@@ -42,7 +42,7 @@ f_expand() ............ OK
 f_mount() ............. OK
 f_mkfs() .............. OK
 f_fdisk() ............. OK
-f_setcp()
+f_setcp() ............. OK
 f_putc() .............. OK
 f_puts()
 f_printf() ............ OK
@@ -76,6 +76,13 @@ int main( int argc , char * argv[] )
     uint32_t plist0[] = { 50  , 50 , 0 , 0 } ;  // Divide the drive into two partitions.
     uint32_t plist1[] = { 100 ,  0 , 0 , 0 } ;  // Divide the drive into two partitions.
 
+    ffRet = f_setcp( 437 ) ;
+    print_FRESULT( "f_setcp(437)" , ffRet ) ;
+    if( ffRet != FR_OK )
+    {
+        return( -1 ) ; 
+    }
+    
     ffRet = f_fdisk( 0 , plist0 , workBuffer ) ;
     print_FRESULT( "f_fdisk(0,plist0,workBuffer)" , ffRet ) ;
     if( ffRet != FR_OK )
