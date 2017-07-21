@@ -102,43 +102,51 @@ typedef uint8_t formatOptions_t ;
 // Filesystem object structure (FATFS).
 typedef struct
 {
-    fs_type_t    fs_type ;        /* Filesystem type (0:N/A) */
-    uint8_t    pdrv;            /* Physical drive number */
-    uint8_t    n_fats;            /* Number of FATs (1 or 2) */
-    uint8_t    wflag;            /* win[] flag (b0:dirty) */
-    uint8_t    fsi_flag;        /* FSINFO flags (b7:disabled, b0:dirty) */
-    uint16_t    id;                /* Volume mount ID */
-    uint16_t    n_rootdir;        /* Number of root directory entries (FAT12/16) */
-    uint16_t    csize;            /* Cluster size [sectors] */
+    fs_type_t fs_type   ; // Filesystem type (0:N/A).
+    uint8_t   pdrv      ; // Physical drive number.
+    uint8_t   n_fats    ; // Number of FATs (1 or 2).
+    uint8_t   wflag     ; // win[] flag (b0:dirty).
+    uint8_t   fsi_flag  ; // FSINFO flags (b7:disabled, b0:dirty).
+    uint16_t  id        ; // Volume mount ID.
+    uint16_t  n_rootdir ; // Number of root directory entries (FAT12/16).
+    uint16_t  csize     ; // Cluster size [sectors];
+
 #if FF_MAX_SS != FF_MIN_SS
-    uint16_t    ssize;            /* Sector size (512, 1024, 2048 or 4096) */
+    uint16_t  ssize ; // Sector size (512, 1024, 2048 or 4096).
 #endif
+
 #if FF_USE_LFN
-    WCHAR*    lfnbuf;            /* LFN working buffer */
+    WCHAR * lfnbuf ; // LFN working buffer.
 #endif
+
 #if FF_FS_EXFAT
-    uint8_t *    dirbuf;            /* Directory entry block scratchpad buffer for exFAT */
+    uint8_t * dirbuf ; // Directory entry block scratchpad buffer for exFAT.
 #endif
+
 #if FF_FS_REENTRANT
-    FF_SYNC_t    sobj;        /* Identifier of sync object */
+    FF_SYNC_t sobj ; // Identifier of sync object.
 #endif
-    uint32_t    last_clst;        /* Last allocated cluster */
-    uint32_t    free_clst;        /* Number of free clusters */
-    uint32_t    cdir;            /* Current directory start cluster (0:root) */
+
+    uint32_t last_clst ; // Last allocated cluster.
+    uint32_t free_clst ; // Number of free clusters.
+    uint32_t cdir      ; // Current directory start cluster (0:root).
+
 #if FF_FS_EXFAT
-    uint32_t    cdc_scl;        /* Containing directory start cluster (invalid when cdir is 0) */
-    uint32_t    cdc_size;        /* b31-b8:Size of containing directory, b7-b0: Chain status */
-    uint32_t    cdc_ofs;        /* Offset in the containing directory (invalid when cdir is 0) */
+    uint32_t cdc_scl  ; // Containing directory start cluster (invalid when cdir is 0).
+    uint32_t cdc_size ; // b31-b8:Size of containing directory, b7-b0: Chain status.
+    uint32_t cdc_ofs  ; // Offset in the containing directory (invalid when cdir is 0).
 #endif
-    uint32_t    n_fatent ;        /* Number of FAT entries (number of clusters + 2) */
-    uint32_t    fsize    ;            /* Size of an FAT [sectors] */
-    uint32_t    volbase  ;        /* Volume base sector */
-    uint32_t    fatbase  ;        /* FAT base sector */
-    uint32_t    dirbase  ;        /* Root directory base sector/cluster */
-    uint32_t    database ;        /* Data base sector */
-    uint32_t    winsect  ;        /* Current sector appearing in the win[] */
-    uint8_t     win[ FF_MAX_SS ] ;    /* Disk access window for Directory, FAT (and file data at tiny cfg) */
-} FATFS;
+
+    uint32_t n_fatent ; // Number of FAT entries (number of clusters + 2).
+    uint32_t fsize    ; // Size of an FAT [sectors].
+    uint32_t volbase  ; // Volume base sector.
+    uint32_t fatbase  ; // FAT base sector.
+    uint32_t dirbase  ; // Root directory base sector/cluster.
+    uint32_t database ; // Data base sector.
+    uint32_t winsect  ; // Current sector appearing in the win[].
+
+    uint8_t  win[ FF_MAX_SS ] ; // Disk access window for Directory, FAT (and file data at tiny cfg).
+} FATFS ;
 
 // Object ID and allocation information (FFOBJID).
 typedef struct

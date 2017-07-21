@@ -1648,29 +1648,48 @@ static uint32_t create_chain( FFOBJID * obj , uint32_t clst )
     return( ncl ) ;
 }
 
-/*-----------------------------------------------------------------------*/
-/* FAT handling - Convert offset into cluster with link map table        */
-/*-----------------------------------------------------------------------*/
-
-static
-uint32_t clmt_clust (	/* <2:Error, >=2:Cluster number */
-	FIL* fp,		/* Pointer to the file object */
-	FSIZE_t ofs		/* File offset to be converted to cluster# */
-)
+/**
+ * @brief Convert offset into cluster with link map table.
+ * @param fp  Pointer to the file object
+ * @param ofs File offset to be converted to cluster#.
+ * @return <2:Error, >=2:Cluster number
+ */
+static uint32_t clmt_clust( FIL * fp , FSIZE_t ofs )
 {
-	uint32_t cl, ncl, *tbl;
-	FATFS *fs = fp->obj.fs;
+    uint32_t * tbl ;
+    uint32_t   cl  ;
+    uint32_t   ncl ;
 
+    FATFS * fs = fp->obj.fs ;
 
-	tbl = fp->cltbl + 1;	/* Top of CLMT */
-	cl = (uint32_t)(ofs / SS(fs) / fs->csize);	/* Cluster order from top of the file */
-	for (;;) {
-		ncl = *tbl++;			/* Number of cluters in the fragment */
-		if (ncl == 0) return 0;	/* End of table? (error) */
-		if (cl < ncl) break;	/* In this fragment? */
-		cl -= ncl; tbl++;		/* Next fragment */
-	}
-	return cl + *tbl;	/* Return the cluster number */
+    // Top of CLMT.
+    tbl = fp->cltbl + 1 ;
+    // Cluster order from top of the file.
+    cl = ( uint32_t ) ( ofs / SS( fs ) / fs->csize ) ;
+    
+    for( ; ; )
+    {
+        // Number of cluters in the fragment.
+        ncl = *tbl++ ;
+        // End of table? (error).
+        if( ncl == 0 )
+        {
+            return( 0 ) ;
+        }
+
+        // In this fragment?
+        if( cl < ncl )
+        {
+            break ;
+        }
+
+        // Next fragment.
+        cl -= ncl ;
+        tbl++ ;
+    }
+
+    // Return the cluster number.
+    return( cl + *tbl ) ;
 }
 
 

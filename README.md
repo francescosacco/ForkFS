@@ -6,6 +6,7 @@ It's a fork from FatFS. The original project is from ELM-Chan.
   * Remove some TABs.
   * Move defines to column 50.
   * Change some functions as if() conditions.
+  * Add Doxygen descriptions'.
 
 * 2017-07-18 - Change fs_type to enum, improve code standard and add all Code Pages.
   * Change fs_type to enum.
