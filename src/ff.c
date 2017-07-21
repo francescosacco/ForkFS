@@ -63,62 +63,62 @@
 
 // FatFs refers the FAT structure as simple byte array instead of structure member
 // because the C structure is not binary compatible between different platforms.
-#define BS_JmpBoot			0		/* x86 jump instruction (3-byte) */
-#define BS_OEMName			3		/* OEM name (8-byte) */
-#define BPB_BytsPerSec		11		/* Sector size [byte] (WORD) */
-#define BPB_SecPerClus		13		/* Cluster size [sector] (BYTE) */
-#define BPB_RsvdSecCnt		14		/* Size of reserved area [sector] (WORD) */
-#define BPB_NumFATs			16		/* Number of FATs (BYTE) */
-#define BPB_RootEntCnt		17		/* Size of root directory area for FAT [entry] (WORD) */
-#define BPB_TotSec16		19		/* Volume size (16-bit) [sector] (WORD) */
-#define BPB_Media			21		/* Media descriptor byte (BYTE) */
-#define BPB_FATSz16			22		/* FAT size (16-bit) [sector] (WORD) */
-#define BPB_SecPerTrk		24		/* Number of sectors per track for int13h [sector] (WORD) */
-#define BPB_NumHeads		26		/* Number of heads for int13h (WORD) */
-#define BPB_HiddSec			28		/* Volume offset from top of the drive (DWORD) */
-#define BPB_TotSec32		32		/* Volume size (32-bit) [sector] (DWORD) */
-#define BS_DrvNum			36		/* Physical drive number for int13h (BYTE) */
-#define BS_NTres			37		/* WindowsNT error flag (BYTE) */
-#define BS_BootSig			38		/* Extended boot signature (BYTE) */
-#define BS_VolID			39		/* Volume serial number (DWORD) */
-#define BS_VolLab			43		/* Volume label string (8-byte) */
-#define BS_FilSysType		54		/* Filesystem type string (8-byte) */
-#define BS_BootCode			62		/* Boot code (448-byte) */
-#define BS_55AA				510		/* Signature word (WORD) */
+#define BS_JmpBoot                               (   0 ) // x86 jump instruction (3-byte).
+#define BS_OEMName                               (   3 ) // OEM name (8-byte).
+#define BPB_BytsPerSec                           (  11 ) // Sector size [byte] (WORD).
+#define BPB_SecPerClus                           (  13 ) // Cluster size [sector] (BYTE).
+#define BPB_RsvdSecCnt                           (  14 ) // Size of reserved area [sector] (WORD).
+#define BPB_NumFATs                              (  16 ) // Number of FATs (BYTE).
+#define BPB_RootEntCnt                           (  17 ) // Size of root directory area for FAT [entry] (WORD).
+#define BPB_TotSec16                             (  19 ) // Volume size (16-bit) [sector] (WORD).
+#define BPB_Media                                (  21 ) // Media descriptor byte (BYTE).
+#define BPB_FATSz16                              (  22 ) // FAT size (16-bit) [sector] (WORD).
+#define BPB_SecPerTrk                            (  24 ) // Number of sectors per track for int13h [sector] (WORD).
+#define BPB_NumHeads                             (  26 ) // Number of heads for int13h (WORD).
+#define BPB_HiddSec                              (  28 ) // Volume offset from top of the drive (DWORD).
+#define BPB_TotSec32                             (  32 ) // Volume size (32-bit) [sector] (DWORD).
+#define BS_DrvNum                                (  36 ) // Physical drive number for int13h (BYTE).
+#define BS_NTres                                 (  37 ) // WindowsNT error flag (BYTE).
+#define BS_BootSig                               (  38 ) // Extended boot signature (BYTE).
+#define BS_VolID                                 (  39 ) // Volume serial number (DWORD).
+#define BS_VolLab                                (  43 ) // Volume label string (8-byte).
+#define BS_FilSysType                            (  54 ) // Filesystem type string (8-byte).
+#define BS_BootCode                              (  62 ) // Boot code (448-byte).
+#define BS_55AA                                  ( 510 ) // Signature word (WORD).
 
-#define BPB_FATSz32			36		/* FAT32: FAT size [sector] (DWORD) */
-#define BPB_ExtFlags32		40		/* FAT32: Extended flags (WORD) */
-#define BPB_FSVer32			42		/* FAT32: Filesystem version (WORD) */
-#define BPB_RootClus32		44		/* FAT32: Root directory cluster (DWORD) */
-#define BPB_FSInfo32		48		/* FAT32: Offset of FSINFO sector (WORD) */
-#define BPB_BkBootSec32		50		/* FAT32: Offset of backup boot sector (WORD) */
-#define BS_DrvNum32			64		/* FAT32: Physical drive number for int13h (BYTE) */
-#define BS_NTres32			65		/* FAT32: Error flag (BYTE) */
-#define BS_BootSig32		66		/* FAT32: Extended boot signature (BYTE) */
-#define BS_VolID32			67		/* FAT32: Volume serial number (DWORD) */
-#define BS_VolLab32			71		/* FAT32: Volume label string (8-byte) */
-#define BS_FilSysType32		82		/* FAT32: Filesystem type string (8-byte) */
-#define BS_BootCode32		90		/* FAT32: Boot code (420-byte) */
+#define BPB_FATSz32                              ( 36 ) // FAT32: FAT size [sector] (DWORD).
+#define BPB_ExtFlags32                           ( 40 ) // FAT32: Extended flags (WORD).
+#define BPB_FSVer32                              ( 42 ) // FAT32: Filesystem version (WORD).
+#define BPB_RootClus32                           ( 44 ) // FAT32: Root directory cluster (DWORD).
+#define BPB_FSInfo32                             ( 48 ) // FAT32: Offset of FSINFO sector (WORD).
+#define BPB_BkBootSec32                          ( 50 ) // FAT32: Offset of backup boot sector (WORD).
+#define BS_DrvNum32                              ( 64 ) // FAT32: Physical drive number for int13h (BYTE).
+#define BS_NTres32                               ( 65 ) // FAT32: Error flag (BYTE).
+#define BS_BootSig32                             ( 66 ) // FAT32: Extended boot signature (BYTE).
+#define BS_VolID32                               ( 67 ) // FAT32: Volume serial number (DWORD).
+#define BS_VolLab32                              ( 71 ) // FAT32: Volume label string (8-byte).
+#define BS_FilSysType32                          ( 82 ) // FAT32: Filesystem type string (8-byte).
+#define BS_BootCode32                            ( 90 ) // FAT32: Boot code (420-byte).
 
-#define BPB_ZeroedEx		11		/* exFAT: MBZ field (53-byte) */
-#define BPB_VolOfsEx		64		/* exFAT: Volume offset from top of the drive [sector] (QWORD) */
-#define BPB_TotSecEx		72		/* exFAT: Volume size [sector] (QWORD) */
-#define BPB_FatOfsEx		80		/* exFAT: FAT offset from top of the volume [sector] (DWORD) */
-#define BPB_FatSzEx			84		/* exFAT: FAT size [sector] (DWORD) */
-#define BPB_DataOfsEx		88		/* exFAT: Data offset from top of the volume [sector] (DWORD) */
-#define BPB_NumClusEx		92		/* exFAT: Number of clusters (DWORD) */
-#define BPB_RootClusEx		96		/* exFAT: Root directory start cluster (DWORD) */
-#define BPB_VolIDEx			100		/* exFAT: Volume serial number (DWORD) */
-#define BPB_FSVerEx			104		/* exFAT: Filesystem version (WORD) */
-#define BPB_VolFlagEx		106		/* exFAT: Volume flags (BYTE) */
-#define BPB_ActFatEx		107		/* exFAT: Active FAT flags (BYTE) */
-#define BPB_BytsPerSecEx	108		/* exFAT: Log2 of sector size in unit of byte (BYTE) */
-#define BPB_SecPerClusEx	109		/* exFAT: Log2 of cluster size in unit of sector (BYTE) */
-#define BPB_NumFATsEx		110		/* exFAT: Number of FATs (BYTE) */
-#define BPB_DrvNumEx		111		/* exFAT: Physical drive number for int13h (BYTE) */
-#define BPB_PercInUseEx		112		/* exFAT: Percent in use (BYTE) */
-#define BPB_RsvdEx			113		/* exFAT: Reserved (7-byte) */
-#define BS_BootCodeEx		120		/* exFAT: Boot code (390-byte) */
+#define BPB_ZeroedEx                             (  11 ) // exFAT: MBZ field (53-byte).
+#define BPB_VolOfsEx                             (  64 ) // exFAT: Volume offset from top of the drive [sector] (QWORD).
+#define BPB_TotSecEx                             (  72 ) // exFAT: Volume size [sector] (QWORD).
+#define BPB_FatOfsEx                             (  80 ) // exFAT: FAT offset from top of the volume [sector] (DWORD).
+#define BPB_FatSzEx                              (  84 ) // exFAT: FAT size [sector] (DWORD).
+#define BPB_DataOfsEx                            (  88 ) // exFAT: Data offset from top of the volume [sector] (DWORD).
+#define BPB_NumClusEx                            (  92 ) // exFAT: Number of clusters (DWORD).
+#define BPB_RootClusEx                           (  96 ) // exFAT: Root directory start cluster (DWORD).
+#define BPB_VolIDEx                              ( 100 ) // exFAT: Volume serial number (DWORD).
+#define BPB_FSVerEx                              ( 104 ) // exFAT: Filesystem version (WORD).
+#define BPB_VolFlagEx                            ( 106 ) // exFAT: Volume flags (BYTE).
+#define BPB_ActFatEx                             ( 107 ) // exFAT: Active FAT flags (BYTE).
+#define BPB_BytsPerSecEx                         ( 108 ) // exFAT: Log2 of sector size in unit of byte (BYTE).
+#define BPB_SecPerClusEx                         ( 109 ) // exFAT: Log2 of cluster size in unit of sector (BYTE).
+#define BPB_NumFATsEx                            ( 110 ) // exFAT: Number of FATs (BYTE).
+#define BPB_DrvNumEx                             ( 111 ) // exFAT: Physical drive number for int13h (BYTE).
+#define BPB_PercInUseEx                          ( 112 ) // exFAT: Percent in use (BYTE).
+#define BPB_RsvdEx                               ( 113 ) // exFAT: Reserved (7-byte).
+#define BS_BootCodeEx                            ( 120 ) // exFAT: Boot code (390-byte).
 
 #define DIR_Name			0		/* Short file name (11-byte) */
 #define DIR_Attr			11		/* Attribute (BYTE) */
@@ -180,12 +180,7 @@
 #define PTE_StLba			8		/* MBR PTE: Start in LBA */
 #define PTE_SizLba			12		/* MBR PTE: Size in LBA */
 
-
-/* Post process after fatal error on file operation */
-#define ABORT(fs, res)		{ fp->err = (uint8_t)(res); LEAVE_FF(fs, res); }
-
-
-/* Reentrancy related */
+// Reentrancy related.
 #if FF_FS_REENTRANT
   #if FF_USE_LFN == 1
     #error Static LFN work area cannot be used at thread-safe configuration
@@ -657,23 +652,26 @@ int dbc_2nd (uint8_t c)
 /*-----------------------------------------------------------------------*/
 /* Request/Release grant to access the volume                            */
 /*-----------------------------------------------------------------------*/
-static
-int lock_fs (		/* 1:Ok, 0:timeout */
-	FATFS* fs		/* Filesystem object */
-)
+/**
+ * @brief Request grant to access the volume.
+ * @param fs Filesystem object.
+ * @return 1:Ok, 0:timeout.
+ */
+static int lock_fs( FATFS * fs )
 {
-	return ff_req_grant(fs->sobj);
+    return( ff_req_grant( fs->sobj ) ) ;
 }
 
-
-static
-void unlock_fs (
-	FATFS* fs,		/* Filesystem object */
-	FRESULT res		/* Result code to be returned */
-)
+/**
+ * @brief Release grant to access the volume.
+ * @param fs Filesystem object.
+ * @param res Result code to be returned.
+ */
+static void unlock_fs( FATFS * fs , FRESULT res )
 {
-	if (fs && res != FR_NOT_ENABLED && res != FR_INVALID_DRIVE && res != FR_TIMEOUT) {
-		ff_rel_grant(fs->sobj);
+	if( ( fs ) && ( res != FR_NOT_ENABLED ) && ( res != FR_INVALID_DRIVE ) && ( res != FR_TIMEOUT ) )
+    {
+        ff_rel_grant( fs->sobj ) ;
 	}
 }
 
@@ -869,40 +867,47 @@ static FRESULT move_window( FATFS * fs , uint32_t sector )
 
 
 /*-----------------------------------------------------------------------*/
-/* Synchronize filesystem and data on the storage                        */
+/*                         */
 /*-----------------------------------------------------------------------*/
-
-static
-FRESULT sync_fs (	/* Returns FR_OK or FR_DISK_ERR */
-	FATFS* fs		/* Filesystem object */
-)
+/**
+ * @brief Synchronize filesystem and data on the storage.
+ * @param fs Filesystem object.
+ * @return Returns FR_OK or FR_DISK_ERR.
+ */
+static FRESULT sync_fs( FATFS * fs )
 {
-	FRESULT res;
+    DRESULT diskRes ;
+	FRESULT res ;
 
-
-    res = sync_window(fs);
-    if(res == FR_OK)
+    res = sync_window( fs ) ;
+    if( res == FR_OK )
     {
         // FAT32: Update FSInfo sector if needed.
         if( ( fs->fs_type == fsType_FAT32 ) && ( fs->fsi_flag == 1 ) )
         {
-			/* Create FSInfo structure */
+			// Create FSInfo structure.
 			( void ) memset( ( void * ) fs->win , 0 , SS( fs ) ) ;
-			st_word(fs->win + BS_55AA, 0xAA55);
-			st_dword(fs->win + FSI_LeadSig, 0x41615252);
-			st_dword(fs->win + FSI_StrucSig, 0x61417272);
-			st_dword(fs->win + FSI_Free_Count, fs->free_clst);
-			st_dword(fs->win + FSI_Nxt_Free, fs->last_clst);
-			/* Write it into the FSInfo sector */
-			fs->winsect = fs->volbase + 1;
-			disk_write(fs->pdrv, fs->win, fs->winsect, 1);
-			fs->fsi_flag = 0;
+			st_word(  fs->win + BS_55AA        , 0xAA55     ) ;
+			st_dword( fs->win + FSI_LeadSig    , 0x41615252 ) ;
+			st_dword( fs->win + FSI_StrucSig   , 0x61417272 ) ;
+			st_dword( fs->win + FSI_Free_Count , fs->free_clst ) ;
+			st_dword( fs->win + FSI_Nxt_Free   , fs->last_clst ) ;
+
+            // Write it into the FSInfo sector.
+			fs->winsect = fs->volbase + 1 ;
+			disk_write( fs->pdrv , fs->win , fs->winsect , 1 ) ;
+			fs->fsi_flag = 0 ;
 		}
-		/* Make sure that no pending write process in the lower layer */
-		if (disk_ioctl(fs->pdrv, CTRL_SYNC, 0) != RES_OK) res = FR_DISK_ERR;
+
+        // Make sure that no pending write process in the lower layer.
+        diskRes = disk_ioctl( fs->pdrv , CTRL_SYNC , 0 ) ;
+		if( diskRes != RES_OK )
+        {
+            res = FR_DISK_ERR ;
+        }
 	}
 
-	return res;
+	return( res ) ;
 }
 
 
@@ -1154,80 +1159,97 @@ FRESULT change_bitmap (
 	}
 }
 
-
-/*---------------------------------------------*/
-/* Fill the first fragment of the FAT chain    */
-/*---------------------------------------------*/
-
-static
-FRESULT fill_first_frag (
-	FFOBJID* obj	/* Pointer to the corresponding object */
-)
+/**
+ * @brief Fill the first fragment of the FAT chain.
+ * @param obj Pointer to the corresponding object.
+ * @return FR_OK if success.
+ */
+static FRESULT fill_first_frag( FFOBJID * obj )
 {
-	FRESULT res;
-	uint32_t cl, n;
+    FRESULT res;
+    uint32_t cl , n ;
 
-
-	if (obj->stat == 3) {	/* Has the object been changed 'fragmented' in this session? */
-		for (cl = obj->sclust, n = obj->n_cont; n; cl++, n--) {	/* Create cluster chain on the FAT */
-			res = put_fat(obj->fs, cl, cl + 1);
-			if (res != FR_OK) return res;
+	// Has the object been changed 'fragmented' in this session?
+    if( obj->stat == 3 )
+    {
+        // Create cluster chain on the FAT.
+		for( cl = obj->sclust , n = obj->n_cont ; n ; cl++ , n-- )
+        {
+			res = put_fat( obj->fs , cl , cl + 1 ) ;
+			if( res != FR_OK )
+            {
+                return( res ) ;
+            }
 		}
-		obj->stat = 0;	/* Change status 'FAT chain is valid' */
+
+		// Change status 'FAT chain is valid'.
+        obj->stat = 0 ;
 	}
-	return FR_OK;
+
+	return( FR_OK ) ;
 }
 
-
-/*---------------------------------------------*/
-/* Fill the last fragment of the FAT chain     */
-/*---------------------------------------------*/
-
-static
-FRESULT fill_last_frag (
-	FFOBJID* obj,	/* Pointer to the corresponding object */
-	uint32_t lcl,		/* Last cluster of the fragment */
-	uint32_t term		/* Value to set the last FAT entry */
-)
+/**
+ * @brief Fill the last fragment of the FAT chain.
+ * @param obj  Pointer to the corresponding object.
+ * @param lcl  Last cluster of the fragment.
+ * @param term Value to set the last FAT entry.
+ * @return FR_OK if success.
+ */
+static FRESULT fill_last_frag( FFOBJID * obj , uint32_t lcl , uint32_t term )
 {
-	FRESULT res;
+    uint32_t clst , val ;
+    FRESULT res ;
 
+    // Create the last chain on the FAT.
+	while( obj->n_frag > 0 )
+    {
+        clst = lcl - obj->n_frag + 1 ;
+        val = ( obj->n_frag > 1 ) ? ( lcl - obj->n_frag + 2 ) : ( term ) ;
 
-	while (obj->n_frag > 0) {	/* Create the last chain on the FAT */
-		res = put_fat(obj->fs, lcl - obj->n_frag + 1, (obj->n_frag > 1) ? lcl - obj->n_frag + 2 : term);
-		if (res != FR_OK) return res;
-		obj->n_frag--;
+		res = put_fat( obj->fs , clst , val ) ;
+		if( res != FR_OK )
+        {
+            return( res ) ;
+        }
+
+		obj->n_frag-- ;
 	}
-	return FR_OK;
+
+	return( FR_OK ) ;
 }
 
 #endif	/* FF_FS_EXFAT */
 
-
-
-/*-----------------------------------------------------------------------*/
-/* FAT handling - Remove a cluster chain                                 */
-/*-----------------------------------------------------------------------*/
-static
-FRESULT remove_chain (	/* FR_OK(0):succeeded, !=0:error */
-	FFOBJID* obj,		/* Corresponding object */
-	uint32_t clst,			/* Cluster to remove a chain from */
-	uint32_t pclst			/* Previous cluster of clst (0:entire chain) */
-)
+/**
+ * @brief Remove a cluster chain.
+ * @param obj   Corresponding object.
+ * @param clst  Cluster to remove a chain from.
+ * @param pclst Previous cluster of clst (0:entire chain).
+ * @return FR_OK(0):succeeded, !=0:error.
+ */
+static FRESULT remove_chain( FFOBJID * obj , uint32_t clst , uint32_t pclst )
 {
-	FRESULT res = FR_OK;
-	uint32_t nxt;
-	FATFS *fs = obj->fs;
+	FATFS   * fs  = obj->fs ;
+	FRESULT   res = FR_OK   ;
+	uint32_t  nxt ;
+
 #if FF_FS_EXFAT || FF_USE_TRIM
-	uint32_t scl = clst, ecl = clst;
+	uint32_t scl = clst ;
+    uint32_t ecl = clst ;
 #endif
+
 #if FF_USE_TRIM
-	uint32_t rt[2];
+	uint32_t rt[ 2 ] ;
 #endif
 
-	if (clst < 2 || clst >= fs->n_fatent) return FR_INT_ERR;	/* Check if in valid range */
+	// Check if in valid range.
+    if( ( clst < 2 ) || ( clst >= fs->n_fatent ) )
+    {
+        return( FR_INT_ERR ) ;
+    }
 
-	/* Mark the previous cluster 'EOC' on the FAT if it exists */
+	// Mark the previous cluster 'EOC' on the FAT if it exists.
 	if( ( pclst != 0 ) && ( !FF_FS_EXFAT || ( fs->fs_type != fsType_EXFAT ) || ( obj->stat != 2 ) ) )
     {
 		res = put_fat( fs , pclst , 0xFFFFFFFF ) ;
@@ -1237,45 +1259,86 @@ FRESULT remove_chain (	/* FR_OK(0):succeeded, !=0:error */
         }
 	}
 
-	/* Remove the chain */
-	do {
-		nxt = get_fat(obj, clst);			/* Get cluster status */
-		if (nxt == 0) break;				/* Empty cluster? */
-		if (nxt == 1) return FR_INT_ERR;	/* Internal error? */
-		if (nxt == 0xFFFFFFFF) return FR_DISK_ERR;	/* Disk error? */
+	// Remove the chain.
+	do
+    {
+        // Get cluster status.
+        nxt = get_fat( obj , clst ) ;
+		
+        // Empty cluster?
+        if( nxt == 0 )
+        {
+            break ;
+        }
+
+        // Internal error?
+		if( nxt == 1 )
+        {
+            return( FR_INT_ERR ) ;
+        }
+
+		// Disk error?
+        if( nxt == 0xFFFFFFFF )
+        {
+            return( FR_DISK_ERR ) ;
+        }
+
 		if( !FF_FS_EXFAT || ( fs->fs_type != fsType_EXFAT ) )
         {
-			res = put_fat(fs, clst, 0);		/* Mark the cluster 'free' on the FAT */
-			if (res != FR_OK) return res;
+			// Mark the cluster 'free' on the FAT.
+            res = put_fat( fs , clst , 0 ) ;
+			if( res != FR_OK )
+            {
+                return( res ) ;
+            }
 		}
 
         // Update FSINFO.
-		if( fs->free_clst < fs->n_fatent - 2 )
+		if( fs->free_clst < ( fs->n_fatent - 2 ) ) 
         {
-			fs->free_clst++;
-			fs->fsi_flag |= 1;
+			fs->free_clst++ ;
+			fs->fsi_flag |= 1 ;
 		}
+
 #if FF_FS_EXFAT || FF_USE_TRIM
-		if (ecl + 1 == nxt) {	/* Is next cluster contiguous? */
-			ecl = nxt;
-		} else {				/* End of contiguous cluster block */
+		// Is next cluster contiguous?
+        if( ( ecl + 1)  == nxt )
+        {
+			ecl = nxt ;
+		}
+        else
+        {
+            // End of contiguous cluster block.
+
 #if FF_FS_EXFAT
 			if( fs->fs_type == fsType_EXFAT )
             {
-				res = change_bitmap(fs, scl, ecl - scl + 1, 0);	/* Mark the cluster block 'free' on the bitmap */
-				if (res != FR_OK) return res;
+				// Mark the cluster block 'free' on the bitmap.
+                res = change_bitmap( fs , scl , ( ecl - scl + 1 ) , 0 ) ;
+				if( res != FR_OK )
+                {
+                    return( res ) ;
+                }
 			}
 #endif
+
 #if FF_USE_TRIM
-			rt[0] = clst2sect(fs, scl);					/* Start of data area freed */
-			rt[1] = clst2sect(fs, ecl) + fs->csize - 1;	/* End of data area freed */
-			disk_ioctl(fs->pdrv, CTRL_TRIM, rt);		/* Inform device the data in the block is no longer needed */
+			// Start of data area freed.
+            rt[ 0 ] = clst2sect( fs , scl ) ;
+            // End of data area freed.
+			rt[ 1 ] = clst2sect( fs , ecl ) + ( fs->csize - 1 ) ;
+            // Inform device the data in the block is no longer needed.
+			disk_ioctl( fs->pdrv , CTRL_TRIM , rt ) ;
 #endif
-			scl = ecl = nxt;
+			scl = ecl = nxt ;
 		}
 #endif
-		clst = nxt;					/* Next cluster */
-	} while (clst < fs->n_fatent);	/* Repeat while not the last link */
+
+		// Next cluster.
+        clst = nxt ;
+	
+        // Repeat while not the last link.
+    } while( clst < fs->n_fatent ) ;
 
 #if FF_FS_EXFAT
 	/* Some post processes for chain status */
@@ -1289,133 +1352,301 @@ FRESULT remove_chain (	/* FR_OK(0):succeeded, !=0:error */
 		}
         else
         {
-			if (obj->stat == 0) {	/* Is it a fragmented chain from the beginning of this session? */
-				clst = obj->sclust;		/* Follow the chain to check if it gets contiguous */
-				while (clst != pclst) {
-					nxt = get_fat(obj, clst);
-					if (nxt < 2) return FR_INT_ERR;
-					if (nxt == 0xFFFFFFFF) return FR_DISK_ERR;
-					if (nxt != clst + 1) break;	/* Not contiguous? */
-					clst++;
+			// Is it a fragmented chain from the beginning of this session?
+            if( obj->stat == 0 )
+            {
+				// Follow the chain to check if it gets contiguous.
+                clst = obj->sclust ;
+				while( clst != pclst )
+                {
+					nxt = get_fat( obj , clst ) ;
+					
+                    if( nxt < 2 )
+                    {
+                        return( FR_INT_ERR ) ;
+                    }
+
+					if( nxt == 0xFFFFFFFF )
+                    {
+                        return( FR_DISK_ERR ) ;
+                    }
+
+					// Not contiguous?
+                    if( nxt != ( clst + 1 ) )
+                    {
+                        break ;
+                    }
+
+					clst++ ;
 				}
-				if (clst == pclst) {	/* Has the chain got contiguous again? */
-					obj->stat = 2;		/* Change the chain status 'contiguous' */
+
+				// Has the chain got contiguous again?
+                if( clst == pclst )
+                {
+                    // Change the chain status 'contiguous'.
+					obj->stat = 2 ;
 				}
-			} else {
-				if (obj->stat == 3 && pclst >= obj->sclust && pclst <= obj->sclust + obj->n_cont) {	/* Was the chain fragmented in this session and got contiguous again? */
-					obj->stat = 2;	/* Change the chain status 'contiguous' */
+			}
+            else
+            {
+                // Was the chain fragmented in this session and got contiguous again?
+				if( ( obj->stat == 3 ) && ( pclst >= obj->sclust ) && ( pclst <= ( obj->sclust + obj->n_cont ) ) )
+                {
+                    // Change the chain status 'contiguous'.
+					obj->stat = 2 ;
 				}
 			}
 		}
 	}
 #endif
-	return FR_OK;
+
+	return( FR_OK ) ;
 }
 
-
-
-
-/*-----------------------------------------------------------------------*/
-/* FAT handling - Stretch a chain or Create a new chain                  */
-/*-----------------------------------------------------------------------*/
-static
-uint32_t create_chain (	/* 0:No free cluster, 1:Internal error, 0xFFFFFFFF:Disk error, >=2:New cluster# */
-	FFOBJID* obj,		/* Corresponding object */
-	uint32_t clst			/* Cluster# to stretch, 0:Create a new chain */
-)
+/**
+ * @brief Stretch a chain or Create a new chain.
+ * @param obj  Corresponding object.
+ * @param clst Cluster# to stretch, 0:Create a new chain.
+ * @return 0:No free cluster, 1:Internal error, 0xFFFFFFFF:Disk error, >=2:New cluster#.
+ */
+static uint32_t create_chain( FFOBJID * obj , uint32_t clst )
 {
-	uint32_t cs, ncl, scl;
-	FRESULT res;
-	FATFS *fs = obj->fs;
+    uint32_t cs , ncl , scl ;
+    FRESULT res ;
 
+    FATFS * fs = obj->fs ;
 
-	if (clst == 0) {	/* Create a new chain */
-		scl = fs->last_clst;				/* Suggested cluster to start to find */
-		if (scl == 0 || scl >= fs->n_fatent) scl = 1;
+	if( clst == 0 )
+    {
+        // Create a new chain.
+        
+        // Suggested cluster to start to find.
+		scl = fs->last_clst ;
+		if( ( scl == 0 ) || ( scl >= fs->n_fatent ) )
+        {
+            scl = 1 ;
+        }
 	}
-	else {				/* Stretch a chain */
-		cs = get_fat(obj, clst);			/* Check the cluster status */
-		if (cs < 2) return 1;				/* Test for insanity */
-		if (cs == 0xFFFFFFFF) return cs;	/* Test for disk error */
-		if (cs < fs->n_fatent) return cs;	/* It is already followed by next cluster */
-		scl = clst;							/* Cluster to start to find */
+	else
+    {
+        // Stretch a chain.
+		
+        // Check the cluster status.
+        cs = get_fat( obj , clst ) ;
+		
+        // Test for insanity.
+        if( cs < 2 )
+        {
+            return( 1 ) ;
+        }
+
+		// Test for disk error.
+        if( cs == 0xFFFFFFFF )
+        {
+            return( cs ) ;
+        }
+
+		// It is already followed by next cluster.
+        if( cs < fs->n_fatent )
+        {
+            return( cs ) ;
+        }
+
+		// Cluster to start to find.
+        scl = clst ;
 	}
-	if (fs->free_clst == 0) return 0;		/* No free cluster */
+
+	// No free cluster.
+    if( fs->free_clst == 0 )
+    {
+        return( 0 ) ;
+    }
 
 #if FF_FS_EXFAT
     // On the exFAT volume.
 	if( fs->fs_type == fsType_EXFAT )
     {
-		ncl = find_bitmap(fs, scl, 1);				/* Find a free cluster */
-		if (ncl == 0 || ncl == 0xFFFFFFFF) return ncl;	/* No free cluster or hard error? */
-		res = change_bitmap(fs, ncl, 1, 1);			/* Mark the cluster 'in use' */
-		if (res == FR_INT_ERR) return 1;
-		if (res == FR_DISK_ERR) return 0xFFFFFFFF;
-		if (clst == 0) {							/* Is it a new chain? */
-			obj->stat = 2;							/* Set status 'contiguous' */
-		} else {									/* It is a stretched chain */
-			if (obj->stat == 2 && ncl != scl + 1) {	/* Is the chain got fragmented? */
-				obj->n_cont = scl - obj->sclust;	/* Set size of the contiguous part */
-				obj->stat = 3;						/* Change status 'just fragmented' */
+		// Find a free cluster.
+        ncl = find_bitmap( fs , scl , 1 ) ;
+        
+        // No free cluster or hard error?
+		if( ( ncl == 0 ) || ( ncl == 0xFFFFFFFF ) )
+        {
+            return( ncl ) ;
+        }
+
+		// Mark the cluster 'in use'.
+        res = change_bitmap( fs , ncl , 1 , 1 ) ;
+
+		if( res == FR_INT_ERR )
+        {
+            return( 1 ) ;
+        }
+
+		if( res == FR_DISK_ERR )
+        {
+            return( 0xFFFFFFFF ) ;
+        }
+
+		// Is it a new chain?
+        if( clst == 0 )
+        {
+			// Set status 'contiguous'.
+            obj->stat = 2 ;
+		}
+        else
+        {
+            // It is a stretched chain */
+            
+            // Is the chain got fragmented?
+			if( ( obj->stat == 2 ) && ( ncl != ( scl + 1 ) ) )
+            {
+				// Set size of the contiguous part.
+                obj->n_cont = ( scl - obj->sclust ) ;
+                // Change status 'just fragmented'.
+				obj->stat = 3 ;
 			}
 		}
-		if (obj->stat != 2) {	/* Is the file non-contiguous? */
-			if (ncl == clst + 1) {	/* Is the cluster next to previous one? */
-				obj->n_frag = obj->n_frag ? obj->n_frag + 1 : 2;	/* Increment size of last framgent */
-			} else {				/* New fragment */
-				if (obj->n_frag == 0) obj->n_frag = 1;
-				res = fill_last_frag(obj, clst, ncl);	/* Fill last fragment on the FAT and link it to new one */
-				if (res == FR_OK) obj->n_frag = 1;
+
+		// Is the file non-contiguous?
+        if( obj->stat != 2 )
+        {
+			// Is the cluster next to previous one?
+            if( ncl == ( clst + 1 ) )
+            {
+                // Increment size of last framgent.
+				obj->n_frag = ( obj->n_frag ) ? ( obj->n_frag + 1 ) : ( 2 ) ;
+			}
+            else
+            {
+                // New fragment.
+				if( obj->n_frag == 0 )
+                {
+                    obj->n_frag = 1 ;
+                }
+
+                // Fill last fragment on the FAT and link it to new one.
+				res = fill_last_frag( obj , clst , ncl ) ;
+				if( res == FR_OK )
+                {
+                    obj->n_frag = 1 ;
+                }
 			}
 		}
-	} else
+	}
+    else
 #endif
-	{	/* On the FAT/FAT32 volume */
-		ncl = 0;
-		if (scl == clst) {						/* Stretching an existing chain? */
-			ncl = scl + 1;						/* Test if next cluster is free */
-			if (ncl >= fs->n_fatent) ncl = 2;
-			cs = get_fat(obj, ncl);				/* Get next cluster status */
-			if (cs == 1 || cs == 0xFFFFFFFF) return cs;	/* Test for error */
-			if (cs != 0) {						/* Not free? */
-				cs = fs->last_clst;				/* Start at suggested cluster if it is valid */
-				if (cs >= 2 && cs < fs->n_fatent) scl = cs;
-				ncl = 0;
+	{
+        // On the FAT/FAT32 volume.
+		ncl = 0 ;
+
+		// Stretching an existing chain?
+        if( scl == clst )
+        {
+			// Test if next cluster is free.
+            ncl = scl + 1 ;
+			if( ncl >= fs->n_fatent )
+            {
+                ncl = 2 ;
+            }
+
+			// Get next cluster status.
+            cs = get_fat( obj , ncl ) ;
+			// Test for error.
+            if( ( cs == 1 ) || ( cs == 0xFFFFFFFF ) )
+            {
+                return( cs ) ;
+            }
+
+			/* Not free? */
+            if (cs != 0)
+            {
+                // Start at suggested cluster if it is valid.
+				cs = fs->last_clst ;
+				if( ( cs >= 2 ) && ( cs < fs->n_fatent ) )
+                {
+                    scl = cs ;
+                }
+
+				ncl = 0 ;
 			}
 		}
-		if (ncl == 0) {	/* The new cluster cannot be contiguous and find another fragment */
-			ncl = scl;	/* Start cluster */
-			for (;;) {
-				ncl++;							/* Next cluster */
-				if (ncl >= fs->n_fatent) {		/* Check wrap-around */
-					ncl = 2;
-					if (ncl > scl) return 0;	/* No free cluster found? */
+
+		// The new cluster cannot be contiguous and find another fragment.
+        if( ncl == 0 )
+        {
+			// Start cluster.
+            ncl = scl ;
+
+			for( ; ; )
+            {
+				// Next cluster.
+                ncl++ ;
+
+				// Check wrap-around.
+                if( ncl >= fs->n_fatent )
+                {
+					ncl = 2 ;
+                    // No free cluster found?
+					if( ncl > scl )
+                    {
+                        return( 0 ) ;
+                    }
 				}
-				cs = get_fat(obj, ncl);			/* Get the cluster status */
-				if (cs == 0) break;				/* Found a free cluster? */
-				if (cs == 1 || cs == 0xFFFFFFFF) return cs;	/* Test for error */
-				if (ncl == scl) return 0;		/* No free cluster found? */
+
+				// Get the cluster status.
+                cs = get_fat( obj , ncl ) ;
+				
+                // Found a free cluster?
+                if( cs == 0 )
+                {
+                    break ;
+                }
+
+				// Test for error.
+                if( ( cs == 1 ) || ( cs == 0xFFFFFFFF ) )
+                {
+                    return( cs ) ;
+                }
+
+				// No free cluster found?
+                if( ncl == scl )
+                {
+                    return( 0 ) ;
+                }
 			}
 		}
-		res = put_fat(fs, ncl, 0xFFFFFFFF);		/* Mark the new cluster 'EOC' */
-		if (res == FR_OK && clst != 0) {
-			res = put_fat(fs, clst, ncl);		/* Link it from the previous one if needed */
+
+		// Mark the new cluster 'EOC'.
+        res = put_fat( fs , ncl , 0xFFFFFFFF ) ;
+		
+        if( ( res == FR_OK ) && ( clst != 0 ) )
+        {
+			// Link it from the previous one if needed.
+            res = put_fat( fs , clst , ncl ) ;
 		}
 	}
 
-	if (res == FR_OK) {			/* Update FSINFO if function succeeded. */
-		fs->last_clst = ncl;
-		if (fs->free_clst <= fs->n_fatent - 2) fs->free_clst--;
-		fs->fsi_flag |= 1;
-	} else {
-		ncl = (res == FR_DISK_ERR) ? 0xFFFFFFFF : 1;	/* Failed. Generate error status */
+	// Update FSINFO if function succeeded.
+    if( res == FR_OK )
+    {
+		fs->last_clst = ncl ;
+		if( fs->free_clst <= ( fs->n_fatent - 2 ) )
+        {
+            fs->free_clst-- ;
+        }
+
+		fs->fsi_flag |= 1 ;
+	}
+    else
+    {
+		// Failed. Generate error status.
+        ncl = ( res == FR_DISK_ERR ) ? ( 0xFFFFFFFF ) : ( 1 ) ;
 	}
 
-	return ncl;		/* Return new cluster number or error status */
+	// Return new cluster number or error status.
+    return( ncl ) ;
 }
-
-
-
 
 /*-----------------------------------------------------------------------*/
 /* FAT handling - Convert offset into cluster with link map table        */
@@ -3216,42 +3447,51 @@ FRESULT find_volume (	/* FR_OK(0): successful, !=0: any error occurred */
 	return FR_OK;
 }
 
-
-
-
-/*-----------------------------------------------------------------------*/
-/* Check if the file/directory object is valid or not                    */
-/*-----------------------------------------------------------------------*/
-
-static
-FRESULT validate (	/* Returns FR_OK or FR_INVALID_OBJECT */
-	FFOBJID* obj,	/* Pointer to the FFOBJID, the 1st member in the FIL/DIR object, to check validity */
-	FATFS** rfs		/* Pointer to pointer to the owner filesystem object to return */
-)
+/**
+ * @brief Check if the file/directory object is valid or not.
+ * @param obj Pointer to the FFOBJID, the 1st member in the FIL/DIR object, to check validity.
+ * @param rfs Pointer to pointer to the owner filesystem object to return.
+ * @return Returns FR_OK or FR_INVALID_OBJECT.
+ */
+static FRESULT validate( FFOBJID * obj , FATFS * * rfs )
 {
-	FRESULT res = FR_INVALID_OBJECT;
+    FRESULT res = FR_INVALID_OBJECT ;
 
-
-	if (obj && obj->fs && obj->fs->fs_type && obj->id == obj->fs->id) {	/* Test if the object is valid */
+    // Test if the object is valid.
+	if( obj && obj->fs && obj->fs->fs_type && ( obj->id == obj->fs->id ) )
+    {
 #if FF_FS_REENTRANT
-		if (lock_fs(obj->fs)) {	/* Obtain the filesystem object */
-			if (!(disk_status(obj->fs->pdrv) & STA_NOINIT)) { /* Test if the phsical drive is kept initialized */
-				res = FR_OK;
-			} else {
-				unlock_fs(obj->fs, FR_OK);
+		// Obtain the filesystem object.
+        if( lock_fs( obj->fs ) )
+        {
+            // Test if the phsical drive is kept initialized.
+			if( !( disk_status( obj->fs->pdrv ) & STA_NOINIT ) )
+            {
+				res = FR_OK ;
 			}
-		} else {
-			res = FR_TIMEOUT;
+            else
+            {
+				unlock_fs( obj->fs , FR_OK ) ;
+			}
+		}
+        else
+        {
+			res = FR_TIMEOUT ;
 		}
 #else
-		if (!(disk_status(obj->fs->pdrv) & STA_NOINIT)) { /* Test if the phsical drive is kept initialized */
-			res = FR_OK;
+        // Test if the phsical drive is kept initialized.
+		if( !( disk_status( obj->fs->pdrv ) & STA_NOINIT ) )
+        {
+			res = FR_OK ;
 		}
 #endif
 	}
-	*rfs = (res == FR_OK) ? obj->fs : 0;	/* Corresponding filesystem object */
-	return res;
+
+	// Corresponding filesystem object.
+    *rfs = ( res == FR_OK ) ? ( obj->fs ) : ( 0 ) ;
+	return( res ) ;
 }
+
 
 
 
@@ -3338,9 +3578,6 @@ FRESULT f_mount( FATFS * fs , const TCHAR * path , uint8_t opt )
     res = find_volume( &path , &fs , 0 ) ;
 	LEAVE_FF( fs , res ) ;
 }
-
-
-
 
 /*-----------------------------------------------------------------------*/
 /* Open or Create a File                                                 */
@@ -3533,15 +3770,33 @@ FRESULT f_read (
 	uint32_t clst, sect;
 	FSIZE_t remain;
 	unsigned int rcnt, cc, csect;
-	uint8_t *rbuff = (uint8_t*)buff;
+	uint8_t * rbuff = ( uint8_t * ) buff ;
 
+    // Clear read byte counter.
+    *br = 0 ;
 
-	*br = 0;	/* Clear read byte counter */
-	res = validate(&fp->obj, &fs);				/* Check validity of the file object */
-	if (res != FR_OK || (res = (FRESULT)fp->err) != FR_OK) LEAVE_FF(fs, res);	/* Check validity */
-	if (!(fp->flag & FA_READ)) LEAVE_FF(fs, FR_DENIED); /* Check access mode */
-	remain = fp->obj.objsize - fp->fptr;
-	if (btr > remain) btr = (unsigned int)remain;		/* Truncate btr by remaining bytes */
+    // Check validity of the file object.
+	res = validate( &fp->obj , &fs ) ;
+
+    // Check validity.
+	if( ( res != FR_OK ) || ( res = ( FRESULT )fp->err ) != FR_OK )
+    {
+        LEAVE_FF( fs , res ) ;
+    }
+
+    // Check access mode.
+	if( !( fp->flag & FA_READ ) )
+    {
+        LEAVE_FF( fs , FR_DENIED ) ;
+    }
+
+	remain = fp->obj.objsize - fp->fptr ;
+
+	// Truncate btr by remaining bytes.
+    if( btr > remain )
+    {
+        btr = ( unsigned int )remain ;
+    }
 
 	for ( ;  btr;								/* Repeat until all data read */
 		btr -= rcnt, *br += rcnt, rbuff += rcnt, fp->fptr += rcnt) {
@@ -3552,26 +3807,52 @@ FRESULT f_read (
 					clst = fp->obj.sclust;		/* Follow cluster chain from the origin */
 				} else {						/* Middle or end of the file */
 
-    				if (fp->cltbl) {
-						clst = clmt_clust(fp, fp->fptr);	/* Get cluster# from the CLMT */
-					} else
+    				if( fp->cltbl )
+                    {
+                        // Get cluster# from the CLMT.
+						clst = clmt_clust( fp , fp->fptr ) ;
+					}
+                    else
 					{
-						clst = get_fat(&fp->obj, fp->clust);	/* Follow cluster chain on the FAT */
+                        // Follow cluster chain on the FAT.
+						clst = get_fat( &fp->obj , fp->clust ) ;
 					}
 				}
-				if (clst < 2) ABORT(fs, FR_INT_ERR);
-				if (clst == 0xFFFFFFFF) ABORT(fs, FR_DISK_ERR);
+
+				if( clst < 2 )
+                {
+                    // Abort.
+                    fp->err = ( uint8_t ) ( FR_INT_ERR ) ;
+                    LEAVE_FF( fs , FR_INT_ERR ) ;
+                }
+
+				if( clst == 0xFFFFFFFF )
+                {
+                    // Abort.
+                    fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                    LEAVE_FF( fs , FR_DISK_ERR ) ;
+                }
 				fp->clust = clst;				/* Update current cluster */
 			}
 			sect = clst2sect(fs, fp->clust);	/* Get current sector */
-			if (sect == 0) ABORT(fs, FR_INT_ERR);
+			if( sect == 0 )
+            {
+                // Abort.
+                fp->err = ( uint8_t ) ( FR_INT_ERR ) ;
+                LEAVE_FF( fs , FR_INT_ERR ) ;
+            }
 			sect += csect;
 			cc = btr / SS(fs);					/* When remaining bytes >= sector size, */
 			if (cc > 0) {						/* Read maximum contiguous sectors directly */
 				if (csect + cc > fs->csize) {	/* Clip at cluster boundary */
 					cc = fs->csize - csect;
 				}
-				if (disk_read(fs->pdrv, rbuff, sect, cc) != RES_OK) ABORT(fs, FR_DISK_ERR);
+				if( disk_read( fs->pdrv , rbuff , sect , cc ) != RES_OK )
+                {
+                    // Abort.
+                    fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                    LEAVE_FF( fs , FR_DISK_ERR ) ;
+                }
 
                 /* Replace one of the read sectors with cached data if it contains a dirty sector */
 				if( ( fp->flag & FA_DIRTY ) && fp->sect - sect < cc )
@@ -3583,12 +3864,28 @@ FRESULT f_read (
 				continue;
 			}
 
-			if (fp->sect != sect) {			/* Load data sector if not in cache */
-				if (fp->flag & FA_DIRTY) {		/* Write-back dirty sector cache */
-					if (disk_write(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);
+			if( fp->sect != sect )
+            {
+                // Load data sector if not in cache.
+				if( fp->flag & FA_DIRTY )
+                {
+                    // Write-back dirty sector cache.
+					if( disk_write( fs->pdrv , fp->buf , fp->sect , 1 ) != RES_OK )
+                    {
+                        // Abort.
+                        fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                        LEAVE_FF( fs , FR_DISK_ERR ) ;
+                    }
 					fp->flag &= (uint8_t)~FA_DIRTY;
 				}
-				if (disk_read(fs->pdrv, fp->buf, sect, 1) != RES_OK)	ABORT(fs, FR_DISK_ERR);	/* Fill sector cache */
+
+                // Fill sector cache.
+				if( disk_read( fs->pdrv , fp->buf , sect , 1 ) != RES_OK )
+                {
+                    // Abort.
+                    fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                    LEAVE_FF( fs , FR_DISK_ERR ) ;
+                }
 			}
 			fp->sect = sect;
 		}
@@ -3627,11 +3924,23 @@ FRESULT f_write (
 	unsigned int wcnt, cc, csect;
 	const uint8_t *wbuff = (const uint8_t*)buff;
 
+	// Clear write byte counter.
+    *bw = 0 ;
+    
+    // Check validity of the file object.
+	res = validate( &fp->obj , &fs ) ;
+	
+    // Check validity.
+    if( ( res != FR_OK ) || ( res = ( FRESULT ) fp->err ) != FR_OK )
+    {
+        LEAVE_FF( fs , res ) ;
+    }
 
-	*bw = 0;	/* Clear write byte counter */
-	res = validate(&fp->obj, &fs);			/* Check validity of the file object */
-	if (res != FR_OK || (res = (FRESULT)fp->err) != FR_OK) LEAVE_FF(fs, res);	/* Check validity */
-	if (!(fp->flag & FA_WRITE)) LEAVE_FF(fs, FR_DENIED);	/* Check access mode */
+	// Check access mode.
+    if( !( fp->flag & FA_WRITE ) )
+    {
+        LEAVE_FF( fs , FR_DENIED ) ;
+    }
 
 	/* Check fptr wrap-around (file size cannot reach 4 GiB at FAT volume) */
 	if ((!FF_FS_EXFAT || ( fs->fs_type != fsType_EXFAT ) ) && (uint32_t)(fp->fptr + btw) < (uint32_t)fp->fptr) {
@@ -3656,26 +3965,65 @@ FRESULT f_write (
 						clst = create_chain(&fp->obj, fp->clust);	/* Follow or stretch cluster chain on the FAT */
 					}
 				}
-				if (clst == 0) break;		/* Could not allocate a new cluster (disk full) */
-				if (clst == 1) ABORT(fs, FR_INT_ERR);
-				if (clst == 0xFFFFFFFF) ABORT(fs, FR_DISK_ERR);
+
+				if( clst == 0 )
+                {
+                    // Could not allocate a new cluster (disk full).
+                    break ;
+                }
+
+				if( clst == 1 )
+                {
+                    // Abort.
+                    fp->err = ( uint8_t ) ( FR_INT_ERR ) ;
+                    LEAVE_FF( fs , FR_INT_ERR ) ;
+                }
+
+				if( clst == 0xFFFFFFFF )
+                {
+                    // Abort.
+                    fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                    LEAVE_FF( fs , FR_DISK_ERR ) ;
+                }
+                
 				fp->clust = clst;			/* Update current cluster */
 				if (fp->obj.sclust == 0) fp->obj.sclust = clst;	/* Set start cluster if the first write */
 			}
-			if (fp->flag & FA_DIRTY) {		/* Write-back sector cache */
-				if (disk_write(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);
+
+			if( fp->flag & FA_DIRTY )
+            {
+                // Write-back sector cache.
+				if( disk_write( fs->pdrv , fp->buf , fp->sect , 1 ) != RES_OK )
+                {
+                    // Abort.
+                    fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                    LEAVE_FF( fs , FR_DISK_ERR ) ;
+                }
+
 				fp->flag &= (uint8_t)~FA_DIRTY;
 			}
 
-			sect = clst2sect(fs, fp->clust);	/* Get current sector */
-			if (sect == 0) ABORT(fs, FR_INT_ERR);
+			// Get current sector.
+            sect = clst2sect( fs , fp->clust ) ;
+			if( sect == 0 )
+            {
+                // Abort.
+                fp->err = ( uint8_t ) ( FR_INT_ERR ) ;
+                LEAVE_FF( fs , FR_INT_ERR ) ;
+            }
+
 			sect += csect;
 			cc = btw / SS(fs);				/* When remaining bytes >= sector size, */
 			if (cc > 0) {					/* Write maximum contiguous sectors directly */
 				if (csect + cc > fs->csize) {	/* Clip at cluster boundary */
 					cc = fs->csize - csect;
 				}
-				if (disk_write(fs->pdrv, wbuff, sect, cc) != RES_OK) ABORT(fs, FR_DISK_ERR);
+				if( disk_write( fs->pdrv , wbuff , sect , cc ) != RES_OK )
+                {
+                    // Abort.
+                    fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                    LEAVE_FF( fs , FR_DISK_ERR ) ;
+                }
 
 				// Refill sector cache if it gets invalidated by the direct write.
                 if( fp->sect - sect < cc )
@@ -3687,12 +4035,17 @@ FRESULT f_write (
 				wcnt = SS(fs) * cc;		/* Number of bytes transferred */
 				continue ;
 			}
-			if (fp->sect != sect && 		/* Fill sector cache with file data */
-				fp->fptr < fp->obj.objsize &&
-				disk_read(fs->pdrv, fp->buf, sect, 1) != RES_OK) {
-					ABORT(fs, FR_DISK_ERR);
+
+			// Fill sector cache with file data.
+            if( ( fp->sect != sect ) && ( fp->fptr < fp->obj.objsize ) &&
+				( disk_read(fs->pdrv, fp->buf, sect, 1) != RES_OK ) )
+            {
+                // Abort.
+                fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                LEAVE_FF( fs , FR_DISK_ERR ) ;
 			}
-			fp->sect = sect;
+
+			fp->sect = sect ;
 		}
 		wcnt = SS(fs) - (unsigned int)fp->fptr % SS(fs);	/* Number of bytes left in the sector */
 
@@ -4007,8 +4360,21 @@ FRESULT f_lseek (
 					do {
 						pcl = cl; ncl++;
 						cl = get_fat(&fp->obj, cl);
-						if (cl <= 1) ABORT(fs, FR_INT_ERR);
-						if (cl == 0xFFFFFFFF) ABORT(fs, FR_DISK_ERR);
+
+						if( cl <= 1 )
+                        {
+                            // Abort.
+                            fp->err = ( uint8_t ) ( FR_INT_ERR ) ;
+                            LEAVE_FF( fs , FR_INT_ERR ) ;
+                        }
+
+						if( cl == 0xFFFFFFFF )
+                        {
+                            // Abort.
+                            fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                            LEAVE_FF( fs , FR_DISK_ERR ) ;
+                        }
+
 					} while (cl == pcl + 1);
 					if (ulen <= tlen) {		/* Store the length and top of the fragment */
 						*tbl++ = ncl; *tbl++ = tcl;
@@ -4027,15 +4393,36 @@ FRESULT f_lseek (
 			if (ofs > 0) {
 				fp->clust = clmt_clust(fp, ofs - 1);
 				dsc = clst2sect(fs, fp->clust);
-				if (dsc == 0) ABORT(fs, FR_INT_ERR);
+
+				if( dsc == 0 )
+                {
+                    // Abort.
+                    fp->err = ( uint8_t ) ( FR_INT_ERR ) ;
+                    LEAVE_FF( fs , FR_INT_ERR ) ;
+                }
+
 				dsc += (uint32_t)((ofs - 1) / SS(fs)) & (fs->csize - 1);
 				if (fp->fptr % SS(fs) && dsc != fp->sect) {	/* Refill sector cache if needed */
-					if (fp->flag & FA_DIRTY) {		/* Write-back dirty sector cache */
-						if (disk_write(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);
+					if( fp->flag & FA_DIRTY )
+                    {
+                        // Write-back dirty sector cache.
+						if( disk_write( fs->pdrv , fp->buf , fp->sect , 1 ) != RES_OK )
+                        {
+                            // Abort.
+                            fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                            LEAVE_FF( fs , FR_DISK_ERR ) ;
+                        }
 						fp->flag &= (uint8_t)~FA_DIRTY;
 					}
-					if (disk_read(fs->pdrv, fp->buf, dsc, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);	/* Load current sector */
-					fp->sect = dsc;
+
+                    // Load current sector.
+					if( disk_read( fs->pdrv , fp->buf , dsc , 1 ) != RES_OK )
+                    {
+                        fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                        LEAVE_FF( fs , FR_DISK_ERR ) ;
+                    }
+
+					fp->sect = dsc ;
 				}
 			}
 		}
@@ -4061,8 +4448,21 @@ FRESULT f_lseek (
 				clst = fp->obj.sclust;					/* start from the first cluster */
 				if (clst == 0) {						/* If no cluster chain, create a new chain */
 					clst = create_chain(&fp->obj, 0);
-					if (clst == 1) ABORT(fs, FR_INT_ERR);
-					if (clst == 0xFFFFFFFF) ABORT(fs, FR_DISK_ERR);
+
+					if( clst == 1 )
+                    {
+                        // Abort.
+                        fp->err = ( uint8_t ) ( FR_INT_ERR ) ;
+                        LEAVE_FF( fs , FR_INT_ERR ) ;
+                    }
+
+					if( clst == 0xFFFFFFFF )
+                    {
+                        // Abort.
+                        fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                        LEAVE_FF( fs , FR_DISK_ERR ) ;
+                    }
+
 					fp->obj.sclust = clst;
 				}
 				fp->clust = clst;
@@ -4084,14 +4484,34 @@ FRESULT f_lseek (
 					{
 						clst = get_fat(&fp->obj, clst);	/* Follow cluster chain if not in write mode */
 					}
-					if (clst == 0xFFFFFFFF) ABORT(fs, FR_DISK_ERR);
-					if (clst <= 1 || clst >= fs->n_fatent) ABORT(fs, FR_INT_ERR);
-					fp->clust = clst;
+
+					if( clst == 0xFFFFFFFF )
+                    {
+                        // Abort.
+                        fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                        LEAVE_FF( fs , FR_DISK_ERR ) ;
+                    }
+
+					if( ( clst <= 1 ) || ( clst >= fs->n_fatent ) )
+                    {
+                        // Abort.
+                        fp->err = ( uint8_t ) ( FR_INT_ERR ) ;
+                        LEAVE_FF( fs , FR_INT_ERR ) ;
+                    }
+
+					fp->clust = clst ;
 				}
 				fp->fptr += ofs;
 				if (ofs % SS(fs)) {
 					nsect = clst2sect(fs, clst);	/* Current sector */
-					if (nsect == 0) ABORT(fs, FR_INT_ERR);
+                    
+					if( nsect == 0 )
+                    {
+                        // Abort.
+                        fp->err = ( uint8_t ) ( FR_INT_ERR ) ;
+                        LEAVE_FF( fs , FR_INT_ERR ) ;
+                    }
+                    
 					nsect += (uint32_t)(ofs / SS(fs));
 				}
 			}
@@ -4101,11 +4521,28 @@ FRESULT f_lseek (
 			fp->flag |= FA_MODIFIED;
 		}
 		if (fp->fptr % SS(fs) && nsect != fp->sect) {	/* Fill sector cache if needed */
-			if (fp->flag & FA_DIRTY) {			/* Write-back dirty sector cache */
-				if (disk_write(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);
+			if (fp->flag & FA_DIRTY)
+            {
+            
+                // Write-back dirty sector cache.
+				if( disk_write( fs->pdrv , fp->buf , fp->sect , 1 ) != RES_OK )
+                {
+                    // Abort.
+                    fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                    LEAVE_FF( fs , FR_DISK_ERR ) ;
+                }
+                
 				fp->flag &= (uint8_t)~FA_DIRTY;
 			}
-			if (disk_read(fs->pdrv, fp->buf, nsect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);	/* Fill sector cache */
+
+			// Fill sector cache.
+            if( disk_read( fs->pdrv , fp->buf , nsect , 1 ) != RES_OK )
+            {
+                // Abort.
+                fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                LEAVE_FF( fs , FR_DISK_ERR ) ;
+            }
+
 			fp->sect = nsect;
 		}
 	}
@@ -4351,27 +4788,57 @@ FRESULT f_getfree (
 	FFOBJID obj;
 
 
-	/* Get logical drive */
-	res = find_volume(&path, &fs, 0);
-	if (res == FR_OK) {
-		*fatfs = fs;				/* Return ptr to the fs object */
-		/* If free_clst is valid, return it without full FAT scan */
-		if (fs->free_clst <= fs->n_fatent - 2) {
-			*nclst = fs->free_clst;
-		} else {
-			/* Scan FAT to obtain number of free clusters */
-			nfree = 0;
-			if (fs->fs_type == fsType_FAT12) {	/* FAT12: Scan bit field FAT entries */
-				clst = 2; obj.fs = fs;
-				do {
-					stat = get_fat(&obj, clst);
-					if (stat == 0xFFFFFFFF) { res = FR_DISK_ERR; break; }
-					if (stat == 1) { res = FR_INT_ERR; break; }
-					if (stat == 0) nfree++;
-				} while (++clst < fs->n_fatent);
-			} else {
+	// Get logical drive.
+	res = find_volume( &path , &fs , 0 ) ;
+	if( res == FR_OK )
+    {
+        // Return ptr to the fs object.
+		*fatfs = fs ;
+        
+		// If free_clst is valid, return it without full FAT scan.
+		if( ( fs->free_clst ) <= ( fs->n_fatent - 2 ) )
+        {
+			*nclst = fs->free_clst ;
+		}
+        else
+        {
+			// Scan FAT to obtain number of free clusters.
+			nfree = 0 ;
+            
+            // FAT12: Scan bit field FAT entries.
+			if( fs->fs_type == fsType_FAT12 )
+            {
+				clst   =  2 ;
+                obj.fs = fs ;
+
+				do
+                {
+					stat = get_fat( &obj , clst ) ;
+					if( stat == 0xFFFFFFFF )
+                    {
+                        res = FR_DISK_ERR ;
+                        break ;
+                    }
+
+					if( stat == 1 )
+                    {
+                        res = FR_INT_ERR ;
+                        break ;
+                    }
+
+					if( stat == 0 )
+                    {
+                        nfree++ ;
+                    }
+
+				} while( ++clst < fs->n_fatent ) ;
+			}
+            else
+            {
 #if FF_FS_EXFAT
-				if (fs->fs_type == fsType_EXFAT) {	/* exFAT: Scan allocation bitmap */
+                // exFAT: Scan allocation bitmap.
+				if( fs->fs_type == fsType_EXFAT )
+                {
 					uint8_t bm;
 					unsigned int b;
 
@@ -4462,7 +4929,13 @@ FRESULT f_truncate (
 				fp->flag &= (uint8_t)~FA_DIRTY;
 			}
 		}
-		if (res != FR_OK) ABORT(fs, res);
+
+		if( res != FR_OK )
+        {
+            // Abort.
+            fp->err = ( uint8_t ) ( res ) ;
+            LEAVE_FF( fs , res ) ;
+        }
 	}
 
 	LEAVE_FF(fs, res);
@@ -4488,18 +4961,29 @@ FRESULT f_unlink (
 #endif
 	DEF_NAMBUF
 
-
-	/* Get logical drive */
-	res = find_volume(&path, &fs, FA_WRITE);
-	if (res == FR_OK) {
-		dj.obj.fs = fs;
-		INIT_NAMBUF(fs);
-		res = follow_path(&dj, path);		/* Follow the file path */
-		if (res == FR_OK && (dj.fn[NSFLAG] & NS_DOT)) {
-			res = FR_INVALID_NAME;			/* Cannot remove dot entry */
+	// Get logical drive.
+	res = find_volume( &path , &fs , FA_WRITE ) ;
+	if( res == FR_OK )
+    {
+        dj.obj.fs = fs ;
+		INIT_NAMBUF( fs ) ;
+        
+        // Follow the file path.
+		res = follow_path( &dj , path ) ;
+		if( ( res == FR_OK ) && ( dj.fn[ NSFLAG ] & NS_DOT ) )
+        {
+            // Cannot remove dot entry.
+			res = FR_INVALID_NAME ;
 		}
+
 #if FF_FS_LOCK != 0
-		if (res == FR_OK) res = chk_lock(&dj, 2);	/* Check if it is an open object */
+
+        // Check if it is an open object.
+		if( res == FR_OK )
+        {
+            res = chk_lock( &dj , 2 ) ;
+        }
+
 #endif
 		if (res == FR_OK) {					/* The object is accessible */
 			if (dj.fn[NSFLAG] & NS_NONAME) {
@@ -5198,27 +5682,68 @@ FRESULT f_forward (
 			if (csect == 0) {						/* On the cluster boundary? */
 				clst = (fp->fptr == 0) ?			/* On the top of the file? */
 					fp->obj.sclust : get_fat(&fp->obj, fp->clust);
-				if (clst <= 1) ABORT(fs, FR_INT_ERR);
-				if (clst == 0xFFFFFFFF) ABORT(fs, FR_DISK_ERR);
-				fp->clust = clst;					/* Update current cluster */
+
+                    if( clst <= 1 )
+                    {
+                        // Abort.
+                        fp->err = ( uint8_t ) ( FR_INT_ERR ) ;
+                        LEAVE_FF( fs , FR_INT_ERR ) ;
+                    }
+
+                    if( clst == 0xFFFFFFFF )
+                    {
+                        // Abort.
+                        fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                        LEAVE_FF( fs , FR_DISK_ERR ) ;
+                    }
+
+                    // Update current cluster.
+                    fp->clust = clst ;
 			}
 		}
-		sect = clst2sect(fs, fp->clust);			/* Get current data sector */
-		if (sect == 0) ABORT(fs, FR_INT_ERR);
+		
+        // Get current data sector.
+        sect = clst2sect( fs , fp->clust ) ;
+		if( sect == 0 )
+        {
+            // Abort.
+            fp->err = ( uint8_t ) ( FR_INT_ERR ) ;
+            LEAVE_FF( fs , FR_INT_ERR ) ;
+        }
+
 		sect += csect;
 		if (fp->sect != sect) {		/* Fill sector cache with file data */
-			if (fp->flag & FA_DIRTY) {		/* Write-back dirty sector cache */
-				if (disk_write(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);
-				fp->flag &= (uint8_t)~FA_DIRTY;
+			if( fp->flag & FA_DIRTY )
+            {
+                // Write-back dirty sector cache.
+				if( disk_write( fs->pdrv , fp->buf , fp->sect , 1 ) != RES_OK )
+                {
+                    // Abort.
+                    fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                    LEAVE_FF( fs , FR_DISK_ERR ) ;
+                }
+
+                fp->flag &= ( uint8_t )~FA_DIRTY ;
 			}
-			if (disk_read(fs->pdrv, fp->buf, sect, 1) != RES_OK) ABORT(fs, FR_DISK_ERR);
+
+			if( disk_read( fs->pdrv , fp->buf , sect , 1 ) != RES_OK )
+            {
+                // Abort.
+                fp->err = ( uint8_t ) ( FR_DISK_ERR ) ;
+                LEAVE_FF( fs , FR_DISK_ERR ) ;
+            }
 		}
 		dbuf = fp->buf;
 		fp->sect = sect;
 		rcnt = SS(fs) - (unsigned int)fp->fptr % SS(fs);	/* Number of bytes left in the sector */
 		if (rcnt > btf) rcnt = btf;					/* Clip it by btr if needed */
 		rcnt = (*func)(dbuf + ((unsigned int)fp->fptr % SS(fs)), rcnt);	/* Forward the file data */
-		if (rcnt == 0) ABORT(fs, FR_INT_ERR);
+		if( rcnt == 0 )
+        {
+            // Abort.
+            fp->err = ( uint8_t ) ( FR_INT_ERR ) ;
+            LEAVE_FF( fs , FR_INT_ERR ) ;
+        }
 	}
 
 	LEAVE_FF(fs, FR_OK);
@@ -5226,17 +5751,16 @@ FRESULT f_forward (
 
 
 
-/*-----------------------------------------------------------------------*/
-/* Create an FAT/exFAT volume                                            */
-/*-----------------------------------------------------------------------*/
-
-FRESULT f_mkfs (
-	const TCHAR* path,	/* Logical drive number */
-	uint8_t opt,			/* Format option */
-	uint32_t au,			/* Size of allocation unit (cluster) [byte] */
-	void* work,			/* Pointer to working buffer */
-	unsigned int len			/* Size of working buffer */
-)
+/**
+ * @brief Create an FAT/exFAT volume.
+ * @param path Logical drive number.
+ * @param opt  Format option.
+ * @param au   Size of allocation unit (cluster) [byte].
+ * @param work Pointer to working buffer.
+ * @param len  Size of working buffer.
+ * @return Returns FR_OK if success.
+ */
+FRESULT f_mkfs( const TCHAR * path , formatOptions_t opt , uint32_t au , void * work , unsigned int len )
 {
 	const unsigned int n_fats = 1;		/* Number of FATs for FAT/FAT32 volume (1 or 2) */
 	const unsigned int n_rootdir = 512;	/* Number of root directory entries for FAT volume */
@@ -5253,7 +5777,6 @@ FRESULT f_mkfs (
 #if FF_USE_TRIM || FF_FS_EXFAT
 	uint32_t tbl[3];
 #endif
-
 
 	/* Check mounted drive and clear work area */
 	vol = get_ldnumber(&path);					/* Get target logical drive */

@@ -91,6 +91,14 @@ typedef enum _FS_TYPE_T_
     fsType_EXFAT
 } fs_type_t ;
 
+// Format options (2nd argument of f_mkfs).
+typedef uint8_t formatOptions_t ;
+#define FM_FAT                                   ( ( formatOptions_t ) 0x01 )
+#define FM_FAT32                                 ( ( formatOptions_t ) 0x02 )
+#define FM_EXFAT                                 ( ( formatOptions_t ) 0x04 )
+#define FM_ANY                                   ( ( formatOptions_t ) 0x07 )
+#define FM_SFD                                   ( ( formatOptions_t ) 0x08 )
+
 // Filesystem object structure (FATFS).
 typedef struct
 {
@@ -205,16 +213,16 @@ typedef struct
 // File function return code (FRESULT).
 typedef enum
 {
-    FR_OK = 0              , // (0) Succeeded.
-    FR_DISK_ERR            , // (1) A hard error occurred in the low level disk I/O layer.
-    FR_INT_ERR             , // (2) Assertion failed.
-    FR_NOT_READY           , // (3) The physical drive cannot work.
-    FR_NO_FILE             , // (4) Could not find the file.
-    FR_NO_PATH             , // (5) Could not find the path.
-    FR_INVALID_NAME        , // (6) The path name format is invalid.
-    FR_DENIED              , // (7) Access denied due to prohibited access or directory full.
-    FR_EXIST               , // (8) Access denied due to prohibited access.
-    FR_INVALID_OBJECT      , // (9) The file/directory object is invalid.
+    FR_OK = 0              , // (00) Succeeded.
+    FR_DISK_ERR            , // (01) A hard error occurred in the low level disk I/O layer.
+    FR_INT_ERR             , // (02) Assertion failed.
+    FR_NOT_READY           , // (03) The physical drive cannot work.
+    FR_NO_FILE             , // (04) Could not find the file.
+    FR_NO_PATH             , // (05) Could not find the path.
+    FR_INVALID_NAME        , // (06) The path name format is invalid.
+    FR_DENIED              , // (07) Access denied due to prohibited access or directory full.
+    FR_EXIST               , // (08) Access denied due to prohibited access.
+    FR_INVALID_OBJECT      , // (09) The file/directory object is invalid.
     FR_WRITE_PROTECTED     , // (10) The physical drive is write protected.
     FR_INVALID_DRIVE       , // (11) The logical drive number is invalid.
     FR_NOT_ENABLED         , // (12) The volume has no work area.
@@ -257,7 +265,7 @@ FRESULT f_setlabel (const TCHAR* label);                            /* Set volum
 FRESULT f_forward (FIL* fp, unsigned int(*func)(const uint8_t*,unsigned int), unsigned int btf, unsigned int* bf);    /* Forward data to the stream */
 FRESULT f_expand (FIL* fp, FSIZE_t szf, uint8_t opt);                    /* Allocate a contiguous block to the file */
 FRESULT f_mount (FATFS* fs, const TCHAR* path, uint8_t opt);            /* Mount/Unmount a logical drive */
-FRESULT f_mkfs (const TCHAR* path, uint8_t opt, uint32_t au, void* work, unsigned int len);    /* Create a FAT volume */
+FRESULT f_mkfs (const TCHAR* path, formatOptions_t opt, uint32_t au, void* work, unsigned int len);    /* Create a FAT volume */
 FRESULT f_fdisk (uint8_t pdrv, const uint32_t* szt, void* work);            /* Divide a physical drive into some partitions */
 FRESULT f_setcp (uint16_t cp);                                            /* Set current code page */
 int f_putc (TCHAR c, FIL* fp);                                        /* Put a character to the file */
@@ -326,13 +334,6 @@ int ff_del_syncobj (FF_SYNC_t sobj);    /* Delete a sync object */
 
 /* Fast seek controls (2nd argument of f_lseek) */
 #define CREATE_LINKMAP    ((FSIZE_t)0 - 1)
-
-/* Format options (2nd argument of f_mkfs) */
-#define FM_FAT        0x01
-#define FM_FAT32    0x02
-#define FM_EXFAT    0x04
-#define FM_ANY        0x07
-#define FM_SFD        0x08
 
 /* File attribute bits for directory entry (FILINFO.fattrib) */
 #define    AM_RDO    0x01    /* Read only */

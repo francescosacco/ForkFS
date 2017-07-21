@@ -1,6 +1,12 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-07-21 - Removed ABORT macro and improve code standard.
+  * Remove ABORT macro.
+  * Remove some TABs.
+  * Move defines to column 50.
+  * Change some functions as if() conditions.
+
 * 2017-07-18 - Change fs_type to enum, improve code standard and add all Code Pages.
   * Change fs_type to enum.
   * Add Doxygen descriptions'.
