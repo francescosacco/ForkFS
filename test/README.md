@@ -1,6 +1,9 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-07-25 - Version 021 - Add test to check wrong file name.
+  * Add test to create a file with wrong name.
+
 * 2017-07-21 - Version 020 - Add Set Codepage function.
   * Add f_setcp().
 

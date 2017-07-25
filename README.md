@@ -1,6 +1,11 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-07-25 - Remove SS definition, change chk_chr and fix solution with FF_MAX_SS different than FF_MIN_SS.
+  * Fix FF_MAX_SS and FF_MIN_SS as always different.
+  * Remove SS() definition.
+  * Remove chk_chr() to use strchr(). Close #27
+
 * 2017-07-21 - Removed ABORT macro and improve code standard.
   * Remove ABORT macro.
   * Remove some TABs.

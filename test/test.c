@@ -4,7 +4,7 @@
 
 #include "ff.h" // ForkFS.
 
-#define VERSION_NUMBER                           ( 20 )
+#define VERSION_NUMBER                           ( 21 )
 #define FRESULT_POSITION                         ( 62 )
 #define BUFFER_SIZE                              ( 1024 )
 
@@ -664,6 +664,17 @@ int main( int argc , char * argv[] )
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
+    }
+
+    ffRet = f_open( &file , "/testdir/fi*e.dat" , FA_WRITE | FA_READ | FA_CREATE_ALWAYS ) ;
+    if( ffRet != FR_OK )
+    {
+        printf( "\tf_open(&file,\"/testdir/fi*e.dat\",FA_WRITE|FA_CREATE_ALWAYS)  OK\n" ) ;
+    }
+    else
+    {
+        printf( "\t\tffRet -> %d\n" , ffRet ) ;
+        return( -1 ) ;
     }
 
     ffRet = f_open( &file , "/testdir/file.dat" , FA_WRITE | FA_READ | FA_CREATE_ALWAYS ) ;

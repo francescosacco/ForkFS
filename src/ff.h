@@ -31,10 +31,11 @@ extern "C" {
 
 typedef uint16_t WCHAR ;
 
-typedef struct {
-    uint8_t pd;    /* Physical drive number */
-    uint8_t pt;    /* Partition: 0:Auto detect, 1-4:Forced partition) */
-} PARTITION;
+typedef struct
+{
+    uint8_t pd ; // Physical drive number.
+    uint8_t pt ; // Partition: 0:Auto detect, 1-4:Forced partition).
+} PARTITION ;
 extern PARTITION VolToPart[];    /* Volume - Partition resolution table */
 
 /* Type of path name strings on FatFs API */
@@ -110,10 +111,7 @@ typedef struct
     uint16_t  id        ; // Volume mount ID.
     uint16_t  n_rootdir ; // Number of root directory entries (FAT12/16).
     uint16_t  csize     ; // Cluster size [sectors];
-
-#if FF_MAX_SS != FF_MIN_SS
-    uint16_t  ssize ; // Sector size (512, 1024, 2048 or 4096).
-#endif
+    uint16_t  ssize     ; // Sector size (512, 1024, 2048 or 4096).
 
 #if FF_USE_LFN
     WCHAR * lfnbuf ; // LFN working buffer.
@@ -331,25 +329,24 @@ int ff_del_syncobj (FF_SYNC_t sobj);    /* Delete a sync object */
 /* Flags and offset address                                     */
 
 
-/* File access mode and open method flags (3rd argument of f_open) */
-#define    FA_READ                0x01
-#define    FA_WRITE            0x02
-#define    FA_OPEN_EXISTING    0x00
-#define    FA_CREATE_NEW        0x04
-#define    FA_CREATE_ALWAYS    0x08
-#define    FA_OPEN_ALWAYS        0x10
-#define    FA_OPEN_APPEND        0x30
+// File access mode and open method flags (3rd argument of f_open).
+#define FA_READ                                  0x01
+#define FA_WRITE                                 0x02
+#define FA_OPEN_EXISTING                         0x00
+#define FA_CREATE_NEW                            0x04
+#define FA_CREATE_ALWAYS                         0x08
+#define FA_OPEN_ALWAYS                           0x10
+#define FA_OPEN_APPEND                           0x30
 
-/* Fast seek controls (2nd argument of f_lseek) */
-#define CREATE_LINKMAP    ((FSIZE_t)0 - 1)
+// Fast seek controls (2nd argument of f_lseek).
+#define CREATE_LINKMAP                           ( ( FSIZE_t ) 0 - 1 )
 
-/* File attribute bits for directory entry (FILINFO.fattrib) */
-#define    AM_RDO    0x01    /* Read only */
-#define    AM_HID    0x02    /* Hidden */
-#define    AM_SYS    0x04    /* System */
-#define AM_DIR    0x10    /* Directory */
-#define AM_ARC    0x20    /* Archive */
-
+// File attribute bits for directory entry (FILINFO.fattrib).
+#define AM_RDO                                   0x01 // Read only.
+#define AM_HID                                   0x02 // Hidden.
+#define AM_SYS                                   0x04 // System.
+#define AM_DIR                                   0x10 // Directory.
+#define AM_ARC                                   0x20 // Archive.
 
 #ifdef __cplusplus
 }
