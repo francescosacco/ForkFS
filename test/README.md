@@ -1,6 +1,12 @@
 # Test Software
 Software to test the ForkFS.
 
+* 2017-07-25 - Version 022 - Add test to check wrong file name.
+  * Change Code Page to Latin 1 (850).
+  * Add test with long file name.
+  * Add test with Code Page.
+  * Add test to create a directory with wrong name.
+
 * 2017-07-25 - Version 021 - Add test to check wrong file name.
   * Add test to create a file with wrong name.
 

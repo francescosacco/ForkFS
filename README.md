@@ -5,6 +5,7 @@ It's a fork from FatFS. The original project is from ELM-Chan.
   * Fix FF_MAX_SS and FF_MIN_SS as always different.
   * Remove SS() definition.
   * Remove chk_chr() to use strchr(). Close #27
+  * Remove MERGE_2STR definition.
 
 * 2017-07-21 - Removed ABORT macro and improve code standard.
   * Remove ABORT macro.

@@ -369,11 +369,7 @@ typedef struct {
 
 
 /* Macros for table definitions */
-#define MERGE_2STR(a, b) a ## b
-#define MKCVTBL(hd, cp) MERGE_2STR(hd, cp)
-
-
-
+#define MKCVTBL(hd,cp)                           ( hd ## cp )
 
 /*--------------------------------------------------------------------------
 
