@@ -4313,111 +4313,154 @@ FRESULT f_write( FIL * fp , const void * buff , unsigned int btw , unsigned int 
 	LEAVE_FF( fs , FR_OK ) ;
 }
 
-/*-----------------------------------------------------------------------*/
-/* Synchronize the File                                                  */
-/*-----------------------------------------------------------------------*/
-
-FRESULT f_sync (
-	FIL* fp		/* Pointer to the file object */
-)
+/**
+ * @brief Synchronize the file.
+ * @param fp Pointer to the file object.
+ * @return FR_OK if success.
+ */
+FRESULT f_sync( FIL * fp )
 {
-	FRESULT res;
-	FATFS *fs;
-	uint32_t tm;
-	uint8_t *dir;
+    FRESULT    res ;
+    FATFS    * fs  ;
+    uint32_t   tm  ;
+    uint8_t  * dir ;
+    DRESULT    diskRes ;
 
+	// Check validity of the file object.
+    res = validate( &fp->obj ,  &fs ) ;
+	if( res == FR_OK )
+    {
+        // Is there any change to the file?
+		if( fp->flag & FA_MODIFIED )
+        {
+			// Write-back cached data if needed.
+            if( fp->flag & FA_DIRTY )
+            {
+                diskRes = disk_write( fs->pdrv , fp->buf , fp->sect , 1 ) ;
+				if( diskRes != RES_OK )
+                {
+                    LEAVE_FF( fs , FR_DISK_ERR ) ;
+                }
 
-	res = validate(&fp->obj, &fs);	/* Check validity of the file object */
-	if (res == FR_OK) {
-		if (fp->flag & FA_MODIFIED) {	/* Is there any change to the file? */
-			if (fp->flag & FA_DIRTY) {	/* Write-back cached data if needed */
-				if (disk_write(fs->pdrv, fp->buf, fp->sect, 1) != RES_OK) LEAVE_FF(fs, FR_DISK_ERR);
-				fp->flag &= (uint8_t)~FA_DIRTY;
+				fp->flag &= ( uint8_t ) ~FA_DIRTY ;
 			}
-			/* Update the directory entry */
-			tm = GET_FATTIME();				/* Modified time */
+
+			// Update the directory entry.
+
+            // Modified time.
+			tm = GET_FATTIME() ;
 #if FF_FS_EXFAT
-			if (fs->fs_type == fsType_EXFAT) {
-				res = fill_first_frag(&fp->obj);	/* Fill first fragment on the FAT if needed */
-				if (res == FR_OK) {
-					res = fill_last_frag(&fp->obj, fp->clust, 0xFFFFFFFF);	/* Fill last fragment on the FAT if needed */
+			if( fs->fs_type == fsType_EXFAT )
+            {
+                // Fill first fragment on the FAT if needed.
+				res = fill_first_frag( &fp->obj ) ;
+				if( res == FR_OK )
+                {
+                    // Fill last fragment on the FAT if needed.
+					res = fill_last_frag( &fp->obj , fp->clust , 0xFFFFFFFF ) ;
 				}
-				if (res == FR_OK) {
-					DIR dj;
+
+				if( res == FR_OK )
+                {
+					DIR dj ;
 					DEF_NAMBUF
 
-					INIT_NAMBUF(fs);
-					res = load_obj_xdir(&dj, &fp->obj);	/* Load directory entry block */
-					if (res == FR_OK) {
-						fs->dirbuf[XDIR_Attr] |= AM_ARC;				/* Set archive attribute to indicate that the file has been changed */
-						fs->dirbuf[XDIR_GenFlags] = fp->obj.stat | 1;	/* Update file allocation information */
-						st_dword(fs->dirbuf + XDIR_FstClus, fp->obj.sclust);
-						st_qword(fs->dirbuf + XDIR_FileSize, fp->obj.objsize);
-						st_qword(fs->dirbuf + XDIR_ValidFileSize, fp->obj.objsize);
-						st_dword(fs->dirbuf + XDIR_ModTime, tm);		/* Update modified time */
-						fs->dirbuf[XDIR_ModTime10] = 0;
-						st_dword(fs->dirbuf + XDIR_AccTime, 0);
-						res = store_xdir(&dj);	/* Restore it to the directory */
-						if (res == FR_OK) {
-							res = sync_fs(fs);
-							fp->flag &= (uint8_t)~FA_MODIFIED;
+					INIT_NAMBUF( fs ) ;
+                    
+                    // Load directory entry block.
+					res = load_obj_xdir( &dj , &fp->obj ) ;
+					if( res == FR_OK )
+                    {
+						// Set archive attribute to indicate that the file has been changed.
+                        fs->dirbuf[ XDIR_Attr ] |= AM_ARC ;
+						// Update file allocation information.
+                        fs->dirbuf[ XDIR_GenFlags ] = fp->obj.stat | 1 ;
+						st_dword( fs->dirbuf + XDIR_FstClus       , fp->obj.sclust  ) ;
+						st_qword( fs->dirbuf + XDIR_FileSize      , fp->obj.objsize ) ;
+						st_qword( fs->dirbuf + XDIR_ValidFileSize , fp->obj.objsize ) ;
+						// Update modified time.
+                        st_dword( fs->dirbuf + XDIR_ModTime       , tm              ) ;
+						fs->dirbuf[ XDIR_ModTime10 ] = 0 ;
+						st_dword( fs->dirbuf + XDIR_AccTime , 0 ) ;
+						// Restore it to the directory.
+                        res = store_xdir( &dj ) ;
+						if( res == FR_OK )
+                        {
+							res = sync_fs( fs ) ;
+							fp->flag &= ( uint8_t ) ~FA_MODIFIED ;
 						}
 					}
-					FREE_NAMBUF();
+					FREE_NAMBUF() ;
 				}
-			} else
+			}
+            else
 #endif
 			{
-				res = move_window(fs, fp->dir_sect);
-				if (res == FR_OK) {
-					dir = fp->dir_ptr;
-					dir[DIR_Attr] |= AM_ARC;						/* Set archive attribute to indicate that the file has been changed */
-					st_clust(fp->obj.fs, dir, fp->obj.sclust);		/* Update file allocation information  */
-					st_dword(dir + DIR_FileSize, (uint32_t)fp->obj.objsize);	/* Update file size */
-					st_dword(dir + DIR_ModTime, tm);				/* Update modified time */
-					st_word(dir + DIR_LstAccDate, 0);
-					fs->wflag = 1;
-					res = sync_fs(fs);					/* Restore it to the directory */
-					fp->flag &= (uint8_t)~FA_MODIFIED;
+				res = move_window( fs , fp->dir_sect ) ;
+				if( res == FR_OK )
+                {
+					dir = fp->dir_ptr ;
+					// Set archive attribute to indicate that the file has been changed.
+                    dir[ DIR_Attr ] |= AM_ARC ;
+                    // Update file allocation information.
+					st_clust( fp->obj.fs , dir , fp->obj.sclust ) ;
+                    // Update file size.
+					st_dword( dir + DIR_FileSize , ( uint32_t ) fp->obj.objsize ) ;
+					// Update modified time.
+                    st_dword( dir + DIR_ModTime    , tm ) ;
+					st_word(  dir + DIR_LstAccDate , 0  ) ;
+					fs->wflag = 1 ;
+					// Restore it to the directory.
+                    res = sync_fs( fs ) ;
+					fp->flag &= ( uint8_t ) ~FA_MODIFIED ;
 				}
 			}
 		}
 	}
 
-	LEAVE_FF(fs, res);
+	LEAVE_FF( fs , res ) ;
 }
 
+/**
+ * @brief Close file.
+ * @param fp Pointer to the file object to be closed.
+ * @return FR_OK if success.
+ */
 
-
-
-/*-----------------------------------------------------------------------*/
-/* Close File                                                            */
-/*-----------------------------------------------------------------------*/
-
-FRESULT f_close (
-	FIL* fp		/* Pointer to the file object to be closed */
-)
+FRESULT f_close( FIL * fp )
 {
-	FRESULT res;
-	FATFS *fs;
+	FRESULT   res ;
+	FATFS   * fs  ;
 
-	res = f_sync(fp);					/* Flush cached data */
-	if (res == FR_OK)
+	// Flush cached data.
+    res = f_sync( fp ) ;
+	if( res == FR_OK )
 	{
-		res = validate(&fp->obj, &fs);	/* Lock volume */
-		if (res == FR_OK) {
+		// Lock volume.
+        res = validate( &fp->obj , &fs ) ;
+		if( res == FR_OK )
+        {
 #if FF_FS_LOCK != 0
-			res = dec_lock(fp->obj.lockid);		/* Decrement file open counter */
-			if (res == FR_OK) fp->obj.fs = 0;	/* Invalidate file object */
+			// Decrement file open counter.
+            res = dec_lock( fp->obj.lockid ) ;
+			// Invalidate file object.
+            if( res == FR_OK )
+            {
+                fp->obj.fs = 0 ;
+            }
 #else
-			fp->obj.fs = 0;	/* Invalidate file object */
+            // Invalidate file object.
+            fp->obj.fs = 0 ;
 #endif
+
 #if FF_FS_REENTRANT
-			unlock_fs(fs, FR_OK);		/* Unlock volume */
+			// Unlock volume.
+            unlock_fs( fs , FR_OK ) ;
 #endif
+
 		}
 	}
-	return res;
+	return( res ) ;
 }
 
 
