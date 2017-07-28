@@ -336,8 +336,8 @@ int main( int argc , char * argv[] )
     }
 
     
-    ffRet = f_open( &file, "file_แ.dat" , FA_WRITE | FA_CREATE_ALWAYS ) ;
-    print_FRESULT( "f_open(&file,\"file_แ.dat\",FA_WRITE|FA_CREATE_ALWAYS)" , ffRet ) ;
+    ffRet = f_open( &file, "file_รก.dat" , FA_WRITE | FA_CREATE_ALWAYS ) ;
+    print_FRESULT( "f_open(&file,\"file_รก.dat\",FA_WRITE|FA_CREATE_ALWAYS)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
@@ -370,7 +370,7 @@ int main( int argc , char * argv[] )
         return( -1 ) ; 
     }
 
-    ffRet = f_open( &file , "/testdir/file_แ.dat" , FA_READ ) ;
+    ffRet = f_open( &file , "/testdir/file_รก.dat" , FA_READ ) ;
     print_FRESULT( "f_open(&file,\"/testdir/file_รก.dat\",FA_READ)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
@@ -429,9 +429,9 @@ int main( int argc , char * argv[] )
         if(  fileInfo.fname[ 0 ] == 0 )
             break ;
         
-        if( strcmp( "file_แ.dat" , fileInfo.fname ) )
+        if( strcmp( "file_รก.dat" , fileInfo.fname ) )
         {
-            printf( "\t\tf_readdir() -> \"%s\" != \"%s\"\n" , fileInfo.fname , "file_แ.dat" ) ;
+            printf( "\t\tf_readdir() -> \"%s\" != \"%s\"\n" , fileInfo.fname , "file_รก.dat" ) ;
             return( -1 ) ;
         }
         
@@ -449,8 +449,8 @@ int main( int argc , char * argv[] )
         return( -1 ) ; 
     }
 
-    ffRet = f_stat( "/testdir/file_แ.dat" , &fileInfo ) ;
-    print_FRESULT( "f_stat(\"/testdir/file_แ.dat\",&fileInfo)" , ffRet ) ;
+    ffRet = f_stat( "/testdir/file_รก.dat" , &fileInfo ) ;
+    print_FRESULT( "f_stat(\"/testdir/file_รก.dat\",&fileInfo)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
@@ -471,8 +471,8 @@ int main( int argc , char * argv[] )
         return( -1 ) ;
     }
 
-    ffRet = f_chmod( "/testdir/file_แ.dat" , AM_RDO | AM_ARC , AM_RDO | AM_ARC ) ;
-    print_FRESULT( "f_chmod(\"/testdir/file_แ.dat\",AM_RDO|AM_ARC,AM_RDO|AM_ARC)" , ffRet ) ;
+    ffRet = f_chmod( "/testdir/file_รก.dat" , AM_RDO | AM_ARC , AM_RDO | AM_ARC ) ;
+    print_FRESULT( "f_chmod(\"/testdir/file_รก.dat\",AM_RDO|AM_ARC,AM_RDO|AM_ARC)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
@@ -481,14 +481,14 @@ int main( int argc , char * argv[] )
     // Set date and time to 2017-05-03 20:02:44
     fileInfo.fdate = ( uint16_t )( ( ( 2017 - 1980 ) * 512U ) | 5 * 32U | 3 ) ;
     fileInfo.ftime = ( uint16_t )( 20 * 2048U | 2 * 32U | 44 / 2U ) ;
-    ffRet = f_utime( "/testdir/file_แ.dat" , &fileInfo ) ;
-    print_FRESULT( "f_utime(\"/testdir/file_แ.dat\",&fileInfo)" , ffRet ) ;
+    ffRet = f_utime( "/testdir/file_รก.dat" , &fileInfo ) ;
+    print_FRESULT( "f_utime(\"/testdir/file_รก.dat\",&fileInfo)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
 
-    ffRet = f_stat( "/testdir/file_แ.dat" , &fileInfo ) ;
+    ffRet = f_stat( "/testdir/file_รก.dat" , &fileInfo ) ;
     print_FRESULT( "f_stat(\"/testdir/file.dat\",&fileInfo)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
@@ -597,9 +597,9 @@ int main( int argc , char * argv[] )
         return( -1 ) ; 
     }
 
-    if( strcmp( "file_แ.dat" , fileInfo.fname ) )
+    if( strcmp( "file_รก.dat" , fileInfo.fname ) )
     {
-        printf( "\t\tf_findfirst() -> \"%s\" != \"%s\"\n" , fileInfo.fname , "file_แ.dat" ) ;
+        printf( "\t\tf_findfirst() -> \"%s\" != \"%s\"\n" , fileInfo.fname , "file_รก.dat" ) ;
         return( -1 ) ;
     }
 
@@ -630,8 +630,8 @@ int main( int argc , char * argv[] )
         return( -1 ) ; 
     }
 
-    ffRet = f_open( &file , "/testdir/file_แ.dat" , FA_READ ) ;
-    print_FRESULT( "f_open(&file,\"/testdir/file_แ.dat\",FA_READ)" , ffRet ) ;
+    ffRet = f_open( &file , "/testdir/file_รก.dat" , FA_READ ) ;
+    print_FRESULT( "f_open(&file,\"/testdir/file_รก.dat\",FA_READ)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
@@ -663,15 +663,15 @@ int main( int argc , char * argv[] )
         return( -1 ) ; 
     }
 
-    ffRet = f_chmod( "/testdir/file_แ.dat" , AM_ARC , AM_RDO | AM_ARC ) ;
-    print_FRESULT( "f_chmod(\"/testdir/file_แ.dat\",AM_ARC,AM_RDO|AM_ARC)" , ffRet ) ;
+    ffRet = f_chmod( "/testdir/file_รก.dat" , AM_ARC , AM_RDO | AM_ARC ) ;
+    print_FRESULT( "f_chmod(\"/testdir/file_รก.dat\",AM_ARC,AM_RDO|AM_ARC)" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
     }
 
-    ffRet = f_unlink( "/testdir/file_แ.dat" ) ;
-    print_FRESULT( "f_unlink(\"/testdir/file_แ.dat\")" , ffRet ) ;
+    ffRet = f_unlink( "/testdir/file_รก.dat" ) ;
+    print_FRESULT( "f_unlink(\"/testdir/file_รก.dat\")" , ffRet ) ;
     if( ffRet != FR_OK )
     {
         return( -1 ) ; 
