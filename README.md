@@ -1,6 +1,10 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-08-04 - Define multiple partition and add Doxygen descriptions.
+  * Remove some FF_VOLUMES to define multiple partition.
+  * Add Doxygen descriptions'.
+
 * 2017-07-28 - Fix defines and add documentation.
   * Move defines to column 50.
   * Add documentation.

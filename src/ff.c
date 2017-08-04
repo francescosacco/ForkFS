@@ -385,15 +385,13 @@ typedef struct
 /* File/Volume controls           */
 /*--------------------------------*/
 
-#if FF_VOLUMES < 1 || FF_VOLUMES > 10
+#if FF_VOLUMES <= 1 || FF_VOLUMES > 10
   #error Wrong FF_VOLUMES setting
 #endif
 static FATFS *FatFs[FF_VOLUMES];	/* Pointer to the filesystem objects (logical drives) */
 static uint16_t Fsid;					/* File system mount ID */
 
-#if FF_VOLUMES >= 2
 static uint8_t CurrVol;				/* Current drive */
-#endif
 
 #if FF_FS_LOCK != 0
 static FILESEM Files[FF_FS_LOCK];	/* Open object lock semaphores */
@@ -3245,11 +3243,7 @@ int get_ldnumber (		/* Returns logical drive number (-1:invalid drive) */
 			}
 #endif
 		} else {	/* No volume id and use default drive */
-#if FF_VOLUMES >= 2
 			vol = CurrVol;	/* Current drive */
-#else
-			vol = 0;		/* Drive 0 */
-#endif
 		}
 	}
 	return vol;
@@ -4470,7 +4464,6 @@ FRESULT f_close( FIL * fp )
 /* Change Current Directory or Current Drive, Get Current Directory      */
 /*-----------------------------------------------------------------------*/
 
-#if FF_VOLUMES >= 2
 FRESULT f_chdrive (
 	const TCHAR* path		/* Drive number */
 )
@@ -4486,7 +4479,6 @@ FRESULT f_chdrive (
 
 	return FR_OK;
 }
-#endif
 
 
 FRESULT f_chdir (
@@ -4539,75 +4531,145 @@ FRESULT f_chdir (
 	LEAVE_FF(fs, res);
 }
 
-
-FRESULT f_getcwd (
-	TCHAR* buff,	/* Pointer to the directory path */
-	unsigned int len		/* Size of path */
-)
+/**
+ * @brief Get current working directory.
+ * @param buff Pointer to the directory path.
+ * @param len Size of path.
+ * @return FR_OK if success.
+ */
+FRESULT f_getcwd( TCHAR * buff , unsigned int len )
 {
-	FRESULT res;
-	DIR dj;
-	FATFS *fs;
-	unsigned int i, n;
-	uint32_t ccl;
-	TCHAR *tp;
-	FILINFO fno;
-	DEF_NAMBUF
+    FRESULT        res   ;
+    DIR            dj    ;
+    FATFS        * fs    ;
+    unsigned int   i , n ;
+    uint32_t       ccl   ;
+    TCHAR        * tp    ;
+    FILINFO        fno   ;
+    DEF_NAMBUF
 
+	*buff = 0 ;
 
-	*buff = 0;
-	/* Get logical drive */
-	res = find_volume((const TCHAR**)&buff, &fs, 0);	/* Get current volume */
-	if (res == FR_OK) {
-		dj.obj.fs = fs;
-		INIT_NAMBUF(fs);
-		i = len;			/* Bottom of buffer (directory stack base) */
-		if (!FF_FS_EXFAT || ( fs->fs_type != fsType_EXFAT ) ) {	/* (Cannot do getcwd on exFAT and returns root path) */
-			dj.obj.sclust = fs->cdir;				/* Start to follow upper directory from current directory */
-			while ((ccl = dj.obj.sclust) != 0) {	/* Repeat while current directory is a sub-directory */
-				res = dir_sdi(&dj, 1 * SZDIRE);	/* Get parent directory */
-				if (res != FR_OK) break;
-				res = move_window(fs, dj.sect);
-				if (res != FR_OK) break;
-				dj.obj.sclust = ld_clust(fs, dj.dir);	/* Goto parent directory */
-				res = dir_sdi(&dj, 0);
-				if (res != FR_OK) break;
-				do {							/* Find the entry links to the child directory */
-					res = dir_read(&dj, 0);
-					if (res != FR_OK) break;
-					if (ccl == ld_clust(fs, dj.dir)) break;	/* Found the entry */
-					res = dir_next(&dj, 0);
-				} while (res == FR_OK);
-				if (res == FR_NO_FILE) res = FR_INT_ERR;/* It cannot be 'not found'. */
-				if (res != FR_OK) break;
-				get_fileinfo(&dj, &fno);		/* Get the directory name and push it to the buffer */
-				for (n = 0; fno.fname[n]; n++) ;
-				if (i < n + 3) {
-					res = FR_NOT_ENOUGH_CORE; break;
+	// Get logical drive.
+	
+    // Get current volume.
+    res = find_volume( ( const TCHAR * * ) &buff , &fs , 0 ) ;
+	if( res == FR_OK )
+    {
+		dj.obj.fs = fs ;
+		INIT_NAMBUF( fs ) ;
+		
+        // Bottom of buffer (directory stack base).
+        i = len ;
+		if( !FF_FS_EXFAT || ( fs->fs_type != fsType_EXFAT ) )
+        {
+            // Cannot do getcwd on exFAT and returns root path.
+            
+            // Start to follow upper directory from current directory.
+			dj.obj.sclust = fs->cdir ;
+			
+            // Repeat while current directory is a sub-directory.
+            while( ( ccl = dj.obj.sclust ) != 0 )
+            {
+				// Get parent directory.
+                res = dir_sdi( &dj , 1 * SZDIRE ) ;
+				if( res != FR_OK )
+                {
+                    break ;
+                }
+
+				res = move_window( fs , dj.sect ) ;
+				if( res != FR_OK )
+                {
+                    break ;
+                }
+
+				// Goto parent directory.
+                dj.obj.sclust = ld_clust( fs , dj.dir ) ;
+				res = dir_sdi( &dj , 0 ) ;
+				if( res != FR_OK )
+                {
+                    break ;
+                }
+
+				// Find the entry links to the child directory.
+                do
+                {
+					res = dir_read( &dj , 0 ) ;
+					if( res != FR_OK )
+                    {
+                        break ;
+                    }
+
+					// Found the entry.
+                    if( ccl == ld_clust( fs , dj.dir ) )
+                    {
+                        break ;
+                    }
+
+					res = dir_next( &dj , 0 ) ;
+				} while( res == FR_OK ) ;
+
+                // It cannot be 'not found'.
+				if( res == FR_NO_FILE )
+                {
+                    res = FR_INT_ERR ;
+                }
+
+				if( res != FR_OK )
+                {
+                    break ;
+                }
+
+				// Get the directory name and push it to the buffer.
+                get_fileinfo( &dj , &fno ) ;
+				for( n = 0 ; fno.fname[ n ] ; n++ )
+                {
+                    // Nop.
+                }
+
+				if( i < n + 3 )
+                {
+					res = FR_NOT_ENOUGH_CORE ;
+                    break;
 				}
-				while (n) buff[--i] = fno.fname[--n];
-				buff[--i] = '/';
+
+				while( n )
+                {
+                    buff[ --i ] = fno.fname[ --n ] ;
+                }
+				buff[ --i ] = '/' ;
 			}
 		}
-		tp = buff;
-		if (res == FR_OK) {
-#if FF_VOLUMES >= 2
-			*tp++ = '0' + CurrVol;			/* Put drive number */
-			*tp++ = ':';
-#endif
-			if (i == len) {					/* Root-directory */
-				*tp++ = '/';
-			} else {						/* Sub-directroy */
-				do		/* Add stacked path str */
-					*tp++ = buff[i++];
-				while (i < len);
+        
+		tp = buff ;
+		if( res == FR_OK )
+        {
+			// Put drive number.
+            *tp++ = '0' + CurrVol ;
+			*tp++ = ':' ;
+
+			if( i == len )
+            {
+                // Root-directory.
+				*tp++ = '/' ;
+			}
+            else
+            {
+                // Sub-directroy.
+				do
+                {
+                    // Add stacked path str.
+					*tp++ = buff[ i++ ] ;
+                } while( i < len ) ;
 			}
 		}
-		*tp = 0;
-		FREE_NAMBUF();
+
+		*tp = 0 ;
+		FREE_NAMBUF() ;
 	}
 
-	LEAVE_FF(fs, res);
+	LEAVE_FF( fs , res ) ;
 }
 
 
