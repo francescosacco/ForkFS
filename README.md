@@ -1,6 +1,15 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-08-08 - Remove some defines and add Doxygen descriptions.
+  * Remove some definitions FF_USE_LFN.
+  * Add Doxygen descriptions'.
+  * Remove defines from DiskIO.
+  * Stack Size:
+    * Text : 590,044 (+736)
+    * Data :   2,028 (+0)
+    * Bss  :   3,860 (+0)
+
 * 2017-08-04 - Define multiple partition and add Doxygen descriptions.
   * Remove some FF_VOLUMES to define multiple partition.
   * Add Doxygen descriptions'.

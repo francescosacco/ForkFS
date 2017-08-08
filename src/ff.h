@@ -112,10 +112,7 @@ typedef struct
     uint16_t  n_rootdir ; // Number of root directory entries (FAT12/16).
     uint16_t  csize     ; // Cluster size [sectors];
     uint16_t  ssize     ; // Sector size (512, 1024, 2048 or 4096).
-
-#if FF_USE_LFN
-    WCHAR * lfnbuf ; // LFN working buffer.
-#endif
+    WCHAR   * lfnbuf    ; // LFN working buffer.
 
 #if FF_FS_EXFAT
     uint8_t * dirbuf ; // Directory entry block scratchpad buffer for exFAT.
@@ -191,10 +188,7 @@ typedef struct
     uint32_t   sect     ; // Current sector (0:Read operation has terminated).
     uint8_t  * dir      ; // Pointer to the directory item in the win[].
     uint8_t    fn[ 12 ] ; // SFN (in/out) {body[8],ext[3],status[1]}.
-
-#if FF_USE_LFN
     uint32_t   blk_ofs  ; // Offset of current entry block being processed (0xFFFFFFFF:Invalid).
-#endif
 
 #if FF_USE_FIND
     const TCHAR * pat   ; // Pointer to the name matching pattern.
@@ -208,12 +202,8 @@ typedef struct
     uint16_t fdate   ; // Modified date.
     uint16_t ftime   ; // Modified time.
     uint8_t  fattrib ; // File attribute.
-#if FF_USE_LFN
     TCHAR    altname[ 13 ]           ; // Altenative file name.
     TCHAR    fname[ FF_MAX_LFN + 1 ] ; // Primary file name.
-#else
-    TCHAR    fname[ 13 ] ; // File name.
-#endif
 } FILINFO ;
 
 // File function return code (FRESULT).
@@ -304,11 +294,10 @@ uint32_t get_fattime (void);
 #endif
 
 /* LFN support functions */
-#if FF_USE_LFN                        /* Code conversion (defined in unicode.c) */
+/* Code conversion (defined in unicode.c) */
 WCHAR ff_oem2uni (WCHAR oem, uint16_t cp);    /* OEM code to Unicode conversion */
 WCHAR ff_uni2oem (WCHAR uni, uint16_t cp);    /* Unicode to OEM code conversion */
 WCHAR ff_wtoupper (WCHAR uni);            /* Unicode upper-case conversion */
-#endif
 #if FF_USE_LFN == 3                        /* Dynamic memory allocation */
 void* ff_memalloc (unsigned int msize);            /* Allocate memory block */
 void ff_memfree (void* mblock);            /* Free memory block */
