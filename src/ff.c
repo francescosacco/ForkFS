@@ -791,8 +791,8 @@ void clear_lock (	/* Clear lock entries of the volume */
  */
 static FRESULT sync_window( FATFS * fs )
 {
-    FRESULT res = FR_OK ;
-    DRESULT diskIoResult ;
+    DRESULT diskIoResult = RES_OK ;
+    FRESULT res          = FR_OK  ;
 
     // Is the disk access window dirty?
     if( fs->wflag )
@@ -810,15 +810,16 @@ static FRESULT sync_window( FATFS * fs )
 				if( fs->n_fats == 2 )
                 {
                     // Reflect it to 2nd FAT if needed.
-                    ( void ) disk_write( fs->pdrv, fs->win , fs->winsect + fs->fsize , 1 ) ;
+                    diskIoResult = disk_write( fs->pdrv, fs->win , fs->winsect + fs->fsize , 1 ) ;
                 }
 			}
 		}
-        else
-        {
-			res = FR_DISK_ERR ;
-		}
 	}
+
+    if( diskIoResult != RES_OK )
+    {
+        res = FR_DISK_ERR ;
+    }
 
     return( res ) ;
 }

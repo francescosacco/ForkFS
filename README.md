@@ -5,8 +5,9 @@ It's a fork from FatFS. The original project is from ELM-Chan.
   * Remove some definitions FF_USE_LFN.
   * Add Doxygen descriptions'.
   * Remove defines from DiskIO.
+  * Add return test to sync_window().
   * Stack Size:
-    * Text : 590,044 (+736)
+    * Text : 590,060 (+752)
     * Data :   2,028 (+0)
     * Bss  :   3,860 (+0)
 
