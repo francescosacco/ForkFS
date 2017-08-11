@@ -1911,107 +1911,212 @@ static FRESULT dir_clear( FATFS * fs , uint32_t clst )
 	return( fRes ) ;
 }
 
-/*-----------------------------------------------------------------------*/
-/* Directory handling - Set directory index                              */
-/*-----------------------------------------------------------------------*/
-
-static
-FRESULT dir_sdi (	/* FR_OK(0):succeeded, !=0:error */
-	DIR* dp,		/* Pointer to directory object */
-	uint32_t ofs		/* Offset of directory table */
-)
+/**
+ * @brief Set directory index.
+ * @param dp  Pointer to directory object.
+ * @param ofs Offset of directory table.
+ * @return FR_OK if success.
+ */
+static FRESULT dir_sdi( DIR * dp , uint32_t ofs )
 {
-	uint32_t csz, clst;
-	FATFS *fs = dp->obj.fs;
+	uint32_t csz , clst ;
+	FATFS *fs = dp->obj.fs ;
 
-
-	if( ofs >= ( uint32_t )((FF_FS_EXFAT && ( fs->fs_type == fsType_EXFAT ) ) ? MAX_DIR_EX : MAX_DIR) || ofs % SZDIRE) {	/* Check range of offset and alignment */
-		return FR_INT_ERR;
+    // Check range of offset and alignment.
+    if( ofs >= ( uint32_t ) ( ( FF_FS_EXFAT && ( fs->fs_type == fsType_EXFAT ) ) ? MAX_DIR_EX : MAX_DIR ) || ofs % SZDIRE )
+    {
+		return( FR_INT_ERR ) ;
 	}
-	dp->dptr = ofs;				/* Set current offset */
-	clst = dp->obj.sclust;		/* Table start cluster (0:root) */
+
+	// Set current offset.
+    dp->dptr = ofs ;
+	// Table start cluster (0:root).
+    clst = dp->obj.sclust ;
+
 	if( ( clst == 0 ) && ( fs->fs_type >= fsType_EXFAT ) )
     {
         // Replace cluster# 0 with root cluster#.
 		clst = fs->dirbase ;
-		if (FF_FS_EXFAT) dp->obj.stat = 0;	/* exFAT: Root dir has an FAT chain */
+		// exFAT: Root dir has an FAT chain.
+        if( FF_FS_EXFAT )
+        {
+            dp->obj.stat = 0 ;
+        }
 	}
 
-	if (clst == 0) {	/* Static table (root-directory on the FAT volume) */
-		if (ofs / SZDIRE >= fs->n_rootdir) return FR_INT_ERR;	/* Is index out of range? */
-		dp->sect = fs->dirbase;
+	// Static table (root-directory on the FAT volume).
+    if( clst == 0 )
+    {
+        // Is index out of range?
+		if( ofs / SZDIRE >= fs->n_rootdir )
+        {
+            return( FR_INT_ERR ) ;
+        }
 
-	} else {			/* Dynamic table (sub-directory or root-directory on the FAT32/exFAT volume) */
-		csz = (uint32_t)fs->csize * fs->ssize;	/* Bytes per cluster */
-		while (ofs >= csz) {				/* Follow cluster chain */
-			clst = get_fat(&dp->obj, clst);				/* Get next cluster */
-			if (clst == 0xFFFFFFFF) return FR_DISK_ERR;	/* Disk error */
-			if (clst < 2 || clst >= fs->n_fatent) return FR_INT_ERR;	/* Reached to end of table or internal error */
-			ofs -= csz;
+		dp->sect = fs->dirbase ;
+	}
+    else
+    {
+        // Dynamic table (sub-directory or root-directory on the FAT32/exFAT volume).
+		
+        // Bytes per cluster.
+        csz = ( uint32_t ) fs->csize * fs->ssize ;
+
+        // Follow cluster chain.
+		while (ofs >= csz)
+        {
+            // Get next cluster.
+			clst = get_fat( &dp->obj , clst ) ;
+			if( clst == 0xFFFFFFFF )
+            {
+                // Disk error.
+                return( FR_DISK_ERR ) ;
+            }
+
+			// Reached to end of table or internal error.
+            if( ( clst < 2 ) || ( clst >= fs->n_fatent ) )
+            {
+                return( FR_INT_ERR ) ;
+            }
+
+			ofs -= csz ;
 		}
-		dp->sect = clst2sect(fs, clst);
-	}
-	dp->clust = clst;					/* Current cluster# */
-	if (dp->sect == 0) return FR_INT_ERR;
-	dp->sect += ofs / fs->ssize;			/* Sector# of the directory entry */
-	dp->dir = fs->win + (ofs % fs->ssize);	/* Pointer to the entry in the win[] */
 
-	return FR_OK;
+		dp->sect = clst2sect( fs , clst ) ;
+	}
+
+	// Current cluster#.
+    dp->clust = clst ;
+	if( dp->sect == 0 )
+    {
+        return( FR_INT_ERR ) ;
+    }
+
+	// Sector# of the directory entry.
+    dp->sect += ofs / fs->ssize ;
+	// Pointer to the entry in the win[].
+    dp->dir = fs->win + ( ofs % fs->ssize ) ;
+
+	return( FR_OK ) ;
 }
 
-
-
-
-/*-----------------------------------------------------------------------*/
-/* Directory handling - Move directory table index next                  */
-/*-----------------------------------------------------------------------*/
-
-static
-FRESULT dir_next (	/* FR_OK(0):succeeded, FR_NO_FILE:End of table, FR_DENIED:Could not stretch */
-	DIR* dp,		/* Pointer to the directory object */
-	int stretch		/* 0: Do not stretch table, 1: Stretch table if needed */
-)
+/**
+ * @brief Move directory table index next.
+ * @param dp Pointer to the directory object.
+ * @param stretch 0: Do not stretch table, 1: Stretch table if needed.
+ * @return FR_OK(0):succeeded, FR_NO_FILE:End of table, FR_DENIED:Could not stretch.
+ */
+static FRESULT dir_next( DIR * dp , int stretch )
 {
-	uint32_t ofs, clst;
-	FATFS *fs = dp->obj.fs;
+	uint32_t ofs , clst ;
+	FATFS * fs = dp->obj.fs ;
+    FRESULT fRes ;
 
+	// Next entry.
+    ofs = dp->dptr + SZDIRE ;
+    // Report EOT when offset has reached max value.
+	if( ( dp->sect == 0 ) || ofs >= ( uint32_t ) ( ( FF_FS_EXFAT && ( fs->fs_type == fsType_EXFAT ) ) ? MAX_DIR_EX : MAX_DIR ) )
+    {
+        return( FR_NO_FILE ) ;
+    }
 
-	ofs = dp->dptr + SZDIRE;	/* Next entry */
-	if( ( dp->sect == 0 ) || ofs >= (uint32_t)((FF_FS_EXFAT && ( fs->fs_type == fsType_EXFAT ) ) ? MAX_DIR_EX : MAX_DIR)) return FR_NO_FILE;	/* Report EOT when offset has reached max value */
+    // Sector changed?
+	if( ofs % fs->ssize == 0 )
+    {
+        // Next sector.
+		dp->sect++ ;
 
-	if (ofs % fs->ssize == 0) {	/* Sector changed? */
-		dp->sect++;				/* Next sector */
-
-		if (dp->clust == 0) {	/* Static table */
-			if (ofs / SZDIRE >= fs->n_rootdir) {	/* Report EOT if it reached end of static table */
-				dp->sect = 0; return FR_NO_FILE;
+        // Static table.
+		if( dp->clust == 0 )
+        {
+            // Report EOT if it reached end of static table.
+			if( ofs / SZDIRE >= fs->n_rootdir )
+            {
+				dp->sect = 0 ;
+                return( FR_NO_FILE ) ;
 			}
 		}
-		else {					/* Dynamic table */
-			if ((ofs / fs->ssize & (fs->csize - 1)) == 0) {	/* Cluster changed? */
-				clst = get_fat(&dp->obj, dp->clust);		/* Get next cluster */
-				if (clst <= 1) return FR_INT_ERR;			/* Internal error */
-				if (clst == 0xFFFFFFFF) return FR_DISK_ERR;	/* Disk error */
-				if (clst >= fs->n_fatent) {					/* It reached end of dynamic table */
-					if (!stretch) {								/* If no stretch, report EOT */
-						dp->sect = 0; return FR_NO_FILE;
+		else
+        {
+            // Dynamic table.
+            
+            // Cluster changed?
+			if( ( ofs / fs->ssize & ( fs->csize - 1 ) ) == 0 )
+            {
+                // Get next cluster.
+				clst = get_fat( &dp->obj , dp->clust ) ;
+                
+                // Internal error.
+				if( clst <= 1 )
+                {
+                    return( FR_INT_ERR ) ;
+                }
+
+                // Disk error.
+				if( clst == 0xFFFFFFFF )
+                {
+                    return( FR_DISK_ERR ) ;
+                }
+
+				// It reached end of dynamic table.
+                if( clst >= fs->n_fatent )
+                {
+                    // If no stretch, report EOT.
+					if( !stretch )
+                    {
+						dp->sect = 0 ;
+                        return( FR_NO_FILE ) ;
 					}
-					clst = create_chain(&dp->obj, dp->clust);	/* Allocate a cluster */
-					if (clst == 0) return FR_DENIED;			/* No free cluster */
-					if (clst == 1) return FR_INT_ERR;			/* Internal error */
-					if (clst == 0xFFFFFFFF) return FR_DISK_ERR;	/* Disk error */
-					if (dir_clear(fs, clst) != FR_OK) return FR_DISK_ERR;	/* Clean up the stretched table */
-					if (FF_FS_EXFAT) dp->obj.stat |= 4;			/* exFAT: The directory has been stretched */
+
+					// Allocate a cluster.
+                    clst = create_chain( &dp->obj , dp->clust ) ;
+					
+                    // No free cluster.
+                    if( clst == 0 )
+                    {
+                        return( FR_DENIED ) ;
+                    }
+
+					// Internal error.
+                    if( clst == 1 )
+                    {
+                        return( FR_INT_ERR ) ;
+                    }
+
+                    // Disk error.
+					if( clst == 0xFFFFFFFF )
+                    {
+                        return( FR_DISK_ERR ) ;
+                    }
+
+					// Clean up the stretched table.
+                    fRes = dir_clear( fs , clst ) ;
+                    if( fRes != FR_OK )
+                    {
+                        return( FR_DISK_ERR ) ;
+                    }
+
+					// exFAT: The directory has been stretched.
+                    if( FF_FS_EXFAT )
+                    {
+                        dp->obj.stat |= 4 ;
+                    }
 				}
-				dp->clust = clst;		/* Initialize data for new cluster */
-				dp->sect = clst2sect(fs, clst);
+				
+                // Initialize data for new cluster.
+                dp->clust = clst ;
+				dp->sect  = clst2sect( fs , clst ) ;
 			}
 		}
 	}
-	dp->dptr = ofs;						/* Current entry */
-	dp->dir = fs->win + ofs % fs->ssize;	/* Pointer to the entry in the win[] */
 
-	return FR_OK;
+	// Current entry.
+    dp->dptr = ofs ;
+
+	// Pointer to the entry in the win[].
+    dp->dir = fs->win + ofs % fs->ssize ;
+
+	return( FR_OK ) ;
 }
 
 
