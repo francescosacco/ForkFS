@@ -2119,45 +2119,74 @@ static FRESULT dir_next( DIR * dp , int stretch )
 	return( FR_OK ) ;
 }
 
-
-
-
-/*-----------------------------------------------------------------------*/
-/* Directory handling - Reserve a block of directory entries             */
-/*-----------------------------------------------------------------------*/
-
-static
-FRESULT dir_alloc (	/* FR_OK(0):succeeded, !=0:error */
-	DIR* dp,		/* Pointer to the directory object */
-	unsigned int nent		/* Number of contiguous entries to allocate */
-)
+/**
+ * @brief Reserve a block of directory entries.
+ * @param dp Pointer to the directory object.
+ * @param nent Number of contiguous entries to allocate.
+ * @return FR_OK if success.
+ */
+static FRESULT dir_alloc( DIR * dp , unsigned int nent )
 {
-	FRESULT res;
-	unsigned int n;
-	FATFS *fs = dp->obj.fs;
+	unsigned int n   ;
+	FRESULT      res ;
+    int dirType ;
+	FATFS * fs = dp->obj.fs ;
 
 
-	res = dir_sdi(dp, 0);
-	if (res == FR_OK) {
+	res = dir_sdi( dp , 0 ) ;
+	if( res == FR_OK )
+    {
 		n = 0;
-		do {
-			res = move_window(fs, dp->sect);
-			if (res != FR_OK) break;
+		do
+        {
+			res = move_window( fs , dp->sect ) ;
+			if( res != FR_OK )
+            {
+                break ;
+            }
+
 #if FF_FS_EXFAT
-			if( ( fs->fs_type == fsType_EXFAT ) ? (int)((dp->dir[XDIR_Type] & 0x80) == 0) : (int)(dp->dir[DIR_Name] == DDEM || dp->dir[DIR_Name] == 0)) {
+            if( fs->fs_type == fsType_EXFAT )
+            {
+                dirType = ( int ) ( ( dp->dir[ XDIR_Type ] & 0x80 ) == 0 ) ;
+            }
+            else
+            {
+                dirType = ( int ) ( ( dp->dir[ DIR_Name ] == DDEM ) || ( dp->dir[ DIR_Name ] == 0 ) ) ;
+            }
+
+			if( dirType )
+            {
 #else
-			if (dp->dir[DIR_Name] == DDEM || dp->dir[DIR_Name] == 0) {
+            dirType = ( dp->dir[ DIR_Name ] == DDEM ) || ( dp->dir[ DIR_Name ] == 0 ) ;
+			if( dirType )
+            {
 #endif
-				if (++n == nent) break;	/* A block of contiguous free entries is found */
-			} else {
-				n = 0;					/* Not a blank entry. Restart to search */
+                n++ ;
+                // A block of contiguous free entries is found.
+				if( n == nent )
+                {
+                    break ;
+                }
 			}
-			res = dir_next(dp, 1);
-		} while (res == FR_OK);	/* Next entry with table stretch enabled */
+            else
+            {
+                // Not a blank entry.
+                // Restart to search.
+				n = 0 ;
+			}
+			res = dir_next( dp , 1 ) ;
+            // Next entry with table stretch enabled.
+        } while( res == FR_OK ) ;
 	}
 
-	if (res == FR_NO_FILE) res = FR_DENIED;	/* No directory entry to allocate */
-	return res;
+	// No directory entry to allocate.
+    if( res == FR_NO_FILE )
+    {
+        res = FR_DENIED ;
+    }
+
+	return( res ) ;
 }
 
 
