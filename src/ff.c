@@ -2196,38 +2196,40 @@ static FRESULT dir_alloc( DIR * dp , unsigned int nent )
 /* FAT: Directory handling - Load/Store start cluster number             */
 /*-----------------------------------------------------------------------*/
 
-static
-uint32_t ld_clust (	/* Returns the top cluster value of the SFN entry */
-	FATFS* fs,		/* Pointer to the fs object */
-	const uint8_t* dir	/* Pointer to the key entry */
-)
+/**
+ * @brief Load start cluster number.
+ * @param fs Pointer to the fs object.
+ * @param dir Pointer to the key entry.
+ * @return Returns the top cluster value of the SFN entry.
+ */
+static uint32_t ld_clust( FATFS * fs , const uint8_t * dir )
 {
-	uint32_t cl;
+	uint32_t cl ;
 
-	cl = ld_word(dir + DIR_FstClusLO);
+	cl = ld_word( dir + DIR_FstClusLO ) ;
 	if( fs->fs_type == fsType_FAT32 )
     {
-		cl |= (uint32_t)ld_word(dir + DIR_FstClusHI) << 16;
+		cl |= ( uint32_t ) ld_word( dir + DIR_FstClusHI ) << 16 ;
 	}
 
-	return cl;
+	return( cl ) ;
 }
 
+/**
+ * @brief Store start cluster number.
+ * @param fs Pointer to the fs object.
+ * @param dir Pointer to the key entry.
+ * @param cl Value to be set.
+ */
 
-static
-void st_clust (
-	FATFS* fs,	/* Pointer to the fs object */
-	uint8_t* dir,	/* Pointer to the key entry */
-	uint32_t cl	/* Value to be set */
-)
+static void st_clust( FATFS * fs , uint8_t * dir , uint32_t cl )
 {
-	st_word(dir + DIR_FstClusLO, (uint16_t)cl);
+	st_word( dir + DIR_FstClusLO , ( uint16_t ) cl ) ;
 	if( fs->fs_type == fsType_FAT32 )
     {
-		st_word(dir + DIR_FstClusHI, (uint16_t)(cl >> 16));
+		st_word( dir + DIR_FstClusHI , ( uint16_t ) ( cl >> 16 ) ) ;
 	}
 }
-
 
 /*--------------------------------------------------------*/
 /* FAT-LFN: Compare a part of file name with an LFN entry */
@@ -3400,8 +3402,11 @@ uint8_t check_fs (	/* 0:FAT, 1:exFAT, 2:Valid BS but not FAT, 3:Not a BS, 4:Disk
 	uint32_t sect	/* Sector# (lba) to load and check if it is an FAT-VBR or not */
 )
 {
+    FRESULT res ;
+    
 	fs->wflag = 0; fs->winsect = 0xFFFFFFFF;		/* Invaidate window */
-	if (move_window(fs, sect) != FR_OK) return 4;	/* Load boot record */
+    res = move_window(fs, sect) ;
+	if (res != FR_OK) return 4;	/* Load boot record */
 
 	if (ld_word(fs->win + BS_55AA) != 0xAA55) return 3;	/* Check boot record signature (always placed here even if the sector size is >512) */
 

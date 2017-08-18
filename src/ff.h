@@ -299,16 +299,16 @@ WCHAR ff_oem2uni (WCHAR oem, uint16_t cp);    /* OEM code to Unicode conversion 
 WCHAR ff_uni2oem (WCHAR uni, uint16_t cp);    /* Unicode to OEM code conversion */
 WCHAR ff_wtoupper (WCHAR uni);            /* Unicode upper-case conversion */
 #if FF_USE_LFN == 3                        /* Dynamic memory allocation */
-void* ff_memalloc (unsigned int msize);            /* Allocate memory block */
-void ff_memfree (void* mblock);            /* Free memory block */
+  void * ff_memalloc( unsigned int msize);            /* Allocate memory block */
+  void   ff_memfree( void* mblock);            /* Free memory block */
 #endif
 
 /* Sync functions */
 #if FF_FS_REENTRANT
-int ff_cre_syncobj (uint8_t vol, FF_SYNC_t* sobj);    /* Create a sync object */
-int ff_req_grant (FF_SYNC_t sobj);        /* Lock sync object */
-void ff_rel_grant (FF_SYNC_t sobj);        /* Unlock sync object */
-int ff_del_syncobj (FF_SYNC_t sobj);    /* Delete a sync object */
+  int ff_cre_syncobj (uint8_t vol, FF_SYNC_t* sobj);    /* Create a sync object */
+  int ff_req_grant (FF_SYNC_t sobj);        /* Lock sync object */
+  void ff_rel_grant (FF_SYNC_t sobj);        /* Unlock sync object */
+  int ff_del_syncobj (FF_SYNC_t sobj);    /* Delete a sync object */
 #endif
 
 
