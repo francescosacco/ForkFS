@@ -2221,7 +2221,6 @@ static uint32_t ld_clust( FATFS * fs , const uint8_t * dir )
  * @param dir Pointer to the key entry.
  * @param cl Value to be set.
  */
-
 static void st_clust( FATFS * fs , uint8_t * dir , uint32_t cl )
 {
 	st_word( dir + DIR_FstClusLO , ( uint16_t ) cl ) ;
@@ -3030,75 +3029,168 @@ void get_fileinfo (		/* No return code */
 }
 
 #if FF_USE_FIND
-/*-----------------------------------------------------------------------*/
-/* Pattern matching                                                      */
-/*-----------------------------------------------------------------------*/
 
-static
-WCHAR get_achar (		/* Get a character and advances ptr 1 or 2 */
-	const TCHAR** ptr	/* Pointer to pointer to the SBCS/DBCS/Unicode string */
-)
+/**
+ * @brief Get a character and advances ptr 1 or 2.
+ * @param ptr Pointer to pointer to the SBCS/DBCS/Unicode string.
+ * @return Return the character.
+ */
+static WCHAR get_achar( const TCHAR** ptr )
 {
-	WCHAR chr;
+	WCHAR chr ;
+    int dbc1 , dbc2 ;
 
 #if FF_LFN_UNICODE && FF_USE_LFN	/* Unicode API */
-	chr = ff_wtoupper(*(*ptr)++);			/* Get a Unicode char and to upper */
+
+	// Get a Unicode char and to upper.
+    chr = ff_wtoupper( *( *ptr )++ ) ;
+
 #else								/* ANSI/OEM API */
-	chr = (uint8_t)*(*ptr)++;					/* Get a byte */
-	if (IsLower(chr)) chr -= 0x20;			/* To upper ASCII char */
+
+	// Get a byte.
+    chr = ( uint8_t ) *( *ptr )++ ;
+
+	// To upper ASCII char */
+    if( IsLower( chr ) )
+    {
+        chr -= 0x20 ;
+    }
+
 #if FF_CODE_PAGE == 0
-	if (ExCvt && chr >= 0x80) chr = ExCvt[chr - 0x80];	/* To upper SBCS extended char */
+
+	if( ExCvt && ( chr >= 0x80 ) )
+    {
+        // To upper SBCS extended char.
+        chr = ExCvt[ chr - 0x80 ] ;
+    }
+
 #elif FF_CODE_PAGE < 900
-	if (chr >= 0x80) chr = ExCvt[chr - 0x80];	/* To upper SBCS extended char */
+
+	if( chr >= 0x80 )
+    {
+        // To upper SBCS extended char.
+        chr = ExCvt[ chr - 0x80 ] ;
+    }
+
 #endif
+
 #if FF_CODE_PAGE == 0 || FF_CODE_PAGE >= 900
-	if (dbc_1st((uint8_t)chr) && dbc_2nd((uint8_t)**ptr)) {	/* Get DBC 2nd byte if needed */
-		chr = chr << 8 | (uint8_t)*(*ptr)++;
+
+    dbc1 = dbc_1st( ( uint8_t ) chr   ) ;
+    dbc2 = dbc_2nd( ( uint8_t ) **ptr ) ;
+	if( dbc1 && dbc2 )
+    {
+        // Get DBC 2nd byte if needed.
+		chr = chr << 8 | ( uint8_t ) *( *ptr )++ ;
 	}
+
 #endif
+
 #endif
-	return chr;
+
+	return( chr ) ;
 }
 
-
-static
-int pattern_matching (	/* 0:not matched, 1:matched */
-	const TCHAR* pat,	/* Matching pattern */
-	const TCHAR* nam,	/* String to be tested */
-	int skip,			/* Number of pre-skip chars (number of ?s) */
-	int inf				/* Infinite search (* specified) */
-)
+/**
+ * @brief Pattern matching.
+ * @param pat Matching pattern.
+ * @param nam String to be tested.
+ * @param skip Number of pre-skip chars (number of ?s).
+ * @param inf Infinite search (* specified).
+ * @return 0:not matched, 1:matched.
+ */
+static int pattern_matching( const TCHAR * pat , const TCHAR * nam , int skip , int inf )
 {
-	const TCHAR *pp, *np;
-	WCHAR pc, nc;
-	int nm, nx;
+	const TCHAR * pp  ;
+    const TCHAR * np  ;
+	WCHAR         pc  ;
+    WCHAR         nc  ;
+    WCHAR         aux ;
+	int           nm  ;
+    int           nx  ;
+    int           ptm ;
 
-
-	while (skip--) {				/* Pre-skip name chars */
-		if (!get_achar(&nam)) return 0;	/* Branch mismatched if less name chars */
+    // Pre-skip name chars.
+	while( skip-- )
+    {
+        // Branch mismatched if less name chars.
+        aux = get_achar( &nam ) ;
+		if( !aux )
+        {
+            return( 0 ) ;
+        }
 	}
-	if (!*pat && inf) return 1;		/* (short circuit) */
 
-	do {
-		pp = pat; np = nam;			/* Top of pattern and name to match */
-		for (;;) {
-			if (*pp == '?' || *pp == '*') {	/* Wildcard? */
-				nm = nx = 0;
-				do {				/* Analyze the wildcard chars */
-					if (*pp++ == '?') nm++; else nx = 1;
-				} while (*pp == '?' || *pp == '*');
-				if (pattern_matching(pp, np, nm, nx)) return 1;	/* Test new branch (recurs upto number of wildcard blocks in the pattern) */
-				nc = *np; break;	/* Branch mismatched */
+	if( !*pat && inf )
+    {
+        // Short circuit.
+        return( 1 ) ;
+    }
+
+	do
+    {
+        // Top of pattern and name to match.
+		pp = pat ;
+        np = nam ;
+
+		for( ; ; )
+        {
+            // Wildcard?
+			if( ( *pp == '?' ) || ( *pp == '*' ) )
+            {
+				nm = nx = 0 ;
+
+				// Analyze the wildcard chars.
+                do
+                {
+					if( *pp++ == '?' )
+                    {
+                        nm++ ;
+                    }
+                    else
+                    {
+                        nx = 1 ;
+                    }
+				} while( ( *pp == '?' ) || ( *pp == '*' ) ) ;
+
+				// Test new branch (recurs upto number of wildcard blocks in the pattern).
+                ptm = pattern_matching( pp , np , nm , nx ) ;
+                if( ptm )
+                {
+                    return( 1 ) ;
+                }
+                
+                // Branch mismatched.
+				nc = *np ;
+                break ;
 			}
-			pc = get_achar(&pp);	/* Get a pattern char */
-			nc = get_achar(&np);	/* Get a name char */
-			if (pc != nc) break;	/* Branch mismatched? */
-			if (pc == 0) return 1;	/* Branch matched? (matched at end of both strings) */
-		}
-		get_achar(&nam);			/* nam++ */
-	} while (inf && nc);			/* Retry until end of name if infinite search is specified */
 
-	return 0;
+            // Get a pattern char.
+			pc = get_achar( &pp ) ;
+            
+            // Get a name char.
+			nc = get_achar( &np ) ;
+            
+            // Branch mismatched?
+			if( pc != nc )
+            {
+                break ;
+            }
+
+			// Branch matched? (matched at end of both strings).
+            if( pc == 0 )
+            {
+                return( 1 ) ;
+            }
+		}
+
+		// nam++.
+        ( void ) get_achar( &nam ) ;
+
+        // Retry until end of name if infinite search is specified.
+    } while( inf && nc ) ;
+
+	return( 0 ) ;
 }
 
 #endif /* FF_USE_FIND */
@@ -3449,7 +3541,10 @@ FRESULT find_volume (	/* FR_OK(0): successful, !=0: any error occurred */
 	/* Get logical drive number */
 	*rfs = 0;
 	vol = get_ldnumber(path);
-	if (vol < 0) return FR_INVALID_DRIVE;
+	if( vol < 0 )
+    {
+        return( FR_INVALID_DRIVE ) ;
+    }
 
 	/* Check if the filesystem object is valid or not */
 	fs = FatFs[vol];					/* Get pointer to the filesystem object */
