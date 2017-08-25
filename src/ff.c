@@ -721,58 +721,100 @@ static int enq_lock( void )
 	return( res ) ;
 }
 
-static
-unsigned int inc_lock (	/* Increment object open counter and returns its index (0:Internal error) */
-	DIR* dp,	/* Directory object pointing the file to register or increment */
-	int acc		/* Desired access (0:Read, 1:Write, 2:Delete/Rename) */
-)
+/**
+ * @brief Increment object open counter.
+ * @param dp Directory object pointing the file to register or increment.
+ * @param acc Desired access (0:Read, 1:Write, 2:Delete/Rename).
+ * @return Returns its index (0:Internal error).
+ */
+static unsigned int inc_lock( DIR * dp , int acc )
 {
-	unsigned int i;
+	unsigned int i ;
 
-
-	for (i = 0; i < FF_FS_LOCK; i++) {	/* Find the object */
-		if (Files[i].fs == dp->obj.fs &&
-			Files[i].clu == dp->obj.sclust &&
-			Files[i].ofs == dp->dptr) break;
+	// Find the object.
+    for( i = 0 ; i < FF_FS_LOCK ; i++ )
+    {
+        if( ( Files[ i ].fs  == dp->obj.fs     ) &&
+            ( Files[ i ].clu == dp->obj.sclust ) &&
+            ( Files[ i ].ofs == dp->dptr       ) )
+            {
+                break ;
+            }
 	}
 
-	if (i == FF_FS_LOCK) {				/* Not opened. Register it as new. */
-		for (i = 0; i < FF_FS_LOCK && Files[i].fs; i++) ;
-		if (i == FF_FS_LOCK) return 0;	/* No free entry to register (int err) */
-		Files[i].fs = dp->obj.fs;
-		Files[i].clu = dp->obj.sclust;
-		Files[i].ofs = dp->dptr;
-		Files[i].ctr = 0;
+	// Not opened. Register it as new.
+    if( i == FF_FS_LOCK )
+    {
+		for( i = 0 ; ( i < FF_FS_LOCK ) && Files[ i ].fs ; i++ )
+        {
+            // Nop.
+        }
+
+		if( i == FF_FS_LOCK )
+        {
+            // No free entry to register (int err)
+            return( 0 ) ;
+        }
+
+		Files[ i ].fs  = dp->obj.fs     ;
+		Files[ i ].clu = dp->obj.sclust ;
+		Files[ i ].ofs = dp->dptr       ;
+		Files[ i ].ctr = 0              ;
 	}
 
-	if (acc && Files[i].ctr) return 0;	/* Access violation (int err) */
+	// Access violation (int err).
+    if( acc && Files[ i ].ctr )
+    {
+        return( 0 ) ;
+    }
 
-	Files[i].ctr = acc ? 0x100 : Files[i].ctr + 1;	/* Set semaphore value */
+	// Set semaphore value.
+    Files[ i ].ctr = ( acc ) ? ( 0x100 ) : ( Files[ i ].ctr + 1 ) ;
 
-	return i + 1;	/* Index number origin from 1 */
+	// Index number origin from 1.
+    return( i + 1 ) ;
 }
 
-
-static
-FRESULT dec_lock (	/* Decrement object open counter */
-	unsigned int i			/* Semaphore index (1..) */
-)
+/**
+ * @brief Decrement object open counter.
+ * @param i Semaphore index.
+ * @return FR_OK if success.
+ */
+static FRESULT dec_lock( unsigned int i )
 {
-	uint16_t n;
-	FRESULT res;
+	FRESULT  res = FR_INT_ERR ;
+	uint16_t n ;
 
+	// Index number origin from 0.
+    i-- ;
+    if( i < FF_FS_LOCK )
+    {
+		n = Files[ i ].ctr ;
 
-	if (--i < FF_FS_LOCK) {	/* Index number origin from 0 */
-		n = Files[i].ctr;
-		if (n == 0x100) n = 0;		/* If write mode open, delete the entry */
-		if (n > 0) n--;				/* Decrement read mode open count */
-		Files[i].ctr = n;
-		if (n == 0) Files[i].fs = 0;	/* Delete the entry if open count gets zero */
-		res = FR_OK;
-	} else {
-		res = FR_INT_ERR;			/* Invalid index nunber */
+        // If write mode open, delete the entry.
+		if( n == 0x100 )
+        {
+            n = 0 ;
+        }
+
+		// Decrement read mode open count.
+        if( n > 0 )
+        {
+            n-- ;
+        }
+
+		Files[ i ].ctr = n ;
+
+		// Delete the entry if open count gets zero.
+        if( n == 0 )
+        {
+            Files[ i ].fs = 0 ;
+        }
+
+		res = FR_OK ;
 	}
-	return res;
+
+	return( res ) ;
 }
 
 
@@ -903,12 +945,6 @@ static FRESULT sync_fs( FATFS * fs )
 
 	return( res ) ;
 }
-
-
-
-/*-----------------------------------------------------------------------*/
-/*                         */
-/*-----------------------------------------------------------------------*/
 
 /**
  * @brief Get physical sector number from cluster number.
