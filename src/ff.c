@@ -704,16 +704,22 @@ static FRESULT chk_lock( DIR * dp , int acc )
 	return( ret ) ;
 }
 
-
-static
-int enq_lock (void)	/* Check if an entry is available for a new object */
+/**
+ * @brief Check if an entry is available for a new object.
+ * @return 1:Ok, 0:Locked.
+ */
+static int enq_lock( void )
 {
-	unsigned int i;
+	unsigned int i , res ;
 
-	for (i = 0; i < FF_FS_LOCK && Files[i].fs; i++) ;
-	return (i == FF_FS_LOCK) ? 0 : 1;
+	for( i = 0 ; ( i < FF_FS_LOCK ) && Files[ i ].fs ; i++ )
+    {
+        // Nop.
+    }
+    
+    res = ( i == FF_FS_LOCK ) ? 0 : 1 ;
+	return( res ) ;
 }
-
 
 static
 unsigned int inc_lock (	/* Increment object open counter and returns its index (0:Internal error) */
