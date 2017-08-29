@@ -456,43 +456,48 @@ static FILESEM Files[FF_FS_LOCK];	/* Open object lock semaphores */
 /*--------------------------------*/
 
 #if FF_CODE_PAGE == 0		/* Run-time code page configuration */
-#define CODEPAGE CodePage
-static uint16_t CodePage;	/* Current code page */
-static const uint8_t *ExCvt, *DbcTbl;	/* Pointer to current SBCS up-case table and DBCS code range table below */
-static const uint8_t Ct437[] = TBL_CT437;
-static const uint8_t Ct720[] = TBL_CT720;
-static const uint8_t Ct737[] = TBL_CT737;
-static const uint8_t Ct771[] = TBL_CT771;
-static const uint8_t Ct775[] = TBL_CT775;
-static const uint8_t Ct850[] = TBL_CT850;
-static const uint8_t Ct852[] = TBL_CT852;
-static const uint8_t Ct855[] = TBL_CT855;
-static const uint8_t Ct857[] = TBL_CT857;
-static const uint8_t Ct860[] = TBL_CT860;
-static const uint8_t Ct861[] = TBL_CT861;
-static const uint8_t Ct862[] = TBL_CT862;
-static const uint8_t Ct863[] = TBL_CT863;
-static const uint8_t Ct864[] = TBL_CT864;
-static const uint8_t Ct865[] = TBL_CT865;
-static const uint8_t Ct866[] = TBL_CT866;
-static const uint8_t Ct869[] = TBL_CT869;
-static const uint8_t Dc932[] = TBL_DC932;
-static const uint8_t Dc936[] = TBL_DC936;
-static const uint8_t Dc949[] = TBL_DC949;
-static const uint8_t Dc950[] = TBL_DC950;
+
+    #define CODEPAGE CodePage
+    
+    // Current code page.
+    static uint16_t CodePage ;
+    
+    // Pointer to current SBCS up-case table and DBCS code range table below.
+    static const uint8_t * ExCvt  ;
+    static const uint8_t * DbcTbl ;
+    static const uint8_t Ct437[] = TBL_CT437 ;
+    static const uint8_t Ct720[] = TBL_CT720 ;
+    static const uint8_t Ct737[] = TBL_CT737 ;
+    static const uint8_t Ct771[] = TBL_CT771 ;
+    static const uint8_t Ct775[] = TBL_CT775 ;
+    static const uint8_t Ct850[] = TBL_CT850 ;
+    static const uint8_t Ct852[] = TBL_CT852 ;
+    static const uint8_t Ct855[] = TBL_CT855 ;
+    static const uint8_t Ct857[] = TBL_CT857 ;
+    static const uint8_t Ct860[] = TBL_CT860 ;
+    static const uint8_t Ct861[] = TBL_CT861 ;
+    static const uint8_t Ct862[] = TBL_CT862 ;
+    static const uint8_t Ct863[] = TBL_CT863 ;
+    static const uint8_t Ct864[] = TBL_CT864 ;
+    static const uint8_t Ct865[] = TBL_CT865 ;
+    static const uint8_t Ct866[] = TBL_CT866 ;
+    static const uint8_t Ct869[] = TBL_CT869 ;
+    static const uint8_t Dc932[] = TBL_DC932 ;
+    static const uint8_t Dc936[] = TBL_DC936 ;
+    static const uint8_t Dc949[] = TBL_DC949 ;
+    static const uint8_t Dc950[] = TBL_DC950 ;
 
 #elif FF_CODE_PAGE < 900	/* Static code page configuration (SBCS) */
-#define CODEPAGE FF_CODE_PAGE
-static const uint8_t ExCvt[] = MKCVTBL(TBL_CT, FF_CODE_PAGE);
+
+    #define CODEPAGE FF_CODE_PAGE
+    static const uint8_t ExCvt[] = MKCVTBL( TBL_CT , FF_CODE_PAGE ) ;
 
 #else					/* Static code page configuration (DBCS) */
-#define CODEPAGE FF_CODE_PAGE
-static const uint8_t DbcTbl[] = MKCVTBL(TBL_DC, FF_CODE_PAGE);
+
+    #define CODEPAGE FF_CODE_PAGE
+    static const uint8_t DbcTbl[] = MKCVTBL( TBL_DC , FF_CODE_PAGE ) ;
 
 #endif
-
-
-
 
 /*--------------------------------------------------------------------------
 
@@ -2272,38 +2277,61 @@ static void st_clust( FATFS * fs , uint8_t * dir , uint32_t cl )
 	}
 }
 
-/*--------------------------------------------------------*/
-/* FAT-LFN: Compare a part of file name with an LFN entry */
-/*--------------------------------------------------------*/
-static
-int cmp_lfn (				/* 1:matched, 0:not matched */
-	const WCHAR* lfnbuf,	/* Pointer to the LFN working buffer to be compared */
-	uint8_t* dir				/* Pointer to the directory entry containing the part of LFN */
-)
+/**
+ * @brief Compare a part of file name with an LFN entry.
+ * @param lfnbuf Pointer to the LFN working buffer to be compared.
+ * @param dir Pointer to the directory entry containing the part of LFN.
+ * @return 1:matched, 0:not matched.
+ */
+static int cmp_lfn( const WCHAR * lfnbuf , uint8_t * dir )
 {
-	unsigned int i, s;
-	WCHAR wc, uc;
+	unsigned int i , s ;
+	WCHAR wc , uc ;
+    uint16_t ldRes ;
 
+	// Check LDIR_FstClusLO.
+    ldRes = ld_word( dir + LDIR_FstClusLO ) ;
+    if( ldRes != 0 )
+    {
+        return( 0 ) ;
+    }
 
-	if (ld_word(dir + LDIR_FstClusLO) != 0) return 0;	/* Check LDIR_FstClusLO */
+	// Offset in the LFN buffer.
+    i = ( ( dir[ LDIR_Ord ] & 0x3F ) - 1 ) * 13 ;
 
-	i = ((dir[LDIR_Ord] & 0x3F) - 1) * 13;	/* Offset in the LFN buffer */
-
-	for (wc = 1, s = 0; s < 13; s++) {		/* Process all characters in the entry */
-		uc = ld_word(dir + LfnOfs[s]);		/* Pick an LFN character */
-		if (wc) {
-			if (i >= FF_MAX_LFN || ff_wtoupper(uc) != ff_wtoupper(lfnbuf[i++])) {	/* Compare it */
-				return 0;					/* Not matched */
+	// Process all characters in the entry.
+    for( wc = 1 , s = 0 ; s < 13 ; s++ )
+    {
+		// Pick an LFN character.
+        uc = ld_word( dir + LfnOfs[ s ] ) ;
+		if( wc )
+        {
+            // Compare it.
+			if( ( i >= FF_MAX_LFN ) || ( ff_wtoupper( uc ) != ff_wtoupper( lfnbuf[ i++ ] ) ) )
+            {
+                // Not matched.
+				return( 0 ) ;
 			}
-			wc = uc;
-		} else {
-			if (uc != 0xFFFF) return 0;		/* Check filler */
+
+			wc = uc ;
+		}
+        else
+        {
+			if( uc != 0xFFFF )
+            {
+                // Check filler.
+                return( 0 ) ;
 		}
 	}
 
-	if ((dir[LDIR_Ord] & LLEF) && wc && lfnbuf[i]) return 0;	/* Last segment matched but different length */
+	// Last segment matched but different length.
+    if( ( dir[ LDIR_Ord ] & LLEF ) && ( wc ) && ( lfnbuf[ i ] ) )
+    {
+        return( 0 ) ;
+    }
 
-	return 1;		/* The part of LFN matched */
+	// The part of LFN matched.
+    return( 1 ) ;
 }
 
 
