@@ -2336,72 +2336,119 @@ static int cmp_lfn( const WCHAR * lfnbuf , uint8_t * dir )
 
 
 #if FF_FS_EXFAT
-/*-----------------------------------------------------*/
-/* FAT-LFN: Pick a part of file name from an LFN entry */
-/*-----------------------------------------------------*/
-static
-int pick_lfn (			/* 1:succeeded, 0:buffer overflow or invalid LFN entry */
-	WCHAR* lfnbuf,		/* Pointer to the LFN working buffer */
-	uint8_t* dir			/* Pointer to the LFN entry */
-)
+
+/**
+ * @brief Pick a part of file name from an LFN entry.
+ * @param lfnbuf Pointer to the LFN working buffer.
+ * @param dir Pointer to the LFN entry.
+ * @return 1:succeeded, 0:buffer overflow or invalid LFN entry.
+ */
+static int pick_lfn( WCHAR * lfnbuf , uint8_t * dir )
 {
-	unsigned int i, s;
-	WCHAR wc, uc;
+	unsigned int i , s ;
+	WCHAR wc , uc ;
+    uint16_t ldRes ;
 
+	// Check LDIR_FstClusLO is 0.
+    ldRes = ld_word( dir + LDIR_FstClusLO ) ;
+    if( ldRes != 0 )
+    {
+        return( 0 ) ;
+    }
 
-	if (ld_word(dir + LDIR_FstClusLO) != 0) return 0;	/* Check LDIR_FstClusLO is 0 */
+	// Offset in the LFN buffer.
+    i = ( ( dir[ LDIR_Ord ] & ~LLEF ) - 1 ) * 13 ;
 
-	i = ((dir[LDIR_Ord] & ~LLEF) - 1) * 13;	/* Offset in the LFN buffer */
+	// Process all characters in the entry.
+    for( wc = 1 , s = 0 ; s < 13 ; s++ )
+    {
+		// Pick an LFN character.
+        uc = ld_word( dir + LfnOfs[ s ] ) ;
+		if( wc )
+        {
+			// Buffer overflow?
+            if( i >= FF_MAX_LFN )
+            {
+                return( 0 ) ;
+            }
 
-	for (wc = 1, s = 0; s < 13; s++) {		/* Process all characters in the entry */
-		uc = ld_word(dir + LfnOfs[s]);		/* Pick an LFN character */
-		if (wc) {
-			if (i >= FF_MAX_LFN) return 0;	/* Buffer overflow? */
-			lfnbuf[i++] = wc = uc;			/* Store it */
-		} else {
-			if (uc != 0xFFFF) return 0;		/* Check filler */
+			// Store it.
+            wc            = uc ;
+            lfnbuf[ i++ ] = uc ;
+		}
+        else
+        {
+			// Check filler.
+            if( uc != 0xFFFF )
+            {
+                return( 0 ) ;
+            }
 		}
 	}
 
-	if (dir[LDIR_Ord] & LLEF) {				/* Put terminator if it is the last LFN part */
-		if (i >= FF_MAX_LFN) return 0;		/* Buffer overflow? */
-		lfnbuf[i] = 0;
+	// Put terminator if it is the last LFN part.
+    if( dir[ LDIR_Ord ] & LLEF )
+    {
+		// Buffer overflow?
+        if( i >= FF_MAX_LFN )
+        {
+            return( 0 ) ;
+        }
+
+		lfnbuf[ i ] = 0 ;
 	}
 
-	return 1;		/* The part of LFN is valid */
+	// The part of LFN is valid.
+    return( 1 ) ;
 }
 #endif
 
-
-/*-----------------------------------------*/
-/* FAT-LFN: Create an entry of LFN entries */
-/*-----------------------------------------*/
-static
-void put_lfn (
-	const WCHAR* lfn,	/* Pointer to the LFN */
-	uint8_t* dir,			/* Pointer to the LFN entry to be created */
-	uint8_t ord,			/* LFN order (1-20) */
-	uint8_t sum			/* Checksum of the corresponding SFN */
-)
+/**
+ * @brief Create an entry of LFN entries.
+ * @param lfn Pointer to the LFN.
+ * @param dir Pointer to the LFN entry to be created.
+ * @param ord LFN order (1-20).
+ * @param sum Checksum of the corresponding SFN.
+ */
+static void put_lfn( const WCHAR * lfn , uint8_t * dir , uint8_t ord , uint8_t sum )
 {
-	unsigned int i, s;
-	WCHAR wc;
+	unsigned int i , s ;
+	WCHAR wc ;
 
+	dir[ LDIR_Chksum ] = sum    ; // Set checksum.
+	dir[ LDIR_Attr   ] = AM_LFN ; // Set attribute. LFN entry.
+	dir[ LDIR_Type   ] = 0      ;
+	st_word( dir + LDIR_FstClusLO , 0 ) ;
 
-	dir[LDIR_Chksum] = sum;			/* Set checksum */
-	dir[LDIR_Attr] = AM_LFN;		/* Set attribute. LFN entry */
-	dir[LDIR_Type] = 0;
-	st_word(dir + LDIR_FstClusLO, 0);
+	// Get offset in the LFN working buffer.
+    i = ( ord - 1 ) * 13 ;
+	s = wc = 0 ;
+	do
+    {
+		// Get an effective character.
+        if( wc != 0xFFFF )
+        {
+            wc = lfn[ i++ ] ;
+        }
 
-	i = (ord - 1) * 13;				/* Get offset in the LFN working buffer */
-	s = wc = 0;
-	do {
-		if (wc != 0xFFFF) wc = lfn[i++];	/* Get an effective character */
-		st_word(dir + LfnOfs[s], wc);		/* Put it */
-		if (wc == 0) wc = 0xFFFF;		/* Padding characters for left locations */
-	} while (++s < 13);
-	if (wc == 0xFFFF || !lfn[i]) ord |= LLEF;	/* Last LFN part is the start of LFN sequence */
-	dir[LDIR_Ord] = ord;			/* Set the LFN order */
+		// Put it.
+        st_word( dir + LfnOfs[ s ] , wc ) ;
+
+        // Padding characters for left locations.
+		if( wc == 0 )
+        {
+            wc = 0xFFFF ;
+        }
+	} while( ++s < 13 ) ;
+    
+	// Last LFN part is the start of LFN sequence.
+    if( ( wc == 0xFFFF ) || ( !lfn[ i ] ) )
+    {
+        ord |= LLEF ;
+    }
+	
+    // Set the LFN order.
+    dir[ LDIR_Ord ] = ord ;
 }
 
 /*-----------------------------------------------------------------------*/
