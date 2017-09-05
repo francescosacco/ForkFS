@@ -2321,6 +2321,7 @@ static int cmp_lfn( const WCHAR * lfnbuf , uint8_t * dir )
             {
                 // Check filler.
                 return( 0 ) ;
+            }
 		}
 	}
 
@@ -2451,59 +2452,80 @@ static void put_lfn( const WCHAR * lfn , uint8_t * dir , uint8_t ord , uint8_t s
     dir[ LDIR_Ord ] = ord ;
 }
 
-/*-----------------------------------------------------------------------*/
-/* FAT-LFN: Create a Numbered SFN                                        */
-/*-----------------------------------------------------------------------*/
-
-static
-void gen_numname (
-	uint8_t* dst,			/* Pointer to the buffer to store numbered SFN */
-	const uint8_t* src,	/* Pointer to SFN */
-	const WCHAR* lfn,	/* Pointer to LFN */
-	unsigned int seq			/* Sequence number */
-)
+/**
+ * @brief Create a Numbered SFN.
+ * @param dst Pointer to the buffer to store numbered SFN.
+ * @param src Pointer to SFN.
+ * @param lfn Pointer to LFN.
+ * @param seq Sequence number.
+ */
+static void gen_numname( uint8_t * dst , const uint8_t * src , const WCHAR * lfn , unsigned int seq )
 {
-	uint8_t ns[8], c;
-	unsigned int i, j;
-	WCHAR wc;
-	uint32_t sr;
-
+	uint8_t ns[ 8 ] , c ;
+	unsigned int i , j , lstRes ;
+	WCHAR wc ;
+	uint32_t sr ;
 
     ( void ) memcpy( ( void * ) dst , ( const void * ) src , 11 ) ;
 
-	if (seq > 5) {	/* In case of many collisions, generate a hash number instead of sequential number */
-		sr = seq;
-		while (*lfn) {	/* Create a CRC */
-			wc = *lfn++;
-			for (i = 0; i < 16; i++) {
-				sr = (sr << 1) + (wc & 1);
-				wc >>= 1;
-				if (sr & 0x10000) sr ^= 0x11021;
+	// In case of many collisions, generate a hash number instead of sequential number.
+    if( seq > 5 )
+    {
+		sr = seq ;
+
+        // Create a CRC.
+		while( *lfn )
+        {
+			wc = *lfn++ ;
+			for( i = 0 ; i < 16 ; i++ )
+            {
+				sr = ( sr << 1 ) + ( wc & 1 ) ;
+				wc >>= 1 ;
+				if( sr & 0x10000 )
+                {
+                    sr ^= 0x11021 ;
+                }
 			}
 		}
-		seq = (unsigned int)sr;
+
+		seq = ( unsigned int ) sr ;
 	}
 
-	/* itoa (hexdecimal) */
-	i = 7;
-	do {
-		c = (uint8_t)((seq % 16) + '0');
-		if (c > '9') c += 7;
-		ns[i--] = c;
-		seq /= 16;
-	} while (seq);
-	ns[i] = '~';
+	// itoa (hexdecimal).
+	i = 7 ;
+	do
+    {
+		c = ( uint8_t ) ( ( seq % 16 ) + '0' ) ;
+		if( c > '9' )
+        {
+            c += 7 ;
+        }
 
-	/* Append the number to the SFN body */
-	for (j = 0; j < i && dst[j] != ' '; j++) {
-		if (dbc_1st(dst[j])) {
-			if (j == i - 1) break;
-			j++;
+		ns[ i-- ] = c ;
+		seq /= 16 ;
+
+    } while( seq ) ;
+	
+    ns[ i ] = '~' ;
+
+	// Append the number to the SFN body.
+	for( j = 0 ; ( j < i ) && ( dst[ j ] != ' ' ) ; j++ )
+    {
+        lstRes = dbc_1st( dst[ j ] ) ;
+		if( lstRes )
+        {
+			if( j == ( i - 1 ) )
+            {
+                break ;
+            }
+			j++ ;
 		}
 	}
-	do {
-		dst[j++] = (i < 8) ? ns[i++] : ' ';
-	} while (j < 8);
+
+	do
+    {
+		dst[ j++ ] = ( i < 8 ) ? ns[ i++ ] : ' ' ;
+	} while( j < 8 ) ;
 }
 
 /*-----------------------------------------------------------------------*/
