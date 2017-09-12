@@ -1,6 +1,9 @@
 # ForkFS
 It's a fork from FatFS. The original project is from ELM-Chan.
 
+* 2017-09-12 - Add Doxygen descriptions.
+  * Add Doxygen descriptions'.
+
 * 2017-09-05 - Add Doxygen descriptions.
   * Add Doxygen descriptions'.
   * Change some functions as if() conditions.

@@ -2528,51 +2528,52 @@ static void gen_numname( uint8_t * dst , const uint8_t * src , const WCHAR * lfn
 	} while( j < 8 ) ;
 }
 
-/*-----------------------------------------------------------------------*/
-/* FAT-LFN: Calculate checksum of an SFN entry                           */
-/*-----------------------------------------------------------------------*/
-
-static
-uint8_t sum_sfn (
-	const uint8_t* dir		/* Pointer to the SFN entry */
-)
+/**
+ * @brief Calculate checksum of an SFN entry.
+ * @param dir Pointer to the SFN entry.
+ * @return Return the checksum.
+ */
+static uint8_t sum_sfn( const uint8_t * dir )
 {
-	uint8_t sum = 0;
-	unsigned int n = 11;
+    uint8_t sum =  0 ;
+    uint8_t n   = 11 ;
 
-	do {
-		sum = (sum >> 1) + (sum << 7) + *dir++;
-	} while (--n);
-	return sum;
+    do
+    {
+        sum = ( sum >> 1 ) + ( sum << 7 ) + *dir++ ;
+    } while( --n ) ;
+
+    return( sum ) ;
 }
 
 
 #if FF_FS_EXFAT
-/*-----------------------------------------------------------------------*/
-/* exFAT: Checksum                                                       */
-/*-----------------------------------------------------------------------*/
-
-static
-uint16_t xdir_sum (			/* Get checksum of the directoly entry block */
-	const uint8_t* dir		/* Directory entry block to be calculated */
-)
+/**
+ * @brief Get checksum of the directoly entry block.
+ * @param dir Directory entry block to be calculated.
+ * @return Return the checksum.
+ */
+static uint16_t xdir_sum( const uint8_t * dir )
 {
-	unsigned int i, szblk;
-	uint16_t sum;
+    unsigned int i , szblk ;
+    uint16_t     sum ;
 
+    szblk = ( dir[ XDIR_NumSec ] + 1 ) * SZDIRE ;
+    for( i = sum = 0 ; i < szblk ; i++ )
+    {
+        if( i == XDIR_SetSum )
+        {
+            // Skip sum field.
+            i++ ;
+        }
+        else
+        {
+            sum = ( ( sum & 1 ) ? ( 0x8000 ) : ( 0x0000 ) ) + ( sum >> 1 ) + dir[ i ] ;
+        }
+    }
 
-	szblk = (dir[XDIR_NumSec] + 1) * SZDIRE;
-	for (i = sum = 0; i < szblk; i++) {
-		if (i == XDIR_SetSum) {	/* Skip sum field */
-			i++;
-		} else {
-			sum = ((sum & 1) ? 0x8000 : 0) + (sum >> 1) + dir[i];
-		}
-	}
-	return sum;
+    return( sum ) ;
 }
-
-
 
 static
 uint16_t xname_sum (		/* Get check sum (to be used as hash) of the name */
